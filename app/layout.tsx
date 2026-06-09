@@ -27,7 +27,12 @@ export default function RootLayout({
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#00FF66" />
       </head>
-      <body className={`${inter.variable} font-inter selection:bg-zinc-800 selection:text-white flex flex-col min-h-screen bg-black`}>
+      <body className={`${inter.variable} font-inter selection:bg-zinc-800 selection:text-white flex flex-col min-h-screen bg-transparent`}>
+        <div className="fixed inset-0 z-[-1] bg-[#000000] overflow-hidden">
+          <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-emerald-500/10 blur-[120px] rounded-full animate-[pulse_8s_ease-in-out_infinite]" />
+          <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-cyan-500/10 blur-[120px] rounded-full animate-[pulse_10s_ease-in-out_infinite_reverse]" />
+          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay"></div>
+        </div>
         <Navbar />
         <main className="flex-grow">{children}</main>
         <Footer />

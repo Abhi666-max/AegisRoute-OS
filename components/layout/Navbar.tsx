@@ -9,25 +9,14 @@ import { auth } from '@/lib/firebase/config';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { DemoModal } from '@/components/ui/DemoModal';
 
 export function Navbar() {
   const { user, userData, initializeAuth, setAuthModalOpen } = useAuthStore();
   const router = useRouter();
+  const [isDemoOpen, setIsDemoOpen] = useState(false);
 
-  const handleFounderLogin = async () => {
-    try {
-      const passcode = window.prompt('ENTER FOUNDER OVERRIDE KEY:');
-      if (passcode === 'Admin@AegisRoute2026') {
-        await signInWithEmailAndPassword(auth, 'abhi.admin.dev@gmail.com', passcode);
-        toast.success('God Mode Unlocked');
-        router.push('/admin');
-      } else {
-        toast.error('Clearance Denied');
-      }
-    } catch (error) {
-      toast.error("Founder bypass failed.");
-    }
-  };
+
 
   const getDashboardRoute = () => {
     if (user?.email === 'abhi.admin.dev@gmail.com') return '/admin';
@@ -71,9 +60,9 @@ export function Navbar() {
           ) : (
             <div className="flex items-center gap-4">
               <button onClick={() => setAuthModalOpen(true)} className="hover:text-white transition-colors">Login</button>
-              <button onClick={handleFounderLogin} className="flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 hover:border-red-500/50 transition-all text-xs font-semibold text-zinc-400 hover:text-white">
+              <Link href="/godmode" className="flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 hover:border-red-500/50 transition-all text-xs font-semibold text-zinc-400 hover:text-white">
                 <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"/> Founder
-              </button>
+              </Link>
             </div>
           )}
         </div>
@@ -100,7 +89,7 @@ export function Navbar() {
             </Link>
           ) : (
             <button 
-              onClick={() => toast.success("Demo request queued. Our Enterprise Sales team will contact you.", { style: { background: '#000000', color: '#ffffff', border: '1px solid #333333' } })}
+              onClick={() => setIsDemoOpen(true)}
               className="px-4 py-1.5 text-sm font-medium border border-zinc-700 rounded-md bg-zinc-900 text-zinc-300 hover:bg-white hover:text-black transition-all"
             >
               Request Enterprise Demo
@@ -108,6 +97,7 @@ export function Navbar() {
           )}
         </div>
       </div>
+      <DemoModal isOpen={isDemoOpen} onClose={() => setIsDemoOpen(false)} />
     </motion.nav>
   );
 }

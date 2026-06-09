@@ -13,9 +13,7 @@ export default function LandingPage() {
   return (
     <div className="relative w-full overflow-hidden" ref={containerRef}>
       
-      {/* Abstract Background Grid */}
-      <div className="absolute inset-0 z-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-emerald-500/10 blur-[120px] rounded-full pointer-events-none z-0"></div>
+
 
       {/* Hero Section */}
       <section className="relative z-10 pt-32 pb-20 px-6 max-w-7xl mx-auto flex flex-col items-center text-center min-h-[90vh] justify-center">
@@ -73,19 +71,19 @@ export default function LandingPage() {
       <section className="relative z-10 border-y border-white/10 bg-black/50 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-6 py-10 grid grid-cols-2 md:grid-cols-4 gap-8 divide-x divide-white/10">
           <div className="flex flex-col items-center justify-center text-center px-4">
-            <h3 className="text-5xl font-bold tracking-tighter bg-gradient-to-r from-white via-zinc-400 to-white bg-[length:200%_auto] animate-[gradient_3s_linear_infinite] bg-clip-text text-transparent mb-2">0ms</h3>
+            <h3 className="text-5xl md:text-6xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-zinc-100 via-emerald-400 to-zinc-100 bg-[length:200%_auto] animate-[gradient_2s_linear_infinite] mb-2">0ms</h3>
             <span className="text-sm text-gray-400 font-medium tracking-wide uppercase">Edge API Latency</span>
           </div>
           <div className="flex flex-col items-center justify-center text-center px-4">
-            <h3 className="text-5xl font-bold tracking-tighter bg-gradient-to-r from-white via-zinc-400 to-white bg-[length:200%_auto] animate-[gradient_3s_linear_infinite] bg-clip-text text-transparent mb-2">99.9%</h3>
+            <h3 className="text-5xl md:text-6xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-zinc-100 via-emerald-400 to-zinc-100 bg-[length:200%_auto] animate-[gradient_2s_linear_infinite] mb-2">99.9%</h3>
             <span className="text-sm text-gray-400 font-medium tracking-wide uppercase">Guaranteed Uptime</span>
           </div>
           <div className="flex flex-col items-center justify-center text-center px-4">
-            <h3 className="text-5xl font-bold tracking-tighter bg-gradient-to-r from-white via-zinc-400 to-white bg-[length:200%_auto] animate-[gradient_3s_linear_infinite] bg-clip-text text-transparent mb-2">256bit</h3>
+            <h3 className="text-5xl md:text-6xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-zinc-100 via-emerald-400 to-zinc-100 bg-[length:200%_auto] animate-[gradient_2s_linear_infinite] mb-2">256bit</h3>
             <span className="text-sm text-gray-400 font-medium tracking-wide uppercase">AES Encryption</span>
           </div>
           <div className="flex flex-col items-center justify-center text-center px-4">
-            <h3 className="text-5xl font-bold tracking-tighter bg-gradient-to-r from-white via-zinc-400 to-white bg-[length:200%_auto] animate-[gradient_3s_linear_infinite] bg-clip-text text-transparent mb-2">5M+</h3>
+            <h3 className="text-5xl md:text-6xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-zinc-100 via-emerald-400 to-zinc-100 bg-[length:200%_auto] animate-[gradient_2s_linear_infinite] mb-2">5M+</h3>
             <span className="text-sm text-gray-400 font-medium tracking-wide uppercase">Vectors Analyzed</span>
           </div>
         </div>
@@ -166,24 +164,23 @@ export default function LandingPage() {
                <span className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#000000_0%,#00FF66_50%,#000000_100%)] opacity-100" />
                <div className="relative h-full w-full bg-[#050505] rounded-xl overflow-hidden z-10 flex flex-col justify-between p-6" style={{ transform: 'translateZ(0)' }}>
                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 pointer-events-none" />
-                <div className="max-w-xl relative z-10">
+                <div className="max-w-xl relative z-10 flex flex-col h-full">
                   <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-6">
                     <Zap className="text-cyan-400 w-6 h-6" />
                   </div>
                   <h3 className="text-3xl font-semibold tracking-tighter text-white mb-4">RoadSOS Live Georouting</h3>
                   <p className="text-gray-400 text-lg mb-8">Zero-cost emergency dispatch logic. Native integration with OpenStreetMap to map citizen coordinates to the nearest medical authorities in real-time.</p>
-                  <div className="inline-flex items-center gap-2 px-6 py-3 bg-cyan-400 text-black font-bold rounded-full transition-colors shadow-[0_0_20px_rgba(34,211,238,0.3)]">
-                    Launch Tool <ArrowRight className="w-4 h-4" />
+                  <div className="mt-auto">
+                    <div className="inline-flex items-center gap-2 px-6 py-3 bg-cyan-400 text-black font-bold rounded-full transition-colors shadow-[0_0_20px_rgba(34,211,238,0.3)]">
+                      Launch Tool <ArrowRight className="w-4 h-4" />
+                    </div>
                   </div>
                 </div>
                 
                 {/* Abstract Data Visualization Mock */}
-                <div className="hidden lg:flex flex-1 items-center justify-center relative z-10">
-                   <div className="w-full max-w-sm aspect-square rounded-full border border-cyan-400/30 relative flex items-center justify-center animate-[spin_60s_linear_infinite]">
-                      <div className="w-3/4 h-3/4 rounded-full border border-emerald-400/30 border-dashed animate-[spin_40s_reverse_linear_infinite]" />
-                      <div className="absolute w-4 h-4 bg-emerald-400 rounded-full top-0 shadow-[0_0_15px_#34d399]" />
-                      <div className="absolute w-3 h-3 bg-cyan-400 rounded-full bottom-0 right-10 shadow-[0_0_15px_#22d3ee]" />
-                   </div>
+                <div className="absolute right-0 top-0 bottom-0 w-1/2 pointer-events-none overflow-hidden">
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 border border-emerald-500/20 rounded-full animate-[ping_3s_infinite]" />
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 border border-cyan-500/20 rounded-full animate-[ping_2s_infinite]" />
                 </div>
               </div>
             </motion.div>
