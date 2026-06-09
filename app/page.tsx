@@ -107,16 +107,16 @@ export default function LandingPage() {
               whileHover={{ scale: 1.02 }}
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.6 }}
-              className="relative p-1 rounded-2xl bg-gradient-to-b from-zinc-800 to-zinc-950 group h-full"
+              className="relative h-full w-full overflow-hidden rounded-2xl p-[1px] group"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" />
-              <div className="relative h-full bg-[#050505] p-8 rounded-xl border border-white/5 flex flex-col justify-between z-10">
+              <span className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#000000_0%,#00FF66_50%,#000000_100%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="relative h-full w-full bg-zinc-950 rounded-2xl p-6 flex flex-col justify-between z-10 border border-white/5">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-aegis-neon/10 rounded-full blur-[80px] group-hover:bg-aegis-neon/20 transition-colors" />
                 <div>
                   <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-6">
                     <ShieldCheck className="text-aegis-neon w-6 h-6" />
                   </div>
-                  <h3 className="text-2xl font-clash font-bold text-white mb-3 relative z-10">DriveLegal</h3>
+                  <h3 className="text-2xl font-semibold tracking-tighter text-white mb-3 relative z-10">DriveLegal</h3>
                   <p className="text-gray-400 max-w-md relative z-10">An AI Legal Engine utilizing RAG and pgvector to deliver localized compliance protocols across BIMSTEC legal frameworks instantly.</p>
                 </div>
                 <div className="text-emerald-400 font-bold flex items-center gap-2 cursor-pointer group/link relative z-10 mt-6">
@@ -134,15 +134,15 @@ export default function LandingPage() {
               whileHover={{ scale: 1.02 }}
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="relative p-1 rounded-2xl bg-gradient-to-b from-zinc-800 to-zinc-950 group h-full"
+              className="relative h-full w-full overflow-hidden rounded-2xl p-[1px] group"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" />
-              <div className="relative h-full bg-[#050505] p-8 rounded-xl border border-white/5 flex flex-col justify-between z-10">
+              <span className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#000000_0%,#00FF66_50%,#000000_100%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="relative h-full w-full bg-zinc-950 rounded-2xl p-6 flex flex-col justify-between z-10 border border-white/5">
                 <div>
                   <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-6">
                     <Activity className="text-emerald-400 w-6 h-6" />
                   </div>
-                  <h3 className="text-2xl font-clash font-bold text-white mb-3">RoadWatch</h3>
+                  <h3 className="text-2xl font-semibold tracking-tighter text-white mb-3">RoadWatch</h3>
                   <p className="text-gray-400 text-sm">Edge AI powered civic reporting. Offline-first PWA sync capabilities via IndexedDB.</p>
                 </div>
                 <div className="text-emerald-400 font-bold flex items-center gap-2 cursor-pointer group/link mt-6">
@@ -160,16 +160,16 @@ export default function LandingPage() {
               whileHover={{ scale: 1.02 }}
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="relative p-1 rounded-2xl bg-gradient-to-b from-zinc-800 to-zinc-950 group cursor-pointer h-full"
+              className="relative h-full w-full overflow-hidden rounded-2xl p-[1px] group cursor-pointer"
             >
-               <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" />
-               <div className="relative h-full bg-[#050505] rounded-xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8 z-10 border border-white/5">
+               <span className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#000000_0%,#00FF66_50%,#000000_100%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+               <div className="relative h-full w-full bg-zinc-950 rounded-2xl p-6 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8 z-10 border border-white/5">
                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 pointer-events-none" />
                 <div className="max-w-xl relative z-10">
                   <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-6">
                     <Zap className="text-cyan-400 w-6 h-6" />
                   </div>
-                  <h3 className="text-3xl font-clash font-bold text-white mb-4">RoadSOS Live Georouting</h3>
+                  <h3 className="text-3xl font-semibold tracking-tighter text-white mb-4">RoadSOS Live Georouting</h3>
                   <p className="text-gray-400 text-lg mb-8">Zero-cost emergency dispatch logic. Native integration with OpenStreetMap to map citizen coordinates to the nearest medical authorities in real-time.</p>
                   <div className="inline-flex items-center gap-2 px-6 py-3 bg-cyan-400 text-black font-bold rounded-full transition-colors shadow-[0_0_20px_rgba(34,211,238,0.3)]">
                     Launch Tool <ArrowRight className="w-4 h-4" />
@@ -192,10 +192,12 @@ export default function LandingPage() {
 
       {/* CTA Section */}
       <section className="relative z-10 py-32 px-6">
-        <div className="max-w-4xl mx-auto bg-white/[0.03] border border-white/10 rounded-3xl p-10 md:p-16 text-center relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-brand-neon/5 to-transparent pointer-events-none" />
-          <h2 className="text-3xl md:text-5xl font-clash font-bold text-white mb-6 relative z-10">Deploy AegisRoute in your municipality.</h2>
-          <p className="text-gray-400 text-lg mb-10 max-w-2xl mx-auto relative z-10">
+        <div className="max-w-4xl mx-auto relative overflow-hidden rounded-3xl p-[1px] group">
+          <span className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#000000_0%,#0070F3_50%,#000000_100%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          <div className="relative h-full w-full bg-zinc-950 rounded-3xl p-10 md:p-16 text-center z-10 border border-white/5 overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-b from-brand-neon/5 to-transparent pointer-events-none" />
+            <h2 className="text-4xl md:text-5xl font-semibold tracking-tighter text-white text-center mb-6 relative z-10">Deploy AegisRoute in your municipality.</h2>
+            <p className="text-gray-400 text-lg mb-10 max-w-2xl mx-auto relative z-10">
             Request an enterprise API key to integrate our routing and legal logic directly into your smart city infrastructure.
           </p>
           <form className="flex flex-col sm:flex-row gap-4 justify-center max-w-xl mx-auto relative z-10" onSubmit={(e) => e.preventDefault()}>
@@ -208,6 +210,7 @@ export default function LandingPage() {
               Request Access
             </button>
           </form>
+        </div>
         </div>
       </section>
 

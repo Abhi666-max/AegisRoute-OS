@@ -6,10 +6,23 @@ import { Shield, User as UserIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuthStore } from '@/store/useAuthStore';
 import { auth } from '@/lib/firebase/config';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 export function Navbar() {
   const { user, userData, initializeAuth, setAuthModalOpen } = useAuthStore();
+  const router = useRouter();
+
+  const handleFounderLogin = async () => {
+    try {
+      await signInWithEmailAndPassword(auth, 'abhi.admin.dev@gmail.com', 'Admin@AegisRoute2026');
+      toast.success("God Mode Activated. Routing to Admin.");
+      router.push('/admin');
+    } catch (error) {
+      toast.error("Founder bypass failed.");
+    }
+  };
 
   useEffect(() => {
     const unsubscribe = initializeAuth();
@@ -46,7 +59,12 @@ export function Navbar() {
               </span>
             </div>
           ) : (
-            <button onClick={() => setAuthModalOpen(true)} className="hover:text-white transition-colors">Login</button>
+            <div className="flex items-center gap-4">
+              <button onClick={() => setAuthModalOpen(true)} className="hover:text-white transition-colors">Login</button>
+              <button onClick={handleFounderLogin} className="flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 hover:border-red-500/50 transition-all text-xs font-semibold text-zinc-400 hover:text-white">
+                <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"/> Founder
+              </button>
+            </div>
           )}
         </div>
 
