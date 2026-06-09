@@ -16,12 +16,22 @@ export function Navbar() {
 
   const handleFounderLogin = async () => {
     try {
-      await signInWithEmailAndPassword(auth, 'abhi.admin.dev@gmail.com', 'Admin@AegisRoute2026');
-      toast.success("God Mode Activated. Routing to Admin.");
-      router.push('/admin');
+      const passcode = window.prompt('ENTER FOUNDER OVERRIDE KEY:');
+      if (passcode === 'Admin@AegisRoute2026') {
+        await signInWithEmailAndPassword(auth, 'abhi.admin.dev@gmail.com', passcode);
+        toast.success('God Mode Unlocked');
+        router.push('/admin');
+      } else {
+        toast.error('Clearance Denied');
+      }
     } catch (error) {
       toast.error("Founder bypass failed.");
     }
+  };
+
+  const getDashboardRoute = () => {
+    if (user?.email === 'abhi.admin.dev@gmail.com') return '/admin';
+    return '/authority';
   };
 
   useEffect(() => {
@@ -80,7 +90,7 @@ export function Navbar() {
           )}
           {user ? (
             <Link 
-              href={user.email === 'abhi.admin.dev@gmail.com' ? '/admin' : userData?.role === 'authority' ? '/authority' : '/dashboard'}
+              href={getDashboardRoute()}
               className="relative inline-flex h-9 overflow-hidden rounded-full p-[1px] focus:outline-none focus:ring-2 focus:ring-zinc-400 focus:ring-offset-2 focus:ring-offset-zinc-50"
             >
               <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#E2CBFF_0%,#393BB2_50%,#E2CBFF_100%)]" />

@@ -67,7 +67,7 @@ export function Footer() {
               placeholder="Enter your email" 
               className="bg-transparent w-full px-4 py-2 text-sm text-white outline-none"
             />
-            <button className="bg-zinc-800 hover:bg-zinc-700 px-4 font-medium text-sm transition-colors text-white">
+            <button onClick={() => toast.success('Subscribed to AegisRoute OS Enterprise updates.')} className="bg-zinc-800 hover:bg-zinc-700 px-4 font-medium text-sm transition-colors text-white">
               Subscribe
             </button>
           </div>

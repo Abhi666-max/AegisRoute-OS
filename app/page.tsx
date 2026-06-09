@@ -14,7 +14,8 @@ export default function LandingPage() {
     <div className="relative w-full overflow-hidden" ref={containerRef}>
       
       {/* Abstract Background Grid */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:24px_24px] z-0 pointer-events-none" />
+      <div className="absolute inset-0 z-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-emerald-500/10 blur-[120px] rounded-full pointer-events-none z-0"></div>
 
       {/* Hero Section */}
       <section className="relative z-10 pt-32 pb-20 px-6 max-w-7xl mx-auto flex flex-col items-center text-center min-h-[90vh] justify-center">
@@ -72,19 +73,19 @@ export default function LandingPage() {
       <section className="relative z-10 border-y border-white/10 bg-black/50 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-6 py-10 grid grid-cols-2 md:grid-cols-4 gap-8 divide-x divide-white/10">
           <div className="flex flex-col items-center justify-center text-center px-4">
-            <h3 className="text-5xl font-bold tracking-tighter text-white mb-2">0ms</h3>
+            <h3 className="text-5xl font-bold tracking-tighter bg-gradient-to-r from-white via-zinc-400 to-white bg-[length:200%_auto] animate-[gradient_3s_linear_infinite] bg-clip-text text-transparent mb-2">0ms</h3>
             <span className="text-sm text-gray-400 font-medium tracking-wide uppercase">Edge API Latency</span>
           </div>
           <div className="flex flex-col items-center justify-center text-center px-4">
-            <h3 className="text-5xl font-bold tracking-tighter text-white mb-2">99.9%</h3>
+            <h3 className="text-5xl font-bold tracking-tighter bg-gradient-to-r from-white via-zinc-400 to-white bg-[length:200%_auto] animate-[gradient_3s_linear_infinite] bg-clip-text text-transparent mb-2">99.9%</h3>
             <span className="text-sm text-gray-400 font-medium tracking-wide uppercase">Guaranteed Uptime</span>
           </div>
           <div className="flex flex-col items-center justify-center text-center px-4">
-            <h3 className="text-5xl font-bold tracking-tighter text-white mb-2">256bit</h3>
+            <h3 className="text-5xl font-bold tracking-tighter bg-gradient-to-r from-white via-zinc-400 to-white bg-[length:200%_auto] animate-[gradient_3s_linear_infinite] bg-clip-text text-transparent mb-2">256bit</h3>
             <span className="text-sm text-gray-400 font-medium tracking-wide uppercase">AES Encryption</span>
           </div>
           <div className="flex flex-col items-center justify-center text-center px-4">
-            <h3 className="text-5xl font-bold tracking-tighter text-white mb-2">5M+</h3>
+            <h3 className="text-5xl font-bold tracking-tighter bg-gradient-to-r from-white via-zinc-400 to-white bg-[length:200%_auto] animate-[gradient_3s_linear_infinite] bg-clip-text text-transparent mb-2">5M+</h3>
             <span className="text-sm text-gray-400 font-medium tracking-wide uppercase">Vectors Analyzed</span>
           </div>
         </div>
@@ -163,7 +164,7 @@ export default function LandingPage() {
               className="relative h-full w-full overflow-hidden rounded-2xl p-[1px] group cursor-pointer"
             >
                <span className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#000000_0%,#00FF66_50%,#000000_100%)] opacity-100" />
-               <div className="relative h-full w-full bg-zinc-950 rounded-2xl p-6 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8 z-10 border border-white/5 overflow-hidden">
+               <div className="relative h-full w-full bg-[#050505] rounded-xl overflow-hidden z-10 flex flex-col justify-between p-6" style={{ transform: 'translateZ(0)' }}>
                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 pointer-events-none" />
                 <div className="max-w-xl relative z-10">
                   <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-6">

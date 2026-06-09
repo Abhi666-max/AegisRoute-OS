@@ -20,6 +20,7 @@ export default function AdminGodMode() {
             </h1>
           </div>
           <p className="text-zinc-500 mt-2 font-mono text-sm tracking-widest uppercase">Global Access Terminal // Admin: abhi.admin.dev@gmail.com</p>
+          <p className="text-red-500 mt-1 font-bold text-lg tracking-tight">Super-Admin Console: Global View</p>
         </div>
         <div className="text-right">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-red-500/10 border border-red-500/20 rounded-full text-red-500 text-xs font-mono font-bold tracking-widest uppercase animate-pulse">
