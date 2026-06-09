@@ -28,13 +28,13 @@ export default function GodModeLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center relative overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-red-900/20 via-black to-black z-0"></div>
+    <div className="min-h-screen bg-[#020202] flex flex-col items-center justify-center relative overflow-hidden">
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#ff000010_1px,transparent_1px),linear-gradient(to_bottom,#ff000010_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] z-0"></div>
       
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="relative z-10 w-full max-w-lg bg-[#050505] border border-red-500/30 rounded-2xl p-10 shadow-[0_0_80px_rgba(255,0,0,0.15)] flex flex-col items-center"
+        className="relative z-10 w-full max-w-md bg-black/50 backdrop-blur-2xl border border-red-500/20 rounded-2xl p-8 shadow-[0_0_80px_rgba(255,0,0,0.1)]"
       >
         <div className="flex flex-col items-center mb-8 w-full">
           <div className="w-16 h-16 bg-red-500/10 rounded-2xl flex items-center justify-center border border-red-500/30 mb-6 relative">
@@ -60,16 +60,16 @@ export default function GodModeLogin() {
               placeholder="ENTER CLASSIFIED KEY"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-black border border-red-500/50 text-red-500 text-center font-mono py-3 rounded-md focus:outline-none focus:shadow-[0_0_20px_rgba(255,0,0,0.3)] transition-all"
+              className="w-full bg-black border border-red-500/20 text-red-500 text-center font-mono py-3 rounded-md focus:outline-none hover:border-red-500/50 focus:border-red-500 focus:shadow-[0_0_20px_rgba(255,0,0,0.3)] transition-all"
               autoFocus
             />
           </div>
           <button
             type="submit"
             disabled={isLoading || !password}
-            className="w-full bg-red-500 hover:bg-red-600 text-black font-black tracking-widest uppercase rounded-lg px-4 py-3 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+            className="w-full bg-black border border-red-500/20 hover:border-red-500 hover:shadow-[0_0_20px_rgba(255,0,0,0.3)] text-red-500 font-black tracking-widest uppercase rounded-lg px-4 py-3 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
           >
-            {isLoading ? "Authenticating..." : "Execute Override"}
+            {isLoading ? "Authenticating..." : "EXECUTE OVERRIDE"}
           </button>
         </form>
       </motion.div>

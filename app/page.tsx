@@ -75,19 +75,19 @@ export default function LandingPage() {
       <section className="relative z-10 border-y border-white/10 bg-black/50 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-6 py-10 grid grid-cols-2 md:grid-cols-4 gap-8 divide-x divide-white/10">
           <div className="flex flex-col items-center justify-center text-center px-4">
-            <h3 className="text-5xl md:text-6xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-zinc-100 via-emerald-400 to-zinc-100 bg-[length:200%_auto] animate-[gradient_2s_linear_infinite] mb-2">0ms</h3>
+            <h3 className="text-5xl md:text-6xl font-semibold tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-zinc-500">0ms</h3>
             <span className="text-sm text-gray-400 font-medium tracking-wide uppercase">Edge API Latency</span>
           </div>
           <div className="flex flex-col items-center justify-center text-center px-4">
-            <h3 className="text-5xl md:text-6xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-zinc-100 via-emerald-400 to-zinc-100 bg-[length:200%_auto] animate-[gradient_2s_linear_infinite] mb-2">99.9%</h3>
+            <h3 className="text-5xl md:text-6xl font-semibold tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-zinc-500">99.9%</h3>
             <span className="text-sm text-gray-400 font-medium tracking-wide uppercase">Guaranteed Uptime</span>
           </div>
           <div className="flex flex-col items-center justify-center text-center px-4">
-            <h3 className="text-5xl md:text-6xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-zinc-100 via-emerald-400 to-zinc-100 bg-[length:200%_auto] animate-[gradient_2s_linear_infinite] mb-2">256bit</h3>
+            <h3 className="text-5xl md:text-6xl font-semibold tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-zinc-500">256bit</h3>
             <span className="text-sm text-gray-400 font-medium tracking-wide uppercase">AES Encryption</span>
           </div>
           <div className="flex flex-col items-center justify-center text-center px-4">
-            <h3 className="text-5xl md:text-6xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-zinc-100 via-emerald-400 to-zinc-100 bg-[length:200%_auto] animate-[gradient_2s_linear_infinite] mb-2">5M+</h3>
+            <h3 className="text-5xl md:text-6xl font-semibold tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-zinc-500">5M+</h3>
             <span className="text-sm text-gray-400 font-medium tracking-wide uppercase">Vectors Analyzed</span>
           </div>
         </div>

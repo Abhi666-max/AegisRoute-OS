@@ -62,11 +62,11 @@ export function DemoModal() {
             {/* Right Side - Form */}
             <div className="w-full md:w-7/12 p-8 md:p-12 bg-[#050505]">
               <div className="mb-8">
-                <h3 className="text-xl font-semibold text-white tracking-tight">Request Enterprise Demo</h3>
+                <h3 className="text-xl font-semibold text-white tracking-tight">Request Enterprise Pilot</h3>
                 <p className="text-zinc-500 text-sm mt-1">Fill out the form below to receive API keys.</p>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-5">
+              <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-6">
                 <div className="grid grid-cols-2 gap-5">
                   <div className="space-y-2">
                     <label className="text-xs font-mono text-zinc-500 uppercase tracking-widest">Government ID / Name</label>
@@ -100,8 +100,8 @@ export function DemoModal() {
                   </div>
                 </div>
 
-                <button type="submit" className="w-full bg-white text-black font-bold rounded-lg py-3 hover:bg-zinc-200 transition-colors mt-4">
-                  Request Access
+                <button type="submit" className="relative z-50 w-full py-3 bg-white text-black font-semibold rounded-md hover:bg-zinc-200 pointer-events-auto cursor-pointer mt-4">
+                  Request Enterprise Pilot
                 </button>
               </form>
             </div>

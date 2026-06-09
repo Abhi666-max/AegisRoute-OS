@@ -34,10 +34,7 @@ export function AuthModal() {
 
     try {
       if (isLogin) {
-        const userCredential = await Promise.race([
-          signInWithEmailAndPassword(auth, email, password),
-          new Promise((_, rej) => setTimeout(() => rej(new Error('Network Timeout')), 8000))
-        ]) as any;
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
         let fetchedRole = 'citizen';
         
@@ -60,10 +57,7 @@ export function AuthModal() {
           toast.success('Citizen logged in');
         }
       } else {
-        const userCredential = await Promise.race([
-          createUserWithEmailAndPassword(auth, email, password),
-          new Promise((_, rej) => setTimeout(() => rej(new Error('Network Timeout')), 8000))
-        ]) as any;
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
         
         await setDoc(doc(db, 'users', user.uid), {
@@ -84,11 +78,7 @@ export function AuthModal() {
         }
       }
     } catch (err: any) {
-      if (err.message === 'Network Timeout') {
-        toast.error('Authentication Node Offline. Check connection.');
-      } else {
-        toast.error(err.message || 'Authentication failed.');
-      }
+      toast.error(err.message || 'Authentication failed.');
     } finally {
       setLoading(false);
     }

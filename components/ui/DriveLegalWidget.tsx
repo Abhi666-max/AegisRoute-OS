@@ -86,14 +86,7 @@ export function DriveLegalWidget() {
 
       <AnimatePresence>
         {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: 50, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 50, scale: 0.9 }}
-            transition={{ type: "spring", stiffness: 300, damping: 25 }}
-            style={{ display: 'flex', pointerEvents: 'auto' }}
-            className="absolute bottom-0 right-0 w-[350px] h-[500px] bg-[#050505] border border-zinc-800 rounded-xl shadow-2xl flex-col overflow-hidden"
-          >
+          <div className="w-80 h-96 bg-zinc-950 border border-zinc-800 rounded-xl flex flex-col pointer-events-auto shadow-2xl mt-4 opacity-100 animate-in fade-in slide-in-from-bottom-4">
             {/* Header */}
             <div className="h-14 border-b border-zinc-800 flex items-center justify-between px-4 bg-zinc-950">
               <div className="flex items-center gap-2">
@@ -176,7 +169,7 @@ export function DriveLegalWidget() {
                 </button>
               </form>
             </div>
-          </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </div>
