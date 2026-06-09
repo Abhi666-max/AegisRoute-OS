@@ -1,3 +1,5 @@
+"use client";
+
 import { RoadWatchReporter } from "@/components/ui/RoadWatchReporter";
 import { Network } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";

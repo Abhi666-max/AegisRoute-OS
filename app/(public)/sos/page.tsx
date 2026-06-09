@@ -1,3 +1,5 @@
+"use client";
+
 import { RoadSOSMap } from "@/components/ui/RoadSOSMap";
 import { Shield } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
