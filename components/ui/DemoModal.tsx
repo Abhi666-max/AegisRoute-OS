@@ -19,19 +19,19 @@ export function DemoModal({ isOpen, onClose }: DemoModalProps) {
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6">
+        <div className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/90 backdrop-blur-md overflow-hidden p-4">
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            className="absolute inset-0"
           />
           <motion.div 
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="relative w-full max-w-5xl bg-zinc-950 border border-white/10 rounded-3xl overflow-hidden shadow-[0_0_100px_rgba(0,255,102,0.1)] flex flex-col md:flex-row"
+            className="max-h-[90vh] overflow-y-auto w-full max-w-2xl bg-[#050505] border border-zinc-800 rounded-2xl shadow-2xl relative flex flex-col md:flex-row"
           >
             <button onClick={onClose} className="absolute top-4 right-4 z-50 p-2 bg-black/50 hover:bg-zinc-800 rounded-full text-zinc-400 hover:text-white transition-colors">
               <X className="w-5 h-5" />

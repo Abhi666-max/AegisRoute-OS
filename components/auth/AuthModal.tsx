@@ -5,11 +5,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, ShieldCheck } from 'lucide-react';
 import { auth, db } from '@/lib/firebase/config';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 export function AuthModal() {
   const { isAuthModalOpen: isOpen, setAuthModalOpen } = useAuthStore();
+  const router = useRouter();
   const onClose = () => setAuthModalOpen(false);
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
@@ -28,7 +31,26 @@ export function AuthModal() {
 
     try {
       if (isLogin) {
-        await signInWithEmailAndPassword(auth, email, password);
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        let userRole = 'citizen';
+        if (user.email === 'abhi.admin.dev@gmail.com') {
+          userRole = 'admin';
+        } else {
+          const docSnap = await getDoc(doc(db, 'users', user.uid));
+          if (docSnap.exists()) {
+            userRole = docSnap.data().role || 'citizen';
+          }
+        }
+        
+        onClose();
+        if (userRole === 'admin' || user.email === 'abhi.admin.dev@gmail.com') {
+          router.push('/admin');
+        } else if (userRole === 'authority') {
+          router.push('/authority');
+        } else {
+          toast.success('Welcome Citizen');
+        }
       } else {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
@@ -40,8 +62,9 @@ export function AuthModal() {
           country,
           createdAt: Date.now()
         });
+        onClose();
+        toast.success('Welcome Citizen');
       }
-      onClose();
     } catch (err: any) {
       setError(err.message || 'Authentication failed. Please try again.');
     } finally {

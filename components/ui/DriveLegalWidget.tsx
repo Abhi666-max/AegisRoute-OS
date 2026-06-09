@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Send, Bot, User } from "lucide-react";
+import { createPortal } from "react-dom";
 
 interface Message {
   id: string;
@@ -20,6 +21,9 @@ export function DriveLegalWidget() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -63,7 +67,7 @@ export function DriveLegalWidget() {
     }
   };
 
-  return (
+  const widgetContent = (
     <div style={{ position: 'fixed', bottom: '24px', right: '24px', zIndex: 2147483647, pointerEvents: 'auto' }}>
       <AnimatePresence>
         {!isOpen && (
@@ -176,4 +180,7 @@ export function DriveLegalWidget() {
       </AnimatePresence>
     </div>
   );
+
+  if (!mounted) return null;
+  return createPortal(widgetContent, document.body);
 }
