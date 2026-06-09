@@ -86,7 +86,7 @@ export function DriveLegalWidget() {
 
       <AnimatePresence>
         {isOpen && (
-          <div className="w-80 h-96 bg-zinc-950 border border-zinc-800 rounded-xl flex flex-col pointer-events-auto shadow-2xl mt-4 opacity-100 animate-in fade-in slide-in-from-bottom-4">
+          <div className="relative z-[9999999] w-80 h-96 bg-zinc-950 border border-zinc-800 shadow-2xl rounded-2xl p-4 flex flex-col pointer-events-auto mt-4 opacity-100 animate-in fade-in slide-in-from-bottom-4">
             {/* Header */}
             <div className="h-14 border-b border-zinc-800 flex items-center justify-between px-4 bg-zinc-950">
               <div className="flex items-center gap-2">
@@ -107,7 +107,7 @@ export function DriveLegalWidget() {
             </div>
 
             {/* Chat Area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar bg-black">
+            <div className="flex-1 overflow-y-auto mt-4 space-y-4 custom-scrollbar bg-zinc-950">
               {messages.map((msg) => (
                 <motion.div
                   key={msg.id}
@@ -150,7 +150,7 @@ export function DriveLegalWidget() {
             </div>
 
             {/* Input Area */}
-            <div className="p-4 bg-zinc-950 border-t border-zinc-800">
+            <div className="mt-4 bg-zinc-950 border-t border-zinc-800 pt-4">
               <form onSubmit={handleSubmit} className="relative flex items-center">
                 <input
                   type="text"
