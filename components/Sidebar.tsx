@@ -48,13 +48,13 @@ export function Sidebar() {
           const isActive = pathname === item.href;
           return (
             <Link key={item.href} href={item.href}>
-              <div className={`flex items-center px-2 py-3 rounded-lg transition-colors ${isActive ? "bg-white/10 text-[#00FF66]" : "text-gray-400 hover:text-white hover:bg-white/5"}`}>
-                <item.icon className="w-6 h-6 shrink-0" />
+              <div className={`flex items-center px-3 py-2 rounded-md transition-colors ${isActive ? "bg-zinc-900 border border-zinc-800 text-white shadow-[0_0_15px_rgba(16,185,129,0.1)]" : "text-zinc-500 hover:text-white"}`}>
+                <item.icon className="w-5 h-5 shrink-0" />
                 <motion.span
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: isHovered ? 1 : 0, x: isHovered ? 0 : -10 }}
                   transition={{ duration: 0.2 }}
-                  className="ml-4 whitespace-nowrap font-medium"
+                  className="ml-4 whitespace-nowrap tracking-tighter font-medium"
                 >
                   {item.label}
                 </motion.span>
