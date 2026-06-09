@@ -75,13 +75,17 @@ export function Footer() {
       </div>
       
       <div className="max-w-7xl mx-auto px-6">
-        <div className="flex flex-col md:flex-row items-center justify-between pt-8 border-t border-zinc-900">
-          <div className="flex items-center gap-2"><span className="text-zinc-500 text-sm">Architected & Founded by</span> <span className="font-semibold text-zinc-300 hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-[#00FF66] hover:to-[#0070F3] transition-all duration-300">Abhijeet Kangane</span></div>
-          <div className="flex gap-4 mt-4 md:mt-0 text-zinc-400"> 
-            <Linkedin className="w-5 h-5 text-zinc-500 hover:text-white hover:scale-125 transition-all duration-300 drop-shadow-[0_0_0_rgba(255,255,255,0)] hover:drop-shadow-[0_0_10px_rgba(255,255,255,0.5)] cursor-pointer"/> 
-            <Github className="w-5 h-5 text-zinc-500 hover:text-white hover:scale-125 transition-all duration-300 drop-shadow-[0_0_0_rgba(255,255,255,0)] hover:drop-shadow-[0_0_10px_rgba(255,255,255,0.5)] cursor-pointer"/> 
-            <Twitter className="w-5 h-5 text-zinc-500 hover:text-white hover:scale-125 transition-all duration-300 drop-shadow-[0_0_0_rgba(255,255,255,0)] hover:drop-shadow-[0_0_10px_rgba(255,255,255,0.5)] cursor-pointer"/> 
-            <Instagram className="w-5 h-5 text-zinc-500 hover:text-white hover:scale-125 transition-all duration-300 drop-shadow-[0_0_0_rgba(255,255,255,0)] hover:drop-shadow-[0_0_10px_rgba(255,255,255,0.5)] cursor-pointer"/> 
+        <div className="flex flex-col items-center justify-center mt-12 pb-8">
+          <div className="flex items-center gap-4 px-6 py-2.5 rounded-full bg-zinc-950/50 backdrop-blur-md border border-white/10 shadow-[0_0_30px_rgba(0,255,102,0.05)] hover:shadow-[0_0_30px_rgba(0,255,102,0.15)] transition-all duration-500">
+            <span className="text-zinc-400 text-sm tracking-wide">ARCHITECTED & FOUNDED BY</span>
+            <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 tracking-tight">ABHIJEET KANGANE</span>
+            <div className="w-[1px] h-4 bg-zinc-800 mx-2"></div>
+            <div className="flex items-center gap-3">
+              <Github className="w-4 h-4 text-zinc-400 hover:text-white hover:scale-125 transition-all cursor-pointer" />
+              <Linkedin className="w-4 h-4 text-zinc-400 hover:text-white hover:scale-125 transition-all cursor-pointer" />
+              <Twitter className="w-4 h-4 text-zinc-400 hover:text-white hover:scale-125 transition-all cursor-pointer" />
+              <Instagram className="w-4 h-4 text-zinc-400 hover:text-white hover:scale-125 transition-all cursor-pointer" />
+            </div>
           </div>
         </div>
       </div>

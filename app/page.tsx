@@ -109,7 +109,7 @@ export default function LandingPage() {
               transition={{ duration: 0.6 }}
               className="relative h-full w-full overflow-hidden rounded-2xl p-[1px] group"
             >
-              <span className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#000000_0%,#00FF66_50%,#000000_100%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <span className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#000000_0%,#00FF66_50%,#000000_100%)] opacity-100" />
               <div className="relative h-full w-full bg-zinc-950 rounded-2xl p-6 flex flex-col justify-between z-10 border border-white/5">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-aegis-neon/10 rounded-full blur-[80px] group-hover:bg-aegis-neon/20 transition-colors" />
                 <div>
@@ -136,7 +136,7 @@ export default function LandingPage() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="relative h-full w-full overflow-hidden rounded-2xl p-[1px] group"
             >
-              <span className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#000000_0%,#00FF66_50%,#000000_100%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <span className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#000000_0%,#00FF66_50%,#000000_100%)] opacity-100" />
               <div className="relative h-full w-full bg-zinc-950 rounded-2xl p-6 flex flex-col justify-between z-10 border border-white/5">
                 <div>
                   <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-6">
@@ -162,8 +162,8 @@ export default function LandingPage() {
               transition={{ duration: 0.6, delay: 0.3 }}
               className="relative h-full w-full overflow-hidden rounded-2xl p-[1px] group cursor-pointer"
             >
-               <span className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#000000_0%,#00FF66_50%,#000000_100%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-               <div className="relative h-full w-full bg-zinc-950 rounded-2xl p-6 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8 z-10 border border-white/5">
+               <span className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#000000_0%,#00FF66_50%,#000000_100%)] opacity-100" />
+               <div className="relative h-full w-full bg-zinc-950 rounded-2xl p-6 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8 z-10 border border-white/5 overflow-hidden">
                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 pointer-events-none" />
                 <div className="max-w-xl relative z-10">
                   <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-6">
@@ -193,7 +193,7 @@ export default function LandingPage() {
       {/* CTA Section */}
       <section className="relative z-10 py-32 px-6">
         <div className="max-w-4xl mx-auto relative overflow-hidden rounded-3xl p-[1px] group">
-          <span className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#000000_0%,#0070F3_50%,#000000_100%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          <span className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#000000_0%,#0070F3_50%,#000000_100%)] opacity-100" />
           <div className="relative h-full w-full bg-zinc-950 rounded-3xl p-10 md:p-16 text-center z-10 border border-white/5 overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-b from-brand-neon/5 to-transparent pointer-events-none" />
             <h2 className="text-4xl md:text-5xl font-semibold tracking-tighter text-white text-center mb-6 relative z-10">Deploy AegisRoute in your municipality.</h2>

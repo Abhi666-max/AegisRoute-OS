@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Key, Copy, Terminal, Server, Shield, CheckCircle2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { toast } from "sonner";
 
 export default function DevelopersPortal() {
   const [apiKey, setApiKey] = useState("aegis_live_*******************");
@@ -82,7 +83,10 @@ export default function DevelopersPortal() {
                 <div className="flex items-center gap-2 px-4 py-3 bg-zinc-950 border-b border-zinc-800">
                   <span className="text-xs font-mono text-zinc-500 tracking-widest uppercase">Request: DriveLegal RAG Chatbot</span>
                 </div>
-                <div className="p-6 overflow-x-auto custom-scrollbar">
+                <div className="p-6 overflow-x-auto custom-scrollbar relative group">
+                  <button onClick={() => { navigator.clipboard.writeText(`curl -X POST https://api.aegisroute.os/v1/drivelegal \\\n  -H "Authorization: Bearer aegis_live_x89..." \\\n  -H "Content-Type: application/json" \\\n  -d '{\n    "country": "India",\n    "messages": [\n      { "role": "user", "content": "What is the fine for speeding?" }\n    ]\n  }'`); toast.success("Copied to clipboard"); }} className="absolute top-3 right-3 p-2 rounded-md bg-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-700 opacity-0 group-hover:opacity-100 transition-all border border-zinc-700">
+                    <Copy className="w-4 h-4" />
+                  </button>
                   <pre className="text-sm font-mono leading-relaxed text-zinc-300">
                     <span className="text-white">curl</span> -X POST https://api.aegisroute.os/v1/drivelegal \<br/>
                     <span className="text-zinc-500">  -H "Authorization: Bearer aegis_live_x89..." \</span><br/>
@@ -103,7 +107,10 @@ export default function DevelopersPortal() {
                 <div className="flex items-center gap-2 px-4 py-3 bg-zinc-950 border-b border-zinc-800">
                   <span className="text-xs font-mono text-zinc-500 tracking-widest uppercase">Request: Fetch Real-Time RoadWatch Data</span>
                 </div>
-                <div className="p-6 overflow-x-auto custom-scrollbar">
+                <div className="p-6 overflow-x-auto custom-scrollbar relative group">
+                  <button onClick={() => { navigator.clipboard.writeText(`const response = await fetch('https://api.aegisroute.os/v1/incidents/live?status=Pending', {\n  method: 'GET',\n  headers: {\n    'Authorization': 'Bearer aegis_live_x89...'\n  }\n});\n\nconst data = await response.json();`); toast.success("Copied to clipboard"); }} className="absolute top-3 right-3 p-2 rounded-md bg-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-700 opacity-0 group-hover:opacity-100 transition-all border border-zinc-700">
+                    <Copy className="w-4 h-4" />
+                  </button>
                   <pre className="text-sm font-mono leading-relaxed text-zinc-300">
                     <span className="text-white">const</span> response = <span className="text-white">await</span> fetch(<span className="text-zinc-300">'https://api.aegisroute.os/v1/incidents/live?status=Pending'</span>, &#123;<br/>
                     <span className="text-zinc-500">  method: </span><span className="text-zinc-300">'GET'</span>,<br/>
