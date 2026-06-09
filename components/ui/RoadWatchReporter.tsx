@@ -91,7 +91,7 @@ export function RoadWatchReporter() {
       >
         {preview ? (
           <>
-            <img src={preview} alt="Preview" className="absolute inset-0 w-full h-full object-cover opacity-60" />
+            <img src={preview} alt="Preview" className="absolute inset-0 w-full h-full object-cover opacity-60 pointer-events-none" />
             
             {/* Scanning Laser Animation */}
             {isScanning && (
@@ -195,7 +195,7 @@ export function RoadWatchReporter() {
         <button
           disabled={!result || isScanning || isSubmitted}
           onClick={handleSubmit}
-          className={`relative z-50 w-full py-3 bg-white text-black font-medium rounded-md hover:bg-zinc-200 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed`}
+          className={`relative z-50 w-full py-3 bg-white text-black font-medium rounded-md hover:bg-zinc-200 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer`}
         >
           {isSubmitted ? 'Report Logged' : 'Submit to Authority'}
         </button>

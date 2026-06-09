@@ -73,8 +73,7 @@ export function DriveLegalWidget() {
             exit={{ scale: 0, opacity: 0 }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => setIsOpen(true)}
-            className="w-14 h-14 rounded-full bg-[#050505] border border-[#00FF66] shadow-[0_0_20px_rgba(0,255,102,0.3)] flex items-center justify-center text-[#00FF66] hover:bg-[#00FF66]/10 transition-colors"
+            className="w-14 h-14 rounded-full bg-white border border-zinc-200 shadow-2xl flex items-center justify-center text-black hover:bg-zinc-200 transition-colors"
           >
             <Bot className="w-7 h-7" />
           </motion.button>
@@ -88,29 +87,29 @@ export function DriveLegalWidget() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 50, scale: 0.9 }}
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
-            className="absolute bottom-0 right-0 w-[350px] h-[500px] bg-[#050505]/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl flex flex-col overflow-hidden"
+            className="absolute bottom-0 right-0 w-[350px] h-[500px] bg-[#050505] border border-zinc-800 rounded-xl shadow-2xl flex flex-col overflow-hidden"
           >
             {/* Header */}
-            <div className="h-14 border-b border-white/10 flex items-center justify-between px-4 bg-black/40">
+            <div className="h-14 border-b border-zinc-800 flex items-center justify-between px-4 bg-zinc-950">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-[#00FF66]/20 flex items-center justify-center border border-[#00FF66]/50">
-                  <Bot className="w-4 h-4 text-[#00FF66]" />
+                <div className="w-8 h-8 rounded-md bg-zinc-900 flex items-center justify-center border border-zinc-800">
+                  <Bot className="w-4 h-4 text-white" />
                 </div>
                 <div>
-                  <h3 className="font-clash font-bold text-sm tracking-wide text-white">DriveLegal AI</h3>
-                  <p className="text-[10px] text-[#00FF66] font-mono tracking-widest uppercase">System Online</p>
+                  <h3 className="font-medium text-sm tracking-tighter text-white">DriveLegal AI</h3>
+                  <p className="text-[10px] text-zinc-500 font-mono tracking-widest uppercase">System Online</p>
                 </div>
               </div>
               <button 
                 onClick={() => setIsOpen(false)}
-                className="text-gray-400 hover:text-white transition-colors p-1"
+                className="text-zinc-500 hover:text-white transition-colors p-1"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Chat Area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar bg-gradient-to-b from-transparent to-black/20">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar bg-black">
               {messages.map((msg) => (
                 <motion.div
                   key={msg.id}
@@ -119,14 +118,14 @@ export function DriveLegalWidget() {
                   className={`flex gap-3 max-w-[85%] ${msg.role === 'user' ? 'ml-auto flex-row-reverse' : 'mr-auto'}`}
                 >
                   <div className={`w-8 h-8 shrink-0 rounded-full flex items-center justify-center ${
-                    msg.role === 'user' ? 'bg-[#00FF66]/10 border border-[#00FF66]' : 'bg-[#0070F3]/10 border border-[#0070F3]'
+                    msg.role === 'user' ? 'bg-zinc-800' : 'bg-transparent border border-zinc-800'
                   }`}>
-                    {msg.role === 'user' ? <User className="w-4 h-4 text-[#00FF66]" /> : <Bot className="w-4 h-4 text-[#0070F3]" />}
+                    {msg.role === 'user' ? <User className="w-4 h-4 text-white" /> : <Bot className="w-4 h-4 text-white" />}
                   </div>
-                  <div className={`p-3 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${
+                  <div className={`p-3 rounded-xl text-sm leading-relaxed whitespace-pre-wrap ${
                     msg.role === 'user' 
-                      ? 'bg-black/60 border border-[#00FF66]/30 text-white rounded-tr-none' 
-                      : 'bg-white/5 border border-white/10 text-gray-200 rounded-tl-none'
+                      ? 'bg-zinc-800 text-white rounded-tr-none' 
+                      : 'bg-transparent text-zinc-400 rounded-tl-none'
                   }`}>
                     {msg.content}
                   </div>
@@ -139,13 +138,13 @@ export function DriveLegalWidget() {
                   animate={{ opacity: 1 }}
                   className="flex gap-3 max-w-[85%] mr-auto"
                 >
-                  <div className="w-8 h-8 shrink-0 rounded-full bg-[#0070F3]/10 border border-[#0070F3] flex items-center justify-center">
-                    <Bot className="w-4 h-4 text-[#0070F3]" />
+                  <div className="w-8 h-8 shrink-0 rounded-full bg-transparent border border-zinc-800 flex items-center justify-center">
+                    <Bot className="w-4 h-4 text-white" />
                   </div>
-                  <div className="p-4 rounded-2xl bg-white/5 border border-white/10 rounded-tl-none flex items-center gap-1.5">
-                    <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1.2 }} className="w-1.5 h-1.5 rounded-full bg-[#00FF66] shadow-[0_0_8px_#00FF66]" />
-                    <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1.2, delay: 0.2 }} className="w-1.5 h-1.5 rounded-full bg-[#00FF66] shadow-[0_0_8px_#00FF66]" />
-                    <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1.2, delay: 0.4 }} className="w-1.5 h-1.5 rounded-full bg-[#00FF66] shadow-[0_0_8px_#00FF66]" />
+                  <div className="p-4 rounded-xl bg-transparent border border-zinc-800 rounded-tl-none flex items-center gap-1.5">
+                    <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1.2 }} className="w-1.5 h-1.5 rounded-full bg-zinc-500" />
+                    <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1.2, delay: 0.2 }} className="w-1.5 h-1.5 rounded-full bg-zinc-500" />
+                    <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1.2, delay: 0.4 }} className="w-1.5 h-1.5 rounded-full bg-zinc-500" />
                   </div>
                 </motion.div>
               )}
@@ -153,7 +152,7 @@ export function DriveLegalWidget() {
             </div>
 
             {/* Input Area */}
-            <div className="p-4 bg-black/60 border-t border-white/10">
+            <div className="p-4 bg-zinc-950 border-t border-zinc-800">
               <form onSubmit={handleSubmit} className="relative flex items-center">
                 <input
                   type="text"
@@ -161,12 +160,12 @@ export function DriveLegalWidget() {
                   onChange={(e) => setInput(e.target.value)}
                   disabled={isLoading}
                   placeholder="Ask DriveLegal AI..."
-                  className="w-full bg-white/5 border border-white/10 rounded-full pl-4 pr-12 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#00FF66]/50 transition-colors disabled:opacity-50"
+                  className="w-full bg-zinc-900 border border-zinc-800 text-sm text-white focus:outline-none rounded-md pl-4 pr-12 py-2 placeholder-zinc-500 transition-colors disabled:opacity-50"
                 />
                 <button
                   type="submit"
                   disabled={!input.trim() || isLoading}
-                  className="absolute right-2 w-8 h-8 flex items-center justify-center rounded-full bg-[#00FF66]/10 text-[#00FF66] hover:bg-[#00FF66]/20 disabled:opacity-50 disabled:hover:bg-[#00FF66]/10 transition-colors"
+                  className="absolute right-2 w-8 h-8 flex items-center justify-center rounded-md bg-white text-black hover:bg-zinc-200 disabled:opacity-50 transition-colors"
                 >
                   <Send className="w-4 h-4" />
                 </button>
