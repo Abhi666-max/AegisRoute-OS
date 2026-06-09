@@ -99,7 +99,7 @@ export function RoadWatchReporter() {
                 initial={{ top: 0 }}
                 animate={{ top: '100%' }}
                 transition={{ duration: 1.5, ease: "linear", repeat: Infinity, repeatType: 'reverse' }}
-                className="absolute left-0 w-full h-0.5 bg-white shadow-[0_0_20px_4px_rgba(255,255,255,0.5)] z-10 pointer-events-none"
+                className="absolute inset-0 left-0 w-full h-0.5 bg-white shadow-[0_0_20px_4px_rgba(255,255,255,0.5)] z-10 pointer-events-none"
               />
             )}
             
@@ -195,7 +195,7 @@ export function RoadWatchReporter() {
         <button
           disabled={!result || isScanning || isSubmitted}
           onClick={handleSubmit}
-          className={`relative z-50 w-full py-3 bg-white text-black font-medium rounded-md hover:bg-zinc-200 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer`}
+          className={`relative z-[9999] pointer-events-auto cursor-pointer w-full py-3 bg-white text-black font-medium rounded-md hover:bg-zinc-200 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed`}
         >
           {isSubmitted ? 'Report Logged' : 'Submit to Authority'}
         </button>

@@ -72,27 +72,19 @@ export default function LandingPage() {
       <section className="relative z-10 border-y border-white/10 bg-black/50 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-6 py-10 grid grid-cols-2 md:grid-cols-4 gap-8 divide-x divide-white/10">
           <div className="flex flex-col items-center justify-center text-center px-4">
-            <span className="text-3xl md:text-5xl font-clash font-bold mb-2">
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-500">0</span><span className="text-emerald-400">ms</span>
-            </span>
+            <h3 className="text-5xl font-bold tracking-tighter text-white mb-2">0ms</h3>
             <span className="text-sm text-gray-400 font-medium tracking-wide uppercase">Edge API Latency</span>
           </div>
           <div className="flex flex-col items-center justify-center text-center px-4">
-            <span className="text-3xl md:text-5xl font-clash font-bold mb-2">
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-500">99.9</span><span className="text-emerald-400">%</span>
-            </span>
+            <h3 className="text-5xl font-bold tracking-tighter text-white mb-2">99.9%</h3>
             <span className="text-sm text-gray-400 font-medium tracking-wide uppercase">Guaranteed Uptime</span>
           </div>
           <div className="flex flex-col items-center justify-center text-center px-4">
-            <span className="text-3xl md:text-5xl font-clash font-bold mb-2">
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-500">256</span><span className="text-emerald-400">bit</span>
-            </span>
+            <h3 className="text-5xl font-bold tracking-tighter text-white mb-2">256bit</h3>
             <span className="text-sm text-gray-400 font-medium tracking-wide uppercase">AES Encryption</span>
           </div>
           <div className="flex flex-col items-center justify-center text-center px-4">
-            <span className="text-3xl md:text-5xl font-clash font-bold mb-2">
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-500">5</span><span className="text-emerald-400">M+</span>
-            </span>
+            <h3 className="text-5xl font-bold tracking-tighter text-white mb-2">5M+</h3>
             <span className="text-sm text-gray-400 font-medium tracking-wide uppercase">Vectors Analyzed</span>
           </div>
         </div>
@@ -101,7 +93,7 @@ export default function LandingPage() {
       {/* Bento Grid Features */}
       <section id="solutions" className="relative z-10 py-32 px-6 max-w-7xl mx-auto">
         <div className="mb-16">
-          <h2 className="text-4xl md:text-5xl font-clash font-bold text-white mb-4">Ecosystem Architecture</h2>
+          <h2 className="text-4xl font-semibold tracking-tighter text-white mb-4">Ecosystem Architecture</h2>
           <p className="text-xl text-gray-400">Three pillars of next-generation civic infrastructure.</p>
         </div>
 
@@ -117,7 +109,7 @@ export default function LandingPage() {
               transition={{ duration: 0.6 }}
               className="bg-[#020202] rounded-3xl p-[1px] relative group h-full"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-cyan-400 opacity-20 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl" />
+              <div className="absolute inset-0 bg-gradient-to-r from-zinc-800 to-zinc-700 opacity-0 group-hover:opacity-10 transition-opacity duration-500 rounded-3xl" />
               <div className="relative h-full bg-[#020202] rounded-[calc(1.5rem-1px)] p-8 flex flex-col justify-between overflow-hidden z-10 border border-white/5 group-hover:border-transparent transition-colors">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-aegis-neon/10 rounded-full blur-[80px] group-hover:bg-aegis-neon/20 transition-colors" />
                 <div>
@@ -144,7 +136,7 @@ export default function LandingPage() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="bg-[#020202] rounded-3xl p-[1px] relative group h-full"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-cyan-400 opacity-20 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl" />
+              <div className="absolute inset-0 bg-gradient-to-r from-zinc-800 to-zinc-700 opacity-0 group-hover:opacity-10 transition-opacity duration-500 rounded-3xl" />
               <div className="relative h-full bg-[#020202] rounded-[calc(1.5rem-1px)] p-8 flex flex-col justify-between overflow-hidden z-10 border border-white/5 group-hover:border-transparent transition-colors">
                 <div>
                   <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-6">
@@ -170,7 +162,7 @@ export default function LandingPage() {
               transition={{ duration: 0.6, delay: 0.3 }}
               className="bg-[#020202] rounded-3xl p-[1px] relative group cursor-pointer"
             >
-               <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-cyan-400 opacity-20 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl" />
+               <div className="absolute inset-0 bg-gradient-to-r from-zinc-800 to-zinc-700 opacity-0 group-hover:opacity-10 transition-opacity duration-500 rounded-3xl" />
                <div className="relative h-full bg-[#020202] rounded-[calc(1.5rem-1px)] p-8 md:p-12 overflow-hidden z-10 flex flex-col md:flex-row items-center justify-between gap-8 border border-white/5 group-hover:border-transparent transition-colors">
                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 pointer-events-none" />
                 <div className="max-w-xl relative z-10">
@@ -212,7 +204,7 @@ export default function LandingPage() {
               placeholder="government.email@gov.in" 
               className="flex-1 bg-black/50 border border-white/10 rounded-full px-6 py-4 text-white outline-none focus:border-brand-neon transition-colors"
             />
-            <button className="px-8 py-4 bg-white text-black font-bold rounded-full hover:bg-gray-200 transition-colors shadow-xl">
+            <button className="px-8 py-4 bg-white text-black font-bold rounded-full hover:bg-gray-200 transition-colors shadow-xl relative z-50 cursor-pointer">
               Request Access
             </button>
           </form>

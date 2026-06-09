@@ -70,9 +70,11 @@ export default function DevelopersPortal() {
           </h2>
           
           <Tabs defaultValue="drivelegal" className="w-full">
-            <TabsList className="bg-zinc-950 border border-zinc-800 p-1 rounded-md mb-6 inline-flex border-none">
-              <TabsTrigger value="drivelegal" className="data-[state=active]:bg-zinc-800 data-[state=active]:text-white rounded-md px-4 py-1.5 text-sm font-medium text-zinc-400 transition-all">POST /api/v1/drivelegal</TabsTrigger>
-              <TabsTrigger value="incidents" className="data-[state=active]:bg-zinc-800 data-[state=active]:text-white rounded-md px-4 py-1.5 text-sm font-medium text-zinc-400 transition-all">GET /api/v1/incidents/live</TabsTrigger>
+            <TabsList className="bg-transparent border-none p-0 mb-6 flex h-auto">
+              <div className="flex gap-2 p-1 bg-zinc-900 border border-zinc-800 rounded-lg w-max">
+                <TabsTrigger value="drivelegal" className="px-4 py-1.5 text-sm font-medium data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-400 hover:text-white rounded-md transition-all">POST /api/v1/drivelegal</TabsTrigger>
+                <TabsTrigger value="incidents" className="px-4 py-1.5 text-sm font-medium data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-400 hover:text-white rounded-md transition-all">GET /api/v1/incidents/live</TabsTrigger>
+              </div>
             </TabsList>
             
             <TabsContent value="drivelegal" className="mt-0">

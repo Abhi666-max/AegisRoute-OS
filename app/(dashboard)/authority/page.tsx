@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { AlertCircle, Clock, Activity, ShieldAlert, CheckCircle2 } from "lucide-react";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase/config";
+import { useAuthStore } from "@/store/useAuthStore";
 
 const chartData = [
   { time: "00:00", incidents: 12 },
@@ -36,6 +37,8 @@ const itemVariants = {
 export default function AuthorityDashboard() {
   const { incidents, metrics, loading } = useLiveIncidents();
 
+  const { userData } = useAuthStore();
+
   const updateStatus = async (id: string, newStatus: string) => {
     try {
       await updateDoc(doc(db, "incidents", id), { status: newStatus });
@@ -44,8 +47,12 @@ export default function AuthorityDashboard() {
     }
   };
 
+  if (userData?.role === 'citizen') {
+    return <div className="flex h-screen items-center justify-center bg-black"><div className="text-center"><h1 className="text-3xl text-red-500 font-bold tracking-tighter">Clearance Level Inadequate</h1><p className="text-zinc-500 mt-2">This terminal is restricted to verified Regional Authorities.</p></div></div>;
+  }
+
   if (loading) {
-    return <div className="animate-pulse flex items-center justify-center h-[50vh] text-[#00FF66] font-mono uppercase tracking-widest text-sm">Syncing with AegisRoute OS Core...</div>;
+    return <div className="animate-pulse flex items-center justify-center h-[50vh] text-zinc-400 font-mono uppercase tracking-widest text-sm">Syncing with AegisRoute OS Core...</div>;
   }
 
   return (

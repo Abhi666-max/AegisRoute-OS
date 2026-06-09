@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Shield, Globe, MessageCircle, Link2 } from 'lucide-react';
+import { Shield, Globe, MessageCircle, Link2, Github, Linkedin, Twitter, Instagram } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 
@@ -59,9 +59,9 @@ export function Footer() {
       </div>
       
       <div className="max-w-7xl mx-auto px-6">
-        <div className="mt-8 pt-8 border-t border-zinc-900 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-xs text-zinc-600 uppercase tracking-widest">AegisRoute OS</p>
-          <p className="text-xs text-zinc-600 transition-colors hover:text-white cursor-pointer">Architected & Founded by <span className="font-semibold text-zinc-300 hover:text-white">Abhijeet Kangane</span></p>
+        <div className="flex flex-col md:flex-row items-center justify-between pt-8 border-t border-zinc-900">
+          <div className="flex items-center gap-2"><span className="text-zinc-500 text-sm">Architected & Founded by</span> <span className="text-white font-semibold">Abhijeet Kangane</span></div>
+          <div className="flex gap-4 mt-4 md:mt-0 text-zinc-400"> <Linkedin className="w-5 h-5 hover:text-white cursor-pointer transition-colors"/> <Github className="w-5 h-5 hover:text-white cursor-pointer transition-colors"/> <Twitter className="w-5 h-5 hover:text-white cursor-pointer transition-colors"/> <Instagram className="w-5 h-5 hover:text-white cursor-pointer transition-colors"/> </div>
         </div>
       </div>
     </footer>

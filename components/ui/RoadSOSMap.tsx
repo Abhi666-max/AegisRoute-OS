@@ -35,7 +35,7 @@ export function RoadSOSMap() {
 
       await Promise.race([
         addDoc(collection(db, 'incidents'), payload),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 3000))
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 8000))
       ]);
 
       setShowSuccess(true);
