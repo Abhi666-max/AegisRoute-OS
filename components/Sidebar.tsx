@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { LayoutDashboard, AlertTriangle, BarChart3, Activity, Settings, ChevronRight } from "lucide-react";
+import { LayoutDashboard, AlertTriangle, BarChart3, Activity, Settings, ChevronRight, LogOut } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { auth } from '@/lib/firebase/config';
 
 // Removed static navItems, will calculate dynamically inside component
 
@@ -64,17 +65,35 @@ export function Sidebar() {
         })}
       </nav>
       
-      <div className="px-4">
-        <div className="flex items-center px-2 py-3 rounded-lg text-gray-400">
-           <ChevronRight className="w-6 h-6 shrink-0" />
-           <motion.span
-              initial={{ opacity: 0 }}
-              animate={{ opacity: isHovered ? 1 : 0 }}
-              className="ml-4 text-sm whitespace-nowrap"
-           >
-             AegisRoute OS v0.1
-           </motion.span>
+      <div className="px-4 mt-auto">
+        <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800">
+          <div className="relative shrink-0">
+            <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-emerald-500 font-bold text-xs">AK</div>
+            <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-zinc-950 animate-pulse"></div>
+          </div>
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: isHovered ? 1 : 0 }}
+            className="flex flex-col whitespace-nowrap"
+          >
+            <span className="text-sm font-semibold text-white">Abhijeet K.</span>
+            <span className="text-[10px] text-zinc-500 tracking-widest font-mono">OVERSIGHT ADMIN</span>
+          </motion.div>
         </div>
+        
+        <button 
+          onClick={() => { auth.signOut().then(() => window.location.href = '/'); }} 
+          className="w-full mt-2 flex items-center justify-center gap-2 text-red-500 hover:bg-red-500/10 py-2 rounded-md transition-colors text-sm font-medium"
+        >
+          <LogOut size={16} /> 
+          <motion.span
+            initial={{ opacity: 0 }}
+            animate={{ opacity: isHovered ? 1 : 0 }}
+            className="whitespace-nowrap"
+          >
+            Terminate Session
+          </motion.span>
+        </button>
       </div>
     </motion.aside>
   );

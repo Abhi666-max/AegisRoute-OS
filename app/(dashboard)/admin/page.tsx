@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shield, Users, Activity, Zap, Check, X, Search, Database, RefreshCw, Key, Building, Terminal } from 'lucide-react';
+import { Shield, Users, Activity, Zap, Check, X, Search, Database, RefreshCw, Key, Building, Terminal, ShieldCheck } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
@@ -20,6 +20,8 @@ const BIMSTEC_MOCK_NODES = [
 const PIPELINE_MOCK_LEADS = [
   { id: 'lead_1', org: 'Colombo Municipal', email: 'admin@colombo.gov.lk', fleetSize: 450, status: 'PENDING APPROVAL' },
   { id: 'lead_2', org: 'Kolkata Transport', email: 'cmd@kolkatatrans.gov.in', fleetSize: 1200, status: 'EVALUATING' },
+  { id: 'lead_3', org: 'Tokyo Highway Auth', email: 'sys@highway.metro.tokyo.jp', fleetSize: 3400, status: 'PENDING APPROVAL' },
+  { id: 'lead_4', org: 'Jakarta Metro', email: 'it.dept@jakarta.go.id', fleetSize: 2100, status: 'EVALUATING' },
 ];
 
 const MOCK_AUDIT_LOGS = [
@@ -382,8 +384,9 @@ export default function AdminDashboard() {
                   ))}
                 </AnimatePresence>
                 {leads.length === 0 && (
-                  <div className="py-8 text-center text-zinc-500 text-xs font-mono uppercase tracking-widest">
-                    Pipeline clear.
+                  <div className="w-full h-32 flex flex-col items-center justify-center border border-dashed border-zinc-800 rounded-xl bg-zinc-950/30 text-zinc-500">
+                    <ShieldCheck className="w-8 h-8 text-emerald-500 mb-2 opacity-50" />
+                    <span className="text-xs font-mono uppercase tracking-widest">Pipeline clear. All enterprise endpoints provisioned.</span>
                   </div>
                 )}
               </div>

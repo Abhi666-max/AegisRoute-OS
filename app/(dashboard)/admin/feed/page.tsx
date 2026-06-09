@@ -1,45 +1,69 @@
-import { Terminal as TerminalIcon } from 'lucide-react';
+import { Terminal as TerminalIcon, Search } from 'lucide-react';
 
 export default function FeedPage() {
   const simulatedLogs = Array.from({ length: 20 }).map((_, i) => {
-    const actions = ['AUTH_SUCCESS', 'ROUTE_CALCULATED', 'DB_SYNC', 'VECTOR_INDEXED', 'NODE_HEARTBEAT', 'SOS_PING_REJECTED'];
+    const actions = ['AUTH_SUCCESS', 'EDGE_INFERENCE', 'DB_SYNC', 'VECTOR_INDEXED', 'NODE_HEARTBEAT', 'UNAUTHORIZED_ACCESS'];
     const ips = ['192.168.1.104', '10.0.0.44', '172.16.254.1', '8.8.8.8', '142.250.190.46'];
+    const nodes = ['mumbai_auth', 'dhaka_central', 'colombo_metro', 'bkk_patrol', 'sys_root'];
+    
+    const action = actions[Math.floor(Math.random() * actions.length)];
+    const isError = action === 'UNAUTHORIZED_ACCESS';
+    
     return {
       id: i,
       time: new Date(Date.now() - i * 14000).toISOString().split('T')[1].slice(0, -1),
-      action: actions[Math.floor(Math.random() * actions.length)],
+      action: action,
       ip: ips[Math.floor(Math.random() * ips.length)],
-      latency: Math.floor(Math.random() * 40) + 5
+      node: nodes[Math.floor(Math.random() * nodes.length)],
+      latency: Math.floor(Math.random() * 40) + 5,
+      status: isError ? 401 : 200,
+      statusText: isError ? 'DENIED' : 'OK'
     };
   });
 
   return (
     <div className="p-8 min-h-screen bg-[#020202] text-white">
-      <div className="flex items-center gap-3 mb-2">
-        <TerminalIcon className="w-8 h-8 text-emerald-500" />
-        <h1 className="text-3xl font-bold tracking-tighter text-emerald-500">Live Incident Feed</h1>
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-3">
+          <TerminalIcon className="w-8 h-8 text-emerald-500" />
+          <h1 className="text-3xl font-bold tracking-tighter text-emerald-500">Live SIEM Feed</h1>
+        </div>
+        <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-800 rounded-md px-3 py-1.5">
+          <Search className="w-4 h-4 text-zinc-500" />
+          <input type="text" placeholder="Filter logs..." className="bg-transparent text-xs text-white outline-none w-48 font-mono" />
+        </div>
       </div>
-      <p className="text-zinc-500 mb-8">System telemetry linked and operational. Real-time network stream active.</p>
       
-      <div className="mt-8 border border-zinc-800 rounded-xl h-[600px] bg-black p-6 font-mono text-xs text-zinc-500 overflow-hidden relative shadow-[0_0_50px_rgba(16,185,129,0.05)]">
-        <div className="absolute top-0 left-0 w-full h-8 bg-gradient-to-b from-black to-transparent z-10 pointer-events-none"></div>
-        <div className="absolute bottom-0 left-0 w-full h-8 bg-gradient-to-t from-black to-transparent z-10 pointer-events-none"></div>
-        
-        <div className="flex flex-col gap-2 h-full overflow-y-auto custom-scrollbar relative z-0 pr-4">
-          {simulatedLogs.map((log) => (
-            <div key={log.id} className="flex items-center gap-4 py-1 hover:bg-zinc-900/50 transition-colors px-2 rounded">
-              <span className="text-zinc-600">[{log.time}]</span>
-              <span className="text-zinc-400 w-32">{log.ip}</span>
-              <span className={
-                log.action.includes('REJECTED') ? 'text-red-500 font-bold w-48' : 
-                log.action.includes('SUCCESS') ? 'text-emerald-500 w-48' : 'text-blue-400 w-48'
-              }>{log.action}</span>
-              <span className="text-zinc-600 ml-auto">executed in {log.latency}ms</span>
-            </div>
-          ))}
-          <div className="flex items-center gap-4 py-1 px-2 mt-4 text-emerald-500 animate-pulse">
-            <span className="w-2 h-4 bg-emerald-500"></span> Waiting for incoming packets...
-          </div>
+      <div className="border border-zinc-800 rounded-xl bg-[#050505] shadow-2xl overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs whitespace-nowrap font-mono">
+            <thead className="bg-[#020202] text-[10px] text-zinc-500 uppercase tracking-widest border-b border-zinc-800">
+              <tr>
+                <th className="px-6 py-4 font-medium">Timestamp</th>
+                <th className="px-6 py-4 font-medium">IP Address</th>
+                <th className="px-6 py-4 font-medium">Node Identifier</th>
+                <th className="px-6 py-4 font-medium">Event Type</th>
+                <th className="px-6 py-4 font-medium">Latency</th>
+                <th className="px-6 py-4 font-medium text-right">Status</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-zinc-800/50">
+              {simulatedLogs.map((log) => (
+                <tr key={log.id} className="hover:bg-white/[0.02] transition-colors group cursor-default">
+                  <td className="px-6 py-3 text-zinc-500">[{log.time}]</td>
+                  <td className="px-6 py-3 text-zinc-400 group-hover:text-white transition-colors">{log.ip}</td>
+                  <td className="px-6 py-3 text-blue-400">{log.node}</td>
+                  <td className="px-6 py-3 text-zinc-300">{log.action}</td>
+                  <td className="px-6 py-3 text-zinc-500">{log.latency}ms</td>
+                  <td className="px-6 py-3 text-right">
+                    <span className={log.status === 200 ? 'text-emerald-500' : 'text-red-500'}>
+                      [{log.status} {log.statusText}]
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
