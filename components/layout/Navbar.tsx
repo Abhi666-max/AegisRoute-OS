@@ -47,7 +47,7 @@ export function Navbar() {
         {/* Links */}
         <div className="hidden md:flex items-center gap-8 font-medium text-sm text-gray-300">
           <Link href="/#solutions" scroll={true} className="text-sm font-medium text-zinc-400 hover:text-white transition-colors">Solutions</Link>
-          <Link href="/developers" className="text-sm font-medium text-zinc-400 hover:text-white transition-colors">IaaS API</Link>
+          <Link href="/developers" onClick={(e) => { if (!user) { e.preventDefault(); document.dispatchEvent(new CustomEvent('open-auth-modal')); } }} className="text-sm font-medium text-zinc-400 hover:text-white transition-colors">IaaS API</Link>
           {!user && (
             <div className="flex items-center gap-4">
               <button onClick={() => setAuthModalOpen(true)} className="hover:text-white transition-colors">Login</button>

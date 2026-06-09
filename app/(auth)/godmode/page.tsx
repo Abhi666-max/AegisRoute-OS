@@ -6,7 +6,7 @@ import { auth } from "@/lib/firebase/config";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import { ShieldAlert, Terminal } from "lucide-react";
+import { ShieldAlert, Terminal, Lock } from "lucide-react";
 
 export default function GodModeLogin() {
   const [password, setPassword] = useState("");
@@ -28,21 +28,21 @@ export default function GodModeLogin() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#000000] px-4 relative overflow-hidden">
-      <div className="absolute inset-0 bg-red-500/10 blur-[150px] z-0 pointer-events-none" />
+    <div className="min-h-screen bg-black flex items-center justify-center relative overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-red-900/20 via-black to-black z-0"></div>
       
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="relative z-10 w-full max-w-md bg-[#050505] border border-red-500/30 rounded-2xl p-8 shadow-[0_0_50px_rgba(255,0,0,0.1)]"
+        className="relative z-10 w-full max-w-lg bg-[#050505] border border-red-500/30 rounded-2xl p-10 shadow-[0_0_80px_rgba(255,0,0,0.15)] flex flex-col items-center"
       >
-        <div className="flex flex-col items-center mb-8">
+        <div className="flex flex-col items-center mb-8 w-full">
           <div className="w-16 h-16 bg-red-500/10 rounded-2xl flex items-center justify-center border border-red-500/30 mb-6 relative">
              <div className="absolute inset-0 bg-red-500/20 blur-xl rounded-full" />
-             <ShieldAlert className="w-8 h-8 text-red-500 relative z-10" />
+             <Lock className="w-8 h-8 text-red-500 relative z-10" />
           </div>
           <h1 className="text-2xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500 text-center uppercase">Classified:<br/>Founder Override</h1>
-          <p className="text-zinc-500 text-sm font-mono mt-2 tracking-widest uppercase flex items-center gap-2">
+          <p className="text-red-500 text-sm font-mono mt-2 tracking-widest uppercase flex items-center gap-2">
             <Terminal className="w-3 h-3" />
             Terminal Access
           </p>
@@ -53,14 +53,14 @@ export default function GodModeLogin() {
           </div>
         </div>
 
-        <form onSubmit={handleLogin} className="space-y-6">
+        <form onSubmit={handleLogin} className="space-y-6 w-full">
           <div className="space-y-2">
             <input
               type="password"
-              placeholder="ENTER OVERRIDE KEY"
+              placeholder="ENTER CLASSIFIED KEY"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-black/50 border border-zinc-800 focus:border-red-500/50 rounded-lg px-4 py-3 text-center text-red-500 font-mono tracking-widest outline-none transition-colors"
+              className="w-full bg-black border border-red-500/50 text-red-500 text-center font-mono py-3 rounded-md focus:outline-none focus:shadow-[0_0_20px_rgba(255,0,0,0.3)] transition-all"
               autoFocus
             />
           </div>

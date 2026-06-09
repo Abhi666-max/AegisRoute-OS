@@ -40,6 +40,7 @@ export default function RootLayout({
         <AuthModal />
         <DemoModal />
         <Toaster theme="dark" />
+        <DriveLegalWidget />
       </body>
     </html>
   );

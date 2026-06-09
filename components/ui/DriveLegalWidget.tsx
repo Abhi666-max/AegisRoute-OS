@@ -68,7 +68,7 @@ export function DriveLegalWidget() {
   };
 
   const widgetContent = (
-    <div style={{ position: 'fixed', bottom: '24px', right: '24px', zIndex: 2147483647, pointerEvents: 'auto' }}>
+    <div className="fixed bottom-6 right-6 z-[9999999] pointer-events-auto flex flex-col items-end">
       <AnimatePresence>
         {!isOpen && (
           <motion.button

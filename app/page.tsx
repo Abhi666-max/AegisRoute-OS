@@ -4,9 +4,11 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight, Terminal, Activity, Zap, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 import { useRef } from 'react';
+import { useAuthStore } from '@/store/useAuthStore';
 
 export default function LandingPage() {
   const containerRef = useRef(null);
+  const { user } = useAuthStore();
   const { scrollYProgress } = useScroll({ target: containerRef, offset: ["start start", "end start"] });
   const y = useTransform(scrollYProgress, [0, 1], [0, 200]);
 
@@ -53,12 +55,14 @@ export default function LandingPage() {
           >
             <Link 
               href="/report"
+              onClick={(e) => { if (!user) { e.preventDefault(); document.dispatchEvent(new CustomEvent('open-auth-modal')); } }}
               className="px-6 py-2.5 rounded-md bg-white text-black font-medium text-sm hover:bg-zinc-200 transition-all"
             >
               Start for Free
             </Link>
             <Link 
               href="/developers"
+              onClick={(e) => { if (!user) { e.preventDefault(); document.dispatchEvent(new CustomEvent('open-auth-modal')); } }}
               className="px-6 py-2.5 rounded-md bg-transparent border border-zinc-800 text-white font-medium text-sm hover:bg-zinc-900 transition-colors flex items-center gap-2"
             >
               <Terminal className="w-4 h-4" />
@@ -99,7 +103,7 @@ export default function LandingPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[300px]">
           
           {/* DriveLegal */}
-          <Link href="/developers" className="block md:col-span-2">
+          <Link href="/developers" onClick={(e) => { if (!user) { e.preventDefault(); document.dispatchEvent(new CustomEvent('open-auth-modal')); } }} className="block md:col-span-2">
             <motion.div 
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -126,7 +130,7 @@ export default function LandingPage() {
           </Link>
 
           {/* RoadWatch */}
-          <Link href="/report" className="block">
+          <Link href="/report" onClick={(e) => { if (!user) { e.preventDefault(); document.dispatchEvent(new CustomEvent('open-auth-modal')); } }} className="block">
             <motion.div 
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -152,7 +156,7 @@ export default function LandingPage() {
           </Link>
 
           {/* RoadSOS */}
-          <Link href="/sos" className="block md:col-span-3">
+          <Link href="/sos" onClick={(e) => { if (!user) { e.preventDefault(); document.dispatchEvent(new CustomEvent('open-auth-modal')); } }} className="block md:col-span-3">
             <motion.div 
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}

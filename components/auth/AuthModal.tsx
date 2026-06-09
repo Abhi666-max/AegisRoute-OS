@@ -34,7 +34,10 @@ export function AuthModal() {
 
     try {
       if (isLogin) {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const userCredential = await Promise.race([
+          signInWithEmailAndPassword(auth, email, password),
+          new Promise((_, rej) => setTimeout(() => rej(new Error('Network Timeout')), 8000))
+        ]) as any;
         const user = userCredential.user;
         let fetchedRole = 'citizen';
         
@@ -57,7 +60,10 @@ export function AuthModal() {
           toast.success('Citizen logged in');
         }
       } else {
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const userCredential = await Promise.race([
+          createUserWithEmailAndPassword(auth, email, password),
+          new Promise((_, rej) => setTimeout(() => rej(new Error('Network Timeout')), 8000))
+        ]) as any;
         const user = userCredential.user;
         
         await setDoc(doc(db, 'users', user.uid), {
@@ -78,7 +84,11 @@ export function AuthModal() {
         }
       }
     } catch (err: any) {
-      toast.error(err.message || 'Authentication failed.');
+      if (err.message === 'Network Timeout') {
+        toast.error('Authentication Node Offline. Check connection.');
+      } else {
+        toast.error(err.message || 'Authentication failed.');
+      }
     } finally {
       setLoading(false);
     }
@@ -95,10 +105,16 @@ export function AuthModal() {
     };
   }, [isOpen]);
 
+  useEffect(() => {
+    const handleOpen = () => setAuthModalOpen(true);
+    document.addEventListener('open-auth-modal', handleOpen);
+    return () => document.removeEventListener('open-auth-modal', handleOpen);
+  }, [setAuthModalOpen]);
+
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/90 backdrop-blur-xl w-screen h-screen">
+        <div className="fixed inset-0 z-[9999999] flex items-center justify-center bg-black/90 backdrop-blur-xl w-screen h-screen">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
