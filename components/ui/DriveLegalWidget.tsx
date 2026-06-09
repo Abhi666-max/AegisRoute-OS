@@ -91,7 +91,8 @@ export function DriveLegalWidget() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 50, scale: 0.9 }}
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
-            className="absolute bottom-0 right-0 w-[350px] h-[500px] bg-[#050505] border border-zinc-800 rounded-xl shadow-2xl flex flex-col overflow-hidden"
+            style={{ display: 'flex', pointerEvents: 'auto' }}
+            className="absolute bottom-0 right-0 w-[350px] h-[500px] bg-[#050505] border border-zinc-800 rounded-xl shadow-2xl flex-col overflow-hidden"
           >
             {/* Header */}
             <div className="h-14 border-b border-zinc-800 flex items-center justify-between px-4 bg-zinc-950">

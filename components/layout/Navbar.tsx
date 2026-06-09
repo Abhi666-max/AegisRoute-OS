@@ -9,12 +9,10 @@ import { auth } from '@/lib/firebase/config';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { DemoModal } from '@/components/ui/DemoModal';
 
 export function Navbar() {
-  const { user, userData, initializeAuth, setAuthModalOpen } = useAuthStore();
+  const { user, userData, initializeAuth, setAuthModalOpen, setDemoModalOpen } = useAuthStore();
   const router = useRouter();
-  const [isDemoOpen, setIsDemoOpen] = useState(false);
 
 
 
@@ -75,12 +73,18 @@ export function Navbar() {
                     variants={{ hover: { opacity: 1, y: 0, pointerEvents: 'auto' } }}
                     className="absolute right-0 top-full mt-2 w-64 bg-zinc-950/80 backdrop-blur-xl border border-white/10 rounded-xl p-4 shadow-2xl"
                   >
-                    <p className="text-white text-sm font-semibold truncate">{user.email}</p>
+                    <p className="text-white text-sm font-semibold truncate">{user.displayName || user.email}</p>
                     <div className="flex items-center gap-2 mt-2">
                       <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                      <span className="text-xs text-emerald-500 font-mono">Live Sync Active</span>
+                      <span className="text-xs text-emerald-500 font-mono">Live GPS Sync Active</span>
                     </div>
-                    <p className="text-xs text-zinc-500 font-mono mt-3">Current Node:<br/>Dhumalwadi, MH (18.1, 73.2)</p>
+                    <p className="text-xs text-zinc-500 font-mono mt-3">Current Node:<br/>BIMSTEC Grid</p>
+                    <button 
+                      onClick={() => { auth.signOut(); router.push('/'); }}
+                      className="mt-4 w-full bg-red-500/10 hover:bg-red-500/20 text-red-500 font-semibold text-xs py-2 rounded-lg transition-colors border border-red-500/20"
+                    >
+                      Sign Out
+                    </button>
                   </motion.div>
                 </motion.div>
               ) : (
@@ -90,22 +94,16 @@ export function Navbar() {
                 >
                   <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#E2CBFF_0%,#393BB2_50%,#E2CBFF_100%)]" />
                   <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-zinc-950 px-4 py-1 text-sm font-medium text-white backdrop-blur-3xl">
-                    Enter Dashboard
+                    {userData?.role === 'authority' ? 'Authority Dashboard' : 'Enter Dashboard'}
                   </span>
                 </Link>
               )}
-              <button 
-                onClick={() => { auth.signOut(); router.push('/'); }}
-                className="text-sm font-medium text-gray-400 hover:text-red-400 transition-colors"
-              >
-                Sign Out
-              </button>
             </>
           ) : (
 
 
             <button 
-              onClick={() => setIsDemoOpen(true)}
+              onClick={() => setDemoModalOpen(true)}
               className="px-4 py-1.5 text-sm font-medium border border-zinc-700 rounded-md bg-zinc-900 text-zinc-300 hover:bg-white hover:text-black transition-all"
             >
               Request Enterprise Demo
@@ -113,7 +111,6 @@ export function Navbar() {
           )}
         </div>
       </div>
-      <DemoModal isOpen={isDemoOpen} onClose={() => setIsDemoOpen(false)} />
     </motion.nav>
   );
 }

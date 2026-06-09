@@ -5,11 +5,26 @@ import { motion } from "framer-motion";
 import { Key, Copy, Terminal, Server, Shield, CheckCircle2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
+import { useAuthStore } from "@/store/useAuthStore";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function DevelopersPortal() {
   const [apiKey, setApiKey] = useState("aegis_live_*******************");
   const [isCopied, setIsCopied] = useState(false);
   const [isRegenerating, setIsRegenerating] = useState(false);
+
+  const { user } = useAuthStore();
+  const router = useRouter();
+  
+  useEffect(() => {
+    if (!user) {
+      toast.error("Enterprise authentication required.");
+      router.push("/?login=true");
+    }
+  }, [user, router]);
+
+  if (!user) return <div className="h-screen bg-black flex items-center justify-center text-zinc-500 tracking-widest font-mono text-sm uppercase">Securing environment...</div>;
 
   const handleCopy = () => {
     navigator.clipboard.writeText("aegis_live_x89aZ2pQ1Lmn0Rv3Xy7Bwq4Hk9Jc5Vf6M");

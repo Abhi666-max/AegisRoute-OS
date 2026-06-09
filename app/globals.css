@@ -18,6 +18,11 @@
   100% { background-position: 0% 50%; }
 }
 
+@keyframes typing {
+  from { width: 0 }
+  to { width: 100% }
+}
+
 @layer base {
   :root {
     --background: #000000;

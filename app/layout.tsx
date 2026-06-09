@@ -6,6 +6,7 @@ import { Toaster } from '@/components/ui/sonner';
 import { Footer } from '@/components/layout/Footer';
 import { DriveLegalWidget } from '@/components/ui/DriveLegalWidget';
 import { AuthModal } from '@/components/auth/AuthModal';
+import { DemoModal } from '@/components/ui/DemoModal';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
@@ -36,8 +37,8 @@ export default function RootLayout({
         <Navbar />
         <main className="flex-grow">{children}</main>
         <Footer />
-        <DriveLegalWidget />
         <AuthModal />
+        <DemoModal />
         <Toaster theme="dark" />
       </body>
     </html>

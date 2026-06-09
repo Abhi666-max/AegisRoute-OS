@@ -28,13 +28,13 @@ export default function GodModeLogin() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black px-4 relative overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-red-900/20 via-black to-black z-0 pointer-events-none" />
+    <div className="min-h-screen flex items-center justify-center bg-[#000000] px-4 relative overflow-hidden">
+      <div className="absolute inset-0 bg-red-500/10 blur-[150px] z-0 pointer-events-none" />
       
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="relative z-10 w-full max-w-md bg-zinc-950/80 backdrop-blur-xl border border-red-500/30 rounded-2xl p-8 shadow-[0_0_50px_rgba(239,68,68,0.1)]"
+        className="relative z-10 w-full max-w-md bg-[#050505] border border-red-500/30 rounded-2xl p-8 shadow-[0_0_50px_rgba(255,0,0,0.1)]"
       >
         <div className="flex flex-col items-center mb-8">
           <div className="w-16 h-16 bg-red-500/10 rounded-2xl flex items-center justify-center border border-red-500/30 mb-6 relative">
@@ -46,6 +46,11 @@ export default function GodModeLogin() {
             <Terminal className="w-3 h-3" />
             Terminal Access
           </p>
+          <div className="mt-6 p-3 bg-red-500/5 border border-red-500/10 rounded-lg w-full text-center">
+            <p className="text-red-500/80 font-mono text-xs tracking-widest uppercase overflow-hidden whitespace-nowrap animate-[typing_3s_steps(40,end)_infinite]">
+              AUTHORIZED PERSONNEL ONLY... AWAITING OVERRIDE KEY.
+            </p>
+          </div>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-6">

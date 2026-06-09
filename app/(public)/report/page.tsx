@@ -1,7 +1,22 @@
 import { RoadWatchReporter } from "@/components/ui/RoadWatchReporter";
 import { Network } from "lucide-react";
+import { useAuthStore } from "@/store/useAuthStore";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { toast } from "sonner";
 
 export default function RoadWatchPage() {
+  const { user } = useAuthStore();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!user) {
+      toast.error("Enterprise authentication required.");
+      router.push("/?login=true");
+    }
+  }, [user, router]);
+
+  if (!user) return <div className="h-screen bg-black flex items-center justify-center text-zinc-500 tracking-widest font-mono text-sm uppercase">Securing environment...</div>;
   return (
     <div className="min-h-screen bg-black text-white pt-32 pb-20 px-6">
       <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-16">

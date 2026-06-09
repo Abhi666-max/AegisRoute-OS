@@ -4,12 +4,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Building2, User, Mail, ShieldCheck, Zap, Activity } from "lucide-react";
 import { toast } from "sonner";
 
-interface DemoModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
+import { useAuthStore } from "@/store/useAuthStore";
 
-export function DemoModal({ isOpen, onClose }: DemoModalProps) {
+export function DemoModal() {
+  const { isDemoModalOpen: isOpen, setDemoModalOpen } = useAuthStore();
+  const onClose = () => setDemoModalOpen(false);
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     toast.success("Demo request submitted. Our Enterprise Sales team will contact you shortly.");
@@ -19,7 +18,7 @@ export function DemoModal({ isOpen, onClose }: DemoModalProps) {
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/90 backdrop-blur-md overflow-hidden p-4">
+        <div className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/90 backdrop-blur-xl w-screen h-screen">
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
