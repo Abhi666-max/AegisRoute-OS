@@ -15,10 +15,6 @@ export function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
 
-  if (pathname?.startsWith('/admin') || pathname?.startsWith('/authority') || pathname?.startsWith('/godmode')) return null;
-
-
-
   const getDashboardRoute = () => {
     if (user?.email === 'abhi.admin.dev@gmail.com') return '/admin';
     return '/authority';
@@ -28,6 +24,8 @@ export function Navbar() {
     const unsubscribe = initializeAuth();
     return () => unsubscribe();
   }, [initializeAuth]);
+
+  if (pathname?.startsWith('/admin') || pathname?.startsWith('/authority') || pathname?.startsWith('/godmode')) return null;
 
   return (
     <motion.nav 
