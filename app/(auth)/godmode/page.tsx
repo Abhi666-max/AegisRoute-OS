@@ -19,7 +19,7 @@ export default function GodModeLogin() {
     try {
       await signInWithEmailAndPassword(auth, "abhi.admin.dev@gmail.com", password);
       toast.success("God Mode Unlocked");
-      router.push("/admin");
+      window.location.href = "/admin";
     } catch (error) {
       toast.error("Clearance Denied");
     } finally {

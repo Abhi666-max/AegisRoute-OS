@@ -68,7 +68,7 @@ export function DriveLegalWidget() {
   };
 
   const widgetContent = (
-    <div className="fixed bottom-6 right-6 z-[9999999] pointer-events-auto flex flex-col items-end">
+    <div className="fixed bottom-6 right-6 z-[2147483647] pointer-events-none flex flex-col items-end">
       <AnimatePresence>
         {!isOpen && (
           <motion.button
@@ -77,7 +77,8 @@ export function DriveLegalWidget() {
             exit={{ scale: 0, opacity: 0 }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="w-14 h-14 rounded-full bg-white border border-zinc-200 shadow-2xl flex items-center justify-center text-black hover:bg-zinc-200 transition-colors"
+            onClick={() => setIsOpen(true)}
+            className="w-14 h-14 rounded-full bg-white border border-zinc-200 shadow-2xl flex items-center justify-center text-black hover:bg-zinc-200 transition-colors pointer-events-auto"
           >
             <Bot className="w-7 h-7" />
           </motion.button>
@@ -86,7 +87,7 @@ export function DriveLegalWidget() {
 
       <AnimatePresence>
         {isOpen && (
-          <div className="relative z-[9999999] w-80 h-96 bg-zinc-950 border border-zinc-800 shadow-2xl rounded-2xl p-4 flex flex-col pointer-events-auto mt-4 opacity-100 animate-in fade-in slide-in-from-bottom-4">
+          <div className="relative z-[2147483647] w-80 h-96 bg-zinc-950 border border-zinc-800 shadow-2xl rounded-2xl p-4 flex flex-col pointer-events-auto mt-4 opacity-100 animate-in fade-in slide-in-from-bottom-4">
             {/* Header */}
             <div className="h-14 border-b border-zinc-800 flex items-center justify-between px-4 bg-zinc-950">
               <div className="flex items-center gap-2">
