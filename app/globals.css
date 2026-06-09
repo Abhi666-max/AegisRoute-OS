@@ -19,33 +19,33 @@
   }
   
   body {
-    @apply bg-black text-white antialiased overflow-x-hidden;
+    background-color: #000000;
+    color: #ffffff;
+    font-family: var(--font-inter), sans-serif;
+    letter-spacing: -0.02em;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
   }
 }
 
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-::-webkit-scrollbar-track {
-  background: #111111;
-}
-::-webkit-scrollbar-thumb {
-  background: #333333;
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #555555;
+/* Premium Micro-Grid Background Layer */
+.aegis-grid {
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 32px 32px;
 }
 
-/* Custom Utilities for Landing Page Effects */
-@utility bg-grid {
-  background-size: 40px 40px;
-  background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-  mask-image: radial-gradient(circle at center, black, transparent 80%);
+/* Sophisticated Glassmorphism Cards Framework */
+.iaas-card {
+  background: rgba(10, 10, 10, 0.7);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.iaas-card:hover {
+  border-color: rgba(255, 255, 255, 0.15);
 }
 
 /* Leaflet Global Override */
