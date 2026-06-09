@@ -107,10 +107,10 @@ export default function LandingPage() {
               whileHover={{ scale: 1.02 }}
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.6 }}
-              className="bg-[#020202] rounded-3xl p-[1px] relative group h-full"
+              className="relative p-1 rounded-2xl bg-gradient-to-b from-zinc-800 to-zinc-950 group h-full"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-zinc-800 to-zinc-700 opacity-0 group-hover:opacity-10 transition-opacity duration-500 rounded-3xl" />
-              <div className="relative h-full bg-[#020202] rounded-[calc(1.5rem-1px)] p-8 flex flex-col justify-between overflow-hidden z-10 border border-white/5 group-hover:border-transparent transition-colors">
+              <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" />
+              <div className="relative h-full bg-[#050505] p-8 rounded-xl border border-white/5 flex flex-col justify-between z-10">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-aegis-neon/10 rounded-full blur-[80px] group-hover:bg-aegis-neon/20 transition-colors" />
                 <div>
                   <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-6">
@@ -134,10 +134,10 @@ export default function LandingPage() {
               whileHover={{ scale: 1.02 }}
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="bg-[#020202] rounded-3xl p-[1px] relative group h-full"
+              className="relative p-1 rounded-2xl bg-gradient-to-b from-zinc-800 to-zinc-950 group h-full"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-zinc-800 to-zinc-700 opacity-0 group-hover:opacity-10 transition-opacity duration-500 rounded-3xl" />
-              <div className="relative h-full bg-[#020202] rounded-[calc(1.5rem-1px)] p-8 flex flex-col justify-between overflow-hidden z-10 border border-white/5 group-hover:border-transparent transition-colors">
+              <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" />
+              <div className="relative h-full bg-[#050505] p-8 rounded-xl border border-white/5 flex flex-col justify-between z-10">
                 <div>
                   <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-6">
                     <Activity className="text-emerald-400 w-6 h-6" />
@@ -160,10 +160,10 @@ export default function LandingPage() {
               whileHover={{ scale: 1.02 }}
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="bg-[#020202] rounded-3xl p-[1px] relative group cursor-pointer"
+              className="relative p-1 rounded-2xl bg-gradient-to-b from-zinc-800 to-zinc-950 group cursor-pointer h-full"
             >
-               <div className="absolute inset-0 bg-gradient-to-r from-zinc-800 to-zinc-700 opacity-0 group-hover:opacity-10 transition-opacity duration-500 rounded-3xl" />
-               <div className="relative h-full bg-[#020202] rounded-[calc(1.5rem-1px)] p-8 md:p-12 overflow-hidden z-10 flex flex-col md:flex-row items-center justify-between gap-8 border border-white/5 group-hover:border-transparent transition-colors">
+               <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" />
+               <div className="relative h-full bg-[#050505] rounded-xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8 z-10 border border-white/5">
                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 pointer-events-none" />
                 <div className="max-w-xl relative z-10">
                   <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-6">
