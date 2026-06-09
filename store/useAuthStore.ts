@@ -42,20 +42,21 @@ export const useAuthStore = create<AuthState>((set) => ({
         if (user.email === 'abhi.admin.dev@gmail.com') {
           set({ 
             userData: { uid: user.uid, email: user.email, role: 'admin', country: 'Global', createdAt: Date.now() },
-            isAuthModalOpen: false 
+            isAuthModalOpen: false,
+            loading: false
           });
-        } else {
-          try {
-            const userDoc = await getDoc(doc(db, 'users', user.uid));
-            if (userDoc.exists()) {
-              set({ userData: userDoc.data() as UserData });
-            } else {
-              set({ userData: null });
-            }
-          } catch (error) {
-            console.error("Error fetching user data:", error);
+          return;
+        }
+        try {
+          const userDoc = await getDoc(doc(db, 'users', user.uid));
+          if (userDoc.exists()) {
+            set({ userData: userDoc.data() as UserData });
+          } else {
             set({ userData: null });
           }
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+          set({ userData: null });
         }
       } else {
         set({ userData: null });

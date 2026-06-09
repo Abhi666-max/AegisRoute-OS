@@ -42,33 +42,32 @@ export default function GodModeLogin() {
         className="relative z-10 w-full max-w-md bg-[#050505] border border-zinc-800 rounded-2xl p-10 shadow-2xl flex flex-col items-center"
       >
         <div className="flex flex-col items-center mb-8 w-full">
-          <div className="w-16 h-16 bg-zinc-900 rounded-2xl flex items-center justify-center border border-zinc-800 mb-6">
-             <ShieldCheck className="w-8 h-8 text-white" />
-          </div>
-          <h1 className="text-xl font-semibold tracking-tight text-white text-center uppercase">Classified Access:<br/>Founder Override</h1>
-          <p className="text-zinc-500 text-sm font-mono mt-2 tracking-widest uppercase flex items-center gap-2">
-            <Terminal className="w-3 h-3" />
-            Vault Terminal
+          <h1 className="text-xl font-medium tracking-widest text-white text-center uppercase mb-2">FOUNDER MANAGEMENT PORTAL</h1>
+          <p className="text-zinc-500 text-[10px] font-mono tracking-widest uppercase">
+            RESTRICTED INFRASTRUCTURE ACCESS
           </p>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-6 w-full">
-          <div className="space-y-2">
+          <div className="space-y-4">
+            <div className="w-full bg-[#020202] border border-zinc-800 text-zinc-500 text-center font-mono py-3 rounded-md uppercase tracking-widest text-sm opacity-50 select-none">
+              abhi.admin.dev@gmail.com
+            </div>
             <input
               type="password"
-              placeholder="ENTER SECURE KEY"
+              placeholder="ENTER EXECUTIVE KEY"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-[#020202] border border-zinc-800 text-white text-center font-mono py-3 rounded-md focus:outline-none hover:border-zinc-700 focus:border-white transition-all tracking-widest"
+              className="w-full bg-[#020202] border border-zinc-800 text-white text-center font-mono py-3 rounded-md focus:outline-none focus:border-zinc-500 transition-all tracking-widest text-sm"
               autoFocus
             />
           </div>
           <button
             type="submit"
             disabled={isLoading || !password}
-            className="w-full bg-white text-black font-bold tracking-widest uppercase rounded-lg px-4 py-3 hover:bg-zinc-200 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+            className="w-full bg-white text-black font-semibold tracking-widest uppercase rounded-md px-4 py-3 hover:bg-zinc-200 transition-all disabled:opacity-50 text-sm"
           >
-            {isLoading ? "Authenticating..." : "EXECUTE"}
+            {isLoading ? "VERIFYING..." : "INITIALIZE DASHBOARD"}
           </button>
         </form>
       </motion.div>

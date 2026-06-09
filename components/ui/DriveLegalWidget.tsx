@@ -68,7 +68,7 @@ export function DriveLegalWidget() {
   };
 
   const widgetContent = (
-    <div className="fixed bottom-6 right-6 z-[2147483647] pointer-events-none flex flex-col items-end">
+    <div className="fixed bottom-6 right-6 z-[99999999] pointer-events-none flex flex-col items-end">
       <AnimatePresence>
         {!isOpen && (
           <motion.button
@@ -87,7 +87,7 @@ export function DriveLegalWidget() {
 
       <AnimatePresence>
         {isOpen && (
-          <div className="relative z-[2147483647] w-80 h-96 bg-zinc-950 border border-zinc-800 shadow-2xl rounded-2xl p-4 flex flex-col pointer-events-auto mt-4 opacity-100 animate-in fade-in slide-in-from-bottom-4">
+          <div className="relative z-[99999999] w-80 h-[28rem] bg-zinc-950 border border-zinc-800 shadow-2xl rounded-2xl p-4 flex flex-col pointer-events-auto mt-4 opacity-100 animate-in fade-in slide-in-from-bottom-4">
             {/* Header */}
             <div className="h-14 border-b border-zinc-800 flex items-center justify-between px-4 bg-zinc-950">
               <div className="flex items-center gap-2">
