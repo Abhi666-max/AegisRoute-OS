@@ -20,8 +20,11 @@ const Instagram = ({ className }: { className?: string }) => (
 );
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
+import { usePathname } from 'next/navigation';
 
 export function Footer() {
+  const pathname = usePathname();
+  if (pathname?.startsWith('/admin') || pathname?.startsWith('/authority') || pathname?.startsWith('/godmode')) return null;
   return (
     <footer className="w-full bg-black border-t border-zinc-800 pt-20 pb-10">
       <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 lg:gap-8 mb-16">

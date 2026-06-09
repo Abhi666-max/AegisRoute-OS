@@ -6,17 +6,20 @@ import { LayoutDashboard, AlertTriangle, BarChart3, Activity, Settings, ChevronR
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const navItems = [
-  { icon: LayoutDashboard, label: "Overview", href: "/authority" },
-  { icon: AlertTriangle, label: "Live Incidents", href: "/authority/incidents" },
-  { icon: BarChart3, label: "Analytics", href: "/authority/analytics" },
-  { icon: Activity, label: "System Health", href: "/authority/health" },
-  { icon: Settings, label: "Settings", href: "/authority/settings" },
-];
+// Removed static navItems, will calculate dynamically inside component
 
 export function Sidebar() {
   const [isHovered, setIsHovered] = useState(false);
   const pathname = usePathname();
+  
+  const basePath = pathname?.startsWith('/admin') ? '/admin' : '/authority';
+  const navItems = [
+    { icon: LayoutDashboard, label: "Overview", href: `${basePath}` },
+    { icon: AlertTriangle, label: "Live Feed/Incidents", href: `${basePath}/feed` },
+    { icon: BarChart3, label: "Analytics", href: `${basePath}/analytics` },
+    { icon: Activity, label: "System Health", href: `${basePath}/health` },
+    { icon: Settings, label: "Settings", href: `${basePath}/settings` },
+  ];
 
   return (
     <motion.aside

@@ -7,12 +7,15 @@ import { motion } from 'framer-motion';
 import { useAuthStore } from '@/store/useAuthStore';
 import { auth } from '@/lib/firebase/config';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { toast } from 'sonner';
 
 export function Navbar() {
   const { user, userData, initializeAuth, setAuthModalOpen, setDemoModalOpen } = useAuthStore();
   const router = useRouter();
+  const pathname = usePathname();
+
+  if (pathname?.startsWith('/admin') || pathname?.startsWith('/authority') || pathname?.startsWith('/godmode')) return null;
 
 
 
