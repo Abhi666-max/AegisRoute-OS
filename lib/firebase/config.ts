@@ -1,6 +1,6 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { getFirestore, initializeFirestore } from "firebase/firestore";
+import { getAuth, setPersistence, browserSessionPersistence } from "firebase/auth";
+import { getFirestore, initializeFirestore, clearIndexedDbPersistence, disableNetwork, enableNetwork } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
@@ -23,6 +23,11 @@ try {
   app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
   auth = getAuth(app);
   db = initializeFirestore(app, { experimentalForceLongPolling: true });
+  if (typeof window !== 'undefined') {
+    clearIndexedDbPersistence(db).catch(() => {});
+    disableNetwork(db).then(() => enableNetwork(db));
+  }
+  setPersistence(auth, browserSessionPersistence);
   storage = getStorage(app);
 } catch (error) {
   console.error("Firebase Initialization Error. Missing or invalid keys in .env.local:", error);

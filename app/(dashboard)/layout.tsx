@@ -20,27 +20,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       if (!user) {
         router.push("/");
       } else {
-        const isAuthorized = user.email === "abhi.admin.dev@gmail.com" || 
-                             user.email?.endsWith("@gov.in") ||
-                             userData?.role?.toLowerCase() === "authority";
-                             
-        const waitingForUserData = !userData && user.email !== "abhi.admin.dev@gmail.com" && !user.email?.endsWith("@gov.in");
-        
-        if (!isAuthorized && !waitingForUserData) {
+        const isAuthorized = user.email === "abhi.admin.dev@gmail.com" || user.email?.endsWith("@gov.in");
+        if (!isAuthorized) {
           router.push("/");
         }
       }
     }
-  }, [user, userData, loading, router, mounted]);
+  }, [user, loading, router, mounted]);
 
-  const isAuthorized = user?.email === "abhi.admin.dev@gmail.com" || 
-                       user?.email?.endsWith("@gov.in") ||
-                       userData?.role?.toLowerCase() === "authority";
-                       
-  const waitingForUserData = user && !userData && user?.email !== "abhi.admin.dev@gmail.com" && !user?.email?.endsWith("@gov.in");
+  const isAuthorized = user?.email === "abhi.admin.dev@gmail.com" || user?.email?.endsWith("@gov.in");
 
   // Show neon loader while determining auth state or if not mounted
-  if (!mounted || loading || waitingForUserData || (!isAuthorized && user)) {
+  if (!mounted || loading || (!isAuthorized && user)) {
     return (
       <div className="fixed inset-0 z-[200] bg-[#050505] flex flex-col items-center justify-center">
         <motion.div

@@ -21,7 +21,12 @@ export function Sidebar() {
   
   const basePath = pathname?.startsWith('/admin') ? '/admin' : '/authority';
   const isAuthority = basePath === '/authority';
-  const navItems = [
+  const navItems = isAuthority ? [
+    { icon: AlertTriangle, label: "Live Incident Triage", href: `${basePath}` },
+    { icon: LayoutDashboard, label: "Fleet & Unit Dispatch", href: `${basePath}/fleet` },
+    { icon: BarChart3, label: "Jurisdiction Analytics", href: `${basePath}/analytics` },
+    { icon: Activity, label: "Officer Personnel", href: `${basePath}/personnel` },
+  ] : [
     { icon: LayoutDashboard, label: "Overview", href: `${basePath}` },
     { icon: AlertTriangle, label: "Live Feed/Incidents", href: `${basePath}/feed` },
     { icon: BarChart3, label: "Analytics", href: `${basePath}/analytics` },
@@ -56,7 +61,7 @@ export function Sidebar() {
           const isActive = pathname === item.href;
           return (
             <Link key={item.href} href={item.href}>
-              <div className={`flex items-center px-3 py-2 rounded-md transition-colors ${isActive ? "bg-zinc-900 border border-zinc-800 text-white shadow-[0_0_15px_rgba(16,185,129,0.1)]" : "text-zinc-500 hover:text-white"}`}>
+              <div className={`flex items-center px-3 py-2 rounded-md transition-colors ${isActive ? (isAuthority ? "bg-blue-500/10 border border-blue-500/20 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.1)]" : "bg-zinc-900 border border-zinc-800 text-white shadow-[0_0_15px_rgba(16,185,129,0.1)]") : (isAuthority ? "text-zinc-500 hover:text-blue-400 hover:bg-blue-500/10" : "text-zinc-500 hover:text-white")}`}>
                 <item.icon className="w-5 h-5 shrink-0" />
                 <motion.span
                   initial={{ opacity: 0, x: -10 }}

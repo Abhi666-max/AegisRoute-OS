@@ -35,24 +35,34 @@ export function AuthModal() {
     try {
       let fetchedRole = role;
       if (isLogin) {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const loginPromise = signInWithEmailAndPassword(auth, email, password);
+        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Connection timeout. Retrying...')), 5000));
+        const userCredential = await Promise.race([loginPromise, timeoutPromise]) as any;
         const user = userCredential.user;
-        fetchedRole = 'citizen';
         
-        if (user.email === 'abhi.admin.dev@gmail.com') {
-          fetchedRole = 'admin';
-        } else {
-          try {
-            const docSnap = await getDocFromServer(doc(db, 'users', user.uid));
-            if (docSnap.exists()) {
-              fetchedRole = docSnap.data().role || 'citizen';
-            }
-          } catch (e: any) {
-             console.warn("Could not fetch user role, defaulting to citizen:", e.message);
+        if (email.includes('@gov.in')) {
+          setLoading(false);
+          window.location.href = '/authority';
+          return;
+        } else if (email === 'abhi.admin.dev@gmail.com') {
+          setLoading(false);
+          window.location.href = '/admin';
+          return;
+        }
+        
+        fetchedRole = 'citizen';
+        try {
+          const docSnap = await getDocFromServer(doc(db, 'users', user.uid));
+          if (docSnap.exists()) {
+            fetchedRole = docSnap.data().role || 'citizen';
           }
+        } catch (e: any) {
+           console.warn("Could not fetch user role, defaulting to citizen:", e.message);
         }
       } else {
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const registerPromise = createUserWithEmailAndPassword(auth, email, password);
+        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Connection timeout. Retrying...')), 5000));
+        const userCredential = await Promise.race([registerPromise, timeoutPromise]) as any;
         const user = userCredential.user;
         
         await setDoc(doc(db, 'users', user.uid), {
@@ -63,11 +73,17 @@ export function AuthModal() {
           department: role === 'authority' ? department : null,
           createdAt: Date.now()
         });
+
+        if (role === 'authority' || email.includes('@gov.in')) {
+          setLoading(false);
+          window.location.href = '/authority';
+          return;
+        }
       }
 
       onClose();
 
-      // Strict Routing Logic
+      // Strict Routing Logic (Fallback)
       if (fetchedRole.toLowerCase() === 'authority' || email.includes('@gov.in')) {
         toast.success('Authority Node Authenticated. Connecting to Mesh...', { icon: '🏛️' });
         window.location.href = '/authority'; // Use window.location to bypass Next.js cache lag
