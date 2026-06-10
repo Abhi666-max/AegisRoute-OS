@@ -8,7 +8,7 @@ export function DriveLegalWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [messages, setMessages] = useState<{ role: 'user' | 'assistant', content: string }[]>([
-    { role: 'assistant', content: "AegisRoute Legal Intelligence active. How can I assist with civic legalities today?" }
+    { role: 'assistant', content: 'AegisRoute Legal AI online. State your query.' }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -25,15 +25,18 @@ export function DriveLegalWidget() {
   };
 
   const callApi = async (prompt: string) => {
-    return new Promise<string>((resolve, reject) => {
-      setTimeout(() => {
-        if (Math.random() > 0.8) {
-           reject(new Error("Congestion"));
-        } else {
-           resolve("According to South Asian Transit Protocol 2.1, specialized transport requires hardware 2FA validation at all border checkpoints.");
-        }
-      }, 1500);
-    });
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: prompt, countryCode: 'GLOBAL' })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'API Error');
+      return data.content;
+    } catch (e) {
+      throw e;
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -73,7 +76,7 @@ export function DriveLegalWidget() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-            className="absolute bottom-20 right-0 w-[380px] h-[550px] bg-[#050505]/95 backdrop-blur-3xl border border-zinc-800 shadow-[0_0_50px_rgba(16,185,129,0.1)] rounded-2xl flex flex-col overflow-hidden"
+            className="absolute bottom-20 right-0 w-[380px] h-[550px] bg-zinc-950/80 backdrop-blur-2xl border border-white/10 shadow-2xl rounded-2xl flex flex-col overflow-hidden"
           >
             {/* Header */}
             <div className="h-16 bg-[#000] border-b border-zinc-800 flex items-center justify-between px-5 shrink-0 relative">
@@ -136,7 +139,7 @@ export function DriveLegalWidget() {
                     <div className={`text-sm leading-relaxed ${
                       msg.role === 'user' 
                         ? 'bg-zinc-800 text-white px-4 py-3 rounded-2xl rounded-tr-sm max-w-[85%]' 
-                        : 'bg-transparent text-zinc-300 border-l-2 border-emerald-500 pl-4 py-1 w-full'
+                        : 'bg-transparent text-zinc-300 border-l-2 border-zinc-500 pl-4 py-1 w-full'
                     }`}>
                       {msg.content}
                     </div>
@@ -197,7 +200,7 @@ export function DriveLegalWidget() {
         onHoverEnd={() => setIsHovered(false)}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className="relative w-14 h-14 bg-emerald-500 rounded-full flex items-center justify-center text-black shadow-[0_0_20px_rgba(16,185,129,0.4)] border border-emerald-400 z-50 overflow-hidden"
+        className="relative w-14 h-14 bg-zinc-950 rounded-full flex items-center justify-center text-white shadow-[0_0_30px_rgba(255,255,255,0.1)] border border-zinc-800 z-50 overflow-hidden"
       >
         <AnimatePresence mode="wait">
           {isOpen ? (

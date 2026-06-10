@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { LayoutDashboard, AlertTriangle, BarChart3, Activity, Settings, ChevronRight, LogOut } from "lucide-react";
+import { LayoutDashboard, AlertTriangle, BarChart3, Activity, Settings, ChevronRight, LogOut, Shield } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { auth } from '@/lib/firebase/config';
@@ -42,17 +42,19 @@ export function Sidebar() {
       onMouseLeave={() => setIsHovered(false)}
       className="fixed left-0 top-0 h-screen bg-[#050505] border-r border-white/10 z-[100] flex flex-col pt-6 pb-6 overflow-hidden"
     >
-      <div className="flex items-center px-6 mb-10 h-10">
-        <div className="w-8 h-8 rounded bg-[#00FF66]/20 border border-[#00FF66] flex items-center justify-center shrink-0">
-          <Activity className="w-5 h-5 text-[#00FF66]" />
+      <div className="flex items-center px-4 mb-10 h-10 w-full overflow-hidden">
+        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-zinc-700 to-black border border-zinc-600 flex items-center justify-center shadow-[0_0_15px_rgba(255,255,255,0.1)] shrink-0">
+          <Shield size={18} className="text-zinc-300" />
         </div>
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: isHovered ? 1 : 0 }}
           transition={{ duration: 0.2 }}
-          className="ml-4 whitespace-nowrap font-clash font-bold tracking-wider text-white"
+          className="ml-3 whitespace-nowrap"
         >
-          AEGIS<span className="text-[#00FF66]">ROUTE</span>
+          <span className="text-xl font-bold tracking-tighter text-white">
+            AegisRoute<span className="text-zinc-500 font-medium">OS</span>
+          </span>
         </motion.div>
       </div>
 
