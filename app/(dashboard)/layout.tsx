@@ -19,14 +19,28 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     if (mounted && !loading) {
       if (!user) {
         router.push("/");
-      } else if (user.email !== "abhi.admin.dev@gmail.com" && userData?.role !== "authority") {
-        router.push("/");
+      } else {
+        const isAuthorized = user.email === "abhi.admin.dev@gmail.com" || 
+                             user.email?.endsWith("@gov.in") ||
+                             userData?.role?.toLowerCase() === "authority";
+                             
+        const waitingForUserData = !userData && user.email !== "abhi.admin.dev@gmail.com" && !user.email?.endsWith("@gov.in");
+        
+        if (!isAuthorized && !waitingForUserData) {
+          router.push("/");
+        }
       }
     }
   }, [user, userData, loading, router, mounted]);
 
+  const isAuthorized = user?.email === "abhi.admin.dev@gmail.com" || 
+                       user?.email?.endsWith("@gov.in") ||
+                       userData?.role?.toLowerCase() === "authority";
+                       
+  const waitingForUserData = user && !userData && user?.email !== "abhi.admin.dev@gmail.com" && !user?.email?.endsWith("@gov.in");
+
   // Show neon loader while determining auth state or if not mounted
-  if (!mounted || (loading && user?.email !== "abhi.admin.dev@gmail.com") || (!userData && user?.email !== "abhi.admin.dev@gmail.com") || (userData?.role !== "authority" && user?.email !== "abhi.admin.dev@gmail.com")) {
+  if (!mounted || loading || waitingForUserData || (!isAuthorized && user)) {
     return (
       <div className="fixed inset-0 z-[200] bg-[#050505] flex flex-col items-center justify-center">
         <motion.div

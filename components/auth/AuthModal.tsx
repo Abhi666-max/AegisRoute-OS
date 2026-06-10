@@ -33,10 +33,11 @@ export function AuthModal() {
     setLoading(true);
 
     try {
+      let fetchedRole = role;
       if (isLogin) {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
-        let fetchedRole = 'citizen';
+        fetchedRole = 'citizen';
         
         if (user.email === 'abhi.admin.dev@gmail.com') {
           fetchedRole = 'admin';
@@ -45,16 +46,6 @@ export function AuthModal() {
           if (docSnap.exists()) {
             fetchedRole = docSnap.data().role || 'citizen';
           }
-        }
-        
-        onClose();
-        if (fetchedRole === 'admin' || user.email === 'abhi.admin.dev@gmail.com') {
-          router.push('/admin');
-        } else if (fetchedRole === 'authority') {
-          router.push('/authority');
-        } else {
-          router.push('/');
-          toast.success('Citizen logged in');
         }
       } else {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -68,19 +59,24 @@ export function AuthModal() {
           department: role === 'authority' ? department : null,
           createdAt: Date.now()
         });
-        
-        onClose();
-        if (role === 'authority') {
-          router.push('/authority');
-        } else {
-          router.push('/');
-          toast.success('Citizen registered');
-        }
+      }
+
+      onClose();
+
+      // Strict Routing Logic
+      if (fetchedRole.toLowerCase() === 'authority' || email.includes('@gov.in')) {
+        toast.success('Authority Node Authenticated. Connecting to Mesh...', { icon: '🏛️' });
+        window.location.href = '/authority'; // Use window.location to bypass Next.js cache lag
+      } else if (email === 'abhi.admin.dev@gmail.com' || fetchedRole === 'admin') {
+        window.location.href = '/admin';
+      } else {
+        toast.success('Citizen Identity Verified.', { icon: '✅' });
+        window.location.href = '/';
       }
     } catch (err: any) {
       toast.error(err.message || 'Authentication failed.');
     } finally {
-      setLoading(false);
+      setLoading(false); // CRITICAL: Stop the spinner no matter what
     }
   };
 
@@ -177,7 +173,7 @@ export function AuthModal() {
                         required
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        className="w-full bg-zinc-900 border border-zinc-800 rounded-md px-4 py-3 text-white text-sm outline-none focus:border-zinc-500 transition-colors"
+                        className="w-full bg-zinc-900 border border-zinc-800 rounded-md px-4 py-3 text-white text-sm outline-none focus:border-emerald-500 transition-colors"
                         placeholder="John Doe"
                       />
                     </div>
@@ -192,7 +188,7 @@ export function AuthModal() {
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full bg-zinc-900 border border-zinc-800 rounded-md px-4 py-3 text-white text-sm outline-none focus:border-zinc-500 transition-colors"
+                      className="w-full bg-zinc-900 border border-zinc-800 rounded-md px-4 py-3 text-white text-sm outline-none focus:border-emerald-500 transition-colors"
                       placeholder={role === 'authority' ? 'name@gov.in' : 'user@example.com'}
                     />
                   </div>
@@ -205,7 +201,7 @@ export function AuthModal() {
                         required
                         value={department}
                         onChange={(e) => setDepartment(e.target.value)}
-                        className="w-full bg-zinc-900 border border-zinc-800 rounded-md px-4 py-3 text-white text-sm outline-none focus:border-zinc-500 transition-colors"
+                        className="w-full bg-zinc-900 border border-zinc-800 rounded-md px-4 py-3 text-white text-sm outline-none focus:border-emerald-500 transition-colors"
                         placeholder="Traffic Police / PWD"
                       />
                     </div>
@@ -218,7 +214,7 @@ export function AuthModal() {
                       required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full bg-zinc-900 border border-zinc-800 rounded-md px-4 py-3 text-white text-sm outline-none focus:border-zinc-500 transition-colors"
+                      className="w-full bg-zinc-900 border border-zinc-800 rounded-md px-4 py-3 text-white text-sm outline-none focus:border-emerald-500 transition-colors"
                       placeholder="••••••••"
                     />
                   </div>
