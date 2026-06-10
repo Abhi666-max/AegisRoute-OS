@@ -1,6 +1,6 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, initializeFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
@@ -22,7 +22,7 @@ let storage: any;
 try {
   app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
   auth = getAuth(app);
-  db = getFirestore(app);
+  db = initializeFirestore(app, { experimentalForceLongPolling: true });
   storage = getStorage(app);
 } catch (error) {
   console.error("Firebase Initialization Error. Missing or invalid keys in .env.local:", error);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { LayoutDashboard, AlertTriangle, BarChart3, Activity, Settings, ChevronRight, LogOut } from "lucide-react";
 import Link from "next/link";
@@ -11,9 +11,16 @@ import { auth } from '@/lib/firebase/config';
 
 export function Sidebar() {
   const [isHovered, setIsHovered] = useState(false);
+  const [user, setUser] = useState<any>(null);
   const pathname = usePathname();
   
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(setUser);
+    return () => unsubscribe();
+  }, []);
+  
   const basePath = pathname?.startsWith('/admin') ? '/admin' : '/authority';
+  const isAuthority = basePath === '/authority';
   const navItems = [
     { icon: LayoutDashboard, label: "Overview", href: `${basePath}` },
     { icon: AlertTriangle, label: "Live Feed/Incidents", href: `${basePath}/feed` },
@@ -66,10 +73,12 @@ export function Sidebar() {
       </nav>
       
       <div className="px-4 mt-auto">
-        <div className={`flex items-center px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 transition-all overflow-hidden ${isHovered ? 'gap-3' : 'justify-center'}`}>
+        <div className={`flex items-center px-3 py-2 rounded-lg bg-zinc-950 border transition-all overflow-hidden ${isHovered ? 'gap-3' : 'justify-center'} ${isAuthority ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' : 'border-zinc-800'}`}>
           <div className="relative shrink-0 w-10 h-10 rounded-full flex items-center justify-center overflow-hidden">
-            <div className="absolute inset-[-50%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg,transparent,transparent,#10b981)]"></div>
-            <div className="absolute inset-[2px] bg-zinc-900 rounded-full flex items-center justify-center text-white font-bold text-xs z-10">AK</div>
+            <div className={`absolute inset-[-50%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg,transparent,transparent,${isAuthority ? '#3b82f6' : '#10b981'})]`}></div>
+            <div className="absolute inset-[2px] bg-zinc-900 rounded-full flex items-center justify-center text-white font-bold text-xs z-10">
+               {user?.displayName ? user.displayName.substring(0, 2).toUpperCase() : (isAuthority ? 'RA' : 'AK')}
+            </div>
           </div>
           {isHovered && (
             <motion.div 
@@ -77,9 +86,10 @@ export function Sidebar() {
               animate={{ opacity: 1, w: 'auto' }}
               className="flex flex-col whitespace-nowrap"
             >
-              <span className="text-sm font-semibold text-white">Abhijeet K.</span>
-              <span className="text-[10px] text-emerald-500 tracking-widest font-mono uppercase flex items-center gap-1">
-                <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span> FOUNDER
+              <span className="text-sm font-semibold text-white">{user?.displayName || (isAuthority ? 'Regional Authority' : 'Abhijeet K.')}</span>
+              <span className={`text-[10px] tracking-widest font-mono flex items-center gap-1 ${isAuthority ? 'text-blue-400' : 'text-emerald-500 uppercase'}`}>
+                {!isAuthority && <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>}
+                {isAuthority ? user?.email : 'FOUNDER'}
               </span>
             </motion.div>
           )}

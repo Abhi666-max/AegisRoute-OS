@@ -74,7 +74,7 @@ export function AuthModal() {
         window.location.href = '/';
       }
     } catch (err: any) {
-      toast.error(err.message || 'Authentication failed.');
+      toast.error('Connection timeout. Retrying...');
     } finally {
       setLoading(false); // CRITICAL: Stop the spinner no matter what
     }

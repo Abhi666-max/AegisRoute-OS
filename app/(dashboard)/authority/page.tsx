@@ -1,246 +1,169 @@
-"use client";
+'use client';
 
-import { motion } from "framer-motion";
-import { useLiveIncidents } from "@/hooks/useLiveIncidents";
-import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { AlertCircle, Clock, Activity, ShieldAlert, CheckCircle2 } from "lucide-react";
-import { doc, updateDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase/config";
-import { useAuthStore } from "@/store/useAuthStore";
-
-const chartData = [
-  { time: "00:00", incidents: 12 },
-  { time: "04:00", incidents: 8 },
-  { time: "08:00", incidents: 24 },
-  { time: "12:00", incidents: 35 },
-  { time: "16:00", incidents: 42 },
-  { time: "20:00", incidents: 28 },
-  { time: "24:00", incidents: 15 },
-]; // Static data for chart since historic data might not exist
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1
-    }
-  }
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0 }
-};
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { AlertTriangle, Activity, Clock, ShieldAlert, CheckCircle2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function AuthorityDashboard() {
-  const { incidents, metrics, loading } = useLiveIncidents();
+  const [activeTab, setActiveTab] = useState<'active' | 'archive'>('active');
+  const [incidents, setIncidents] = useState([
+    { id: 'SOS-991', type: 'Severe Accident', location: 'NH-48, Panvel', status: 'CRITICAL', time: 'Just now' },
+    { id: 'SOS-992', type: 'Bridge Collapse', location: 'NH-10, Kharghar', status: 'SEVERE', time: '4 mins ago' },
+    { id: 'SOS-993', type: 'Traffic Gridlock', location: 'Mumbra Bypass', status: 'MODERATE', time: '12 mins ago' }
+  ]);
+  const [archived, setArchived] = useState<{ id: string, type: string, location: string, status: string, time: string }[]>([]);
 
-  const { userData } = useAuthStore();
-
-  const updateStatus = async (id: string, newStatus: string) => {
-    try {
-      await updateDoc(doc(db, "incidents", id), { status: newStatus });
-    } catch (error) {
-      console.error("Error updating status:", error);
-    }
+  const handleDispatch = (id: string) => {
+    toast.success('Ambulance Unit Dispatched.', { icon: '🚑' });
+    setIncidents(prev => prev.map(inc => inc.id === id ? { ...inc, status: 'DISPATCHED' } : inc));
   };
 
-  if (userData?.role === 'citizen') {
-    return <div className="flex h-screen items-center justify-center bg-black"><div className="text-center"><h1 className="text-3xl text-red-500 font-bold tracking-tighter">Clearance Level Inadequate</h1><p className="text-zinc-500 mt-2">This terminal is restricted to verified Regional Authorities.</p></div></div>;
-  }
+  const handleResolve = (incident: any) => {
+    setIncidents(prev => prev.filter(inc => inc.id !== incident.id));
+    setArchived(prev => [{ ...incident, status: 'RESOLVED', time: 'Archived' }, ...prev]);
+    toast.success('Incident marked as RESOLVED.', { icon: '✅' });
+  };
 
-  if (loading) {
-    return <div className="animate-pulse flex items-center justify-center h-[50vh] text-zinc-400 font-mono uppercase tracking-widest text-sm">Syncing with AegisRoute OS Core...</div>;
-  }
+  const handleReopen = (incident: any) => {
+    setArchived(prev => prev.filter(inc => inc.id !== incident.id));
+    setIncidents(prev => [{ ...incident, status: 'CRITICAL', time: 'Re-opened' }, ...prev]);
+    toast.error('Case re-opened and escalated.', { icon: '⚠️' });
+  };
 
   return (
-    <motion.div 
-      variants={containerVariants}
-      initial="hidden"
-      animate="show"
-      className="space-y-8"
-    >
-      <div className="flex justify-between items-end mb-8">
-        <div>
-          <h1 className="text-4xl font-clash font-bold tracking-wider">AUTHORITY <span className="text-[#00FF66]">DASHBOARD</span></h1>
-          <p className="text-gray-400 mt-2 font-mono text-sm uppercase">Live System Overview & Incident Triage</p>
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="min-h-screen text-white">
+      <div className="mb-8">
+        <h1 className="text-4xl font-black tracking-tighter text-white">COMMAND CENTER</h1>
+        <p className="text-zinc-500 font-mono tracking-widest uppercase text-sm mt-1">Regional Authority Dispatch Protocol</p>
+      </div>
+
+      {/* Bento Grid Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        <motion.div whileHover={{ scale: 1.02 }} className="bg-[#050505] border border-zinc-800 p-8 rounded-3xl relative overflow-hidden flex flex-col justify-between h-48">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-red-500/10 blur-[80px] rounded-full pointer-events-none"></div>
+          <div className="flex items-center gap-3 relative z-10">
+            <AlertTriangle className="text-red-500 w-6 h-6" />
+            <span className="text-xs font-mono uppercase tracking-widest text-zinc-400">Active SOS Signals</span>
+          </div>
+          <div className="text-6xl font-black text-red-500 animate-pulse relative z-10">{incidents.length}</div>
+        </motion.div>
+
+        <motion.div whileHover={{ scale: 1.02 }} className="bg-[#050505] border border-zinc-800 p-8 rounded-3xl relative overflow-hidden flex flex-col justify-between h-48">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 blur-[80px] rounded-full pointer-events-none"></div>
+          <div className="flex items-center gap-3 relative z-10">
+            <Activity className="text-blue-500 w-6 h-6" />
+            <span className="text-xs font-mono uppercase tracking-widest text-zinc-400">Fleet Units Available</span>
+          </div>
+          <div className="text-6xl font-black text-blue-500 relative z-10">142</div>
+        </motion.div>
+
+        <motion.div whileHover={{ scale: 1.02 }} className="bg-[#050505] border border-zinc-800 p-8 rounded-3xl relative overflow-hidden flex flex-col justify-between h-48">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 blur-[80px] rounded-full pointer-events-none"></div>
+          <div className="flex items-center gap-3 relative z-10">
+            <Clock className="text-emerald-500 w-6 h-6" />
+            <span className="text-xs font-mono uppercase tracking-widest text-zinc-400">Avg Response Time</span>
+          </div>
+          <div className="text-6xl font-black text-emerald-500 relative z-10">3.4<span className="text-xl ml-2 text-zinc-500">min</span></div>
+        </motion.div>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex items-center gap-4 mb-6 border-b border-zinc-800 pb-4">
+        <button 
+          onClick={() => setActiveTab('active')}
+          className={`px-6 py-2 rounded-full font-mono text-xs uppercase tracking-widest transition-all ${activeTab === 'active' ? 'bg-blue-600 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)]' : 'bg-[#050505] text-zinc-500 border border-zinc-800 hover:text-white'}`}
+        >
+          Live Triage ({incidents.length})
+        </button>
+        <button 
+          onClick={() => setActiveTab('archive')}
+          className={`px-6 py-2 rounded-full font-mono text-xs uppercase tracking-widest transition-all ${activeTab === 'archive' ? 'bg-zinc-800 text-white' : 'bg-[#050505] text-zinc-500 border border-zinc-800 hover:text-white'}`}
+        >
+          Archive ({archived.length})
+        </button>
+      </div>
+
+      {/* Triage Table */}
+      <div className="bg-[#050505] border border-zinc-800 rounded-3xl overflow-hidden shadow-2xl">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm whitespace-nowrap">
+            <thead className="bg-[#000000] text-[10px] font-mono text-zinc-500 uppercase tracking-widest border-b border-zinc-800">
+              <tr>
+                <th className="px-6 py-4 font-medium">INCIDENT ID</th>
+                <th className="px-6 py-4 font-medium">CLASSIFICATION</th>
+                <th className="px-6 py-4 font-medium">COORDINATES</th>
+                <th className="px-6 py-4 font-medium">STATUS</th>
+                <th className="px-6 py-4 font-medium text-right">ACTION</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-zinc-800">
+              <AnimatePresence>
+                {(activeTab === 'active' ? incidents : archived).map((inc) => (
+                  <motion.tr 
+                    layout
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                    key={inc.id} 
+                    className="hover:bg-zinc-900/50 transition-colors"
+                  >
+                    <td className="px-6 py-5">
+                       <div className="flex items-center gap-3">
+                         {inc.status === 'CRITICAL' && <ShieldAlert className="w-4 h-4 text-red-500" />}
+                         {inc.status === 'RESOLVED' && <CheckCircle2 className="w-4 h-4 text-emerald-500" />}
+                         <span className="font-mono text-white font-bold">{inc.id}</span>
+                       </div>
+                    </td>
+                    <td className="px-6 py-5 text-zinc-300 font-medium">{inc.type}</td>
+                    <td className="px-6 py-5 text-zinc-500 font-mono text-xs">{inc.location}</td>
+                    <td className="px-6 py-5">
+                      <span className={`px-3 py-1 rounded text-[10px] font-mono uppercase tracking-widest border ${
+                        inc.status === 'CRITICAL' ? 'bg-red-500/10 text-red-500 border-red-500/20' : 
+                        inc.status === 'DISPATCHED' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' :
+                        inc.status === 'RESOLVED' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
+                        'bg-zinc-800 text-zinc-400 border-zinc-700'
+                      }`}>
+                        {inc.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-5 text-right">
+                      {activeTab === 'active' ? (
+                        <div className="flex justify-end gap-3">
+                          <motion.button 
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => handleDispatch(inc.id)}
+                            disabled={inc.status === 'DISPATCHED'}
+                            className="bg-blue-600 hover:bg-blue-500 disabled:bg-blue-900/50 disabled:text-blue-500/50 text-white px-4 py-2 rounded-lg text-[10px] font-bold font-mono uppercase tracking-widest transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)] disabled:shadow-none"
+                          >
+                            {inc.status === 'DISPATCHED' ? 'UNIT EN ROUTE' : 'DISPATCH FLEET'}
+                          </motion.button>
+                          <motion.button 
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => handleResolve(inc)}
+                            className="bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-2 rounded-lg text-[10px] font-bold font-mono uppercase tracking-widest transition-all"
+                          >
+                            MARK RESOLVED
+                          </motion.button>
+                        </div>
+                      ) : (
+                        <motion.button 
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => handleReopen(inc)}
+                          className="bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 px-4 py-2 rounded-lg text-[10px] font-bold font-mono uppercase tracking-widest transition-all inline-flex items-center gap-2"
+                        >
+                          <AlertTriangle className="w-3 h-3" /> RE-OPEN CASE
+                        </motion.button>
+                      )}
+                    </td>
+                  </motion.tr>
+                ))}
+              </AnimatePresence>
+            </tbody>
+          </table>
         </div>
       </div>
-
-      {/* ROW 1: Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <motion.div variants={itemVariants} className="bg-white/5 border border-white/10 rounded-2xl p-6 relative overflow-hidden group">
-          <div className="absolute inset-0 bg-[#00FF66]/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="flex justify-between items-start mb-4">
-            <div className="p-3 bg-blue-500/10 rounded-xl">
-              <Activity className="text-blue-500 w-6 h-6" />
-            </div>
-          </div>
-          <p className="text-gray-400 text-sm font-medium mb-1">Total Active</p>
-          <h3 className="text-3xl font-bold font-clash">{metrics.totalActive}</h3>
-        </motion.div>
-
-        <motion.div variants={itemVariants} className="bg-white/5 border border-white/10 rounded-2xl p-6 relative overflow-hidden group">
-          <div className={`absolute inset-0 bg-red-500/5 transition-opacity ${metrics.criticalSeverity > 0 ? 'animate-pulse opacity-100' : 'opacity-0'}`} />
-          <div className="flex justify-between items-start mb-4">
-            <div className="p-3 bg-red-500/10 rounded-xl">
-              <ShieldAlert className="text-red-500 w-6 h-6" />
-            </div>
-          </div>
-          <p className="text-gray-400 text-sm font-medium mb-1">Critical Severity</p>
-          <h3 className="text-3xl font-bold font-clash text-red-500">{metrics.criticalSeverity}</h3>
-        </motion.div>
-
-        <motion.div variants={itemVariants} className="bg-white/5 border border-white/10 rounded-2xl p-6 relative overflow-hidden group">
-          <div className="absolute inset-0 bg-[#00FF66]/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="flex justify-between items-start mb-4">
-            <div className="p-3 bg-[#00FF66]/10 rounded-xl">
-              <Clock className="text-[#00FF66] w-6 h-6" />
-            </div>
-          </div>
-          <p className="text-gray-400 text-sm font-medium mb-1">Avg Resolution</p>
-          <h3 className="text-3xl font-bold font-clash text-[#00FF66]">{metrics.avgResolutionTime}</h3>
-        </motion.div>
-
-        <motion.div variants={itemVariants} className="bg-white/5 border border-white/10 rounded-2xl p-6 relative overflow-hidden group">
-          <div className={`absolute inset-0 bg-orange-500/5 transition-opacity ${metrics.activeSOS > 0 ? 'animate-pulse opacity-100' : 'opacity-0'}`} />
-          <div className="flex justify-between items-start mb-4">
-            <div className="p-3 bg-orange-500/10 rounded-xl">
-              <AlertCircle className="text-orange-500 w-6 h-6" />
-            </div>
-          </div>
-          <p className="text-gray-400 text-sm font-medium mb-1">Active SOS</p>
-          <h3 className="text-3xl font-bold font-clash text-orange-500">{metrics.activeSOS}</h3>
-        </motion.div>
-      </div>
-
-      {/* ROW 2: Chart & Live Feed */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <motion.div variants={itemVariants} className="lg:col-span-2 bg-white/5 border border-white/10 rounded-2xl p-6">
-          <h3 className="font-clash font-bold text-lg mb-6">Incident Trends (24h)</h3>
-          <div className="h-[300px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData}>
-                <defs>
-                  <linearGradient id="colorIncidents" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#00FF66" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#00FF66" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <XAxis dataKey="time" stroke="#4B5563" fontSize={12} tickLine={false} axisLine={false} />
-                <YAxis stroke="#4B5563" fontSize={12} tickLine={false} axisLine={false} />
-                <Tooltip 
-                  contentStyle={{ backgroundColor: '#050505', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
-                  itemStyle={{ color: '#00FF66' }}
-                />
-                <Area type="monotone" dataKey="incidents" stroke="#00FF66" fillOpacity={1} fill="url(#colorIncidents)" />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </motion.div>
-
-        <motion.div variants={itemVariants} className="bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col h-[400px]">
-          <h3 className="font-clash font-bold text-lg mb-6 flex items-center justify-between">
-            Live Feed
-            <span className="flex h-3 w-3 relative">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00FF66] opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-[#00FF66]"></span>
-            </span>
-          </h3>
-          <div className="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar">
-            {incidents.slice(0, 10).map((inc) => (
-              <div key={inc.id} className="p-3 bg-black/40 border border-white/5 rounded-xl text-sm">
-                <div className="flex justify-between items-center mb-2">
-                  <span className={`px-2 py-0.5 rounded text-xs font-bold ${
-                    inc.severityScore >= 80 ? 'bg-red-500/20 text-red-500 border border-red-500/20' :
-                    inc.severityScore >= 50 ? 'bg-orange-500/20 text-orange-500 border border-orange-500/20' :
-                    'bg-[#00FF66]/20 text-[#00FF66] border border-[#00FF66]/20'
-                  }`}>
-                    {inc.severityScore >= 80 ? 'CRITICAL' : inc.severityScore >= 50 ? 'MODERATE' : 'LOW'}
-                  </span>
-                  <span className="text-gray-500 text-xs font-mono">
-                    {new Date(inc.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                  </span>
-                </div>
-                <p className="text-gray-300 font-medium truncate">{inc.type || 'Hazard Report'}</p>
-                <p className="text-gray-500 text-xs truncate mt-1">{inc.location}</p>
-              </div>
-            ))}
-            {incidents.length === 0 && (
-              <div className="text-gray-500 text-sm text-center py-10">No live incidents reported.</div>
-            )}
-          </div>
-        </motion.div>
-      </div>
-
-      {/* ROW 3: Table */}
-      <motion.div variants={itemVariants} className="bg-white/5 border border-white/10 rounded-2xl p-6">
-        <h3 className="font-clash font-bold text-lg mb-6">Active Infrastructure Hazards</h3>
-        <div className="rounded-md border border-white/10 overflow-hidden">
-          <Table>
-            <TableHeader className="bg-black/60">
-              <TableRow className="border-b border-white/10 hover:bg-transparent">
-                <TableHead className="text-gray-400 font-mono">ID</TableHead>
-                <TableHead className="text-gray-400 font-mono">LOCATION</TableHead>
-                <TableHead className="text-gray-400 font-mono">SEVERITY</TableHead>
-                <TableHead className="text-gray-400 font-mono">STATUS</TableHead>
-                <TableHead className="text-right text-gray-400 font-mono">ACTION</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {incidents.map((inc) => (
-                <TableRow key={inc.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                  <TableCell className="font-mono text-xs text-gray-500">{inc.id.slice(0, 8)}</TableCell>
-                  <TableCell className="text-gray-300">{inc.location}</TableCell>
-                  <TableCell>
-                    <span className={`font-bold ${inc.severityScore >= 80 ? 'text-red-500' : inc.severityScore >= 50 ? 'text-orange-500' : 'text-[#00FF66]'}`}>
-                      {inc.severityScore}/100
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <span className={`flex items-center gap-2 text-sm ${
-                      inc.status === 'Resolved' ? 'text-gray-500' :
-                      inc.status === 'In Progress' ? 'text-blue-500' : 'text-orange-500'
-                    }`}>
-                      {inc.status === 'Resolved' && <CheckCircle2 className="w-4 h-4" />}
-                      {inc.status === 'In Progress' && <Activity className="w-4 h-4 animate-pulse" />}
-                      {inc.status === 'Pending' && <AlertCircle className="w-4 h-4" />}
-                      {inc.status}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {inc.status === 'Pending' && (
-                      <button 
-                        onClick={() => updateStatus(inc.id, 'In Progress')}
-                        className="text-xs font-bold text-blue-500 hover:text-blue-400 bg-blue-500/10 hover:bg-blue-500/20 px-3 py-1.5 rounded transition-colors"
-                      >
-                        Start Work
-                      </button>
-                    )}
-                    {inc.status === 'In Progress' && (
-                      <button 
-                        onClick={() => updateStatus(inc.id, 'Resolved')}
-                        className="text-xs font-bold text-[#00FF66] hover:text-[#00FF66]/80 bg-[#00FF66]/10 hover:bg-[#00FF66]/20 px-3 py-1.5 rounded transition-colors"
-                      >
-                        Resolve
-                      </button>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-              {incidents.length === 0 && (
-                <TableRow className="hover:bg-transparent">
-                  <TableCell colSpan={5} className="h-24 text-center text-gray-500">
-                    No active incidents. System clear.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-      </motion.div>
     </motion.div>
   );
 }
