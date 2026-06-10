@@ -1,5 +1,5 @@
 'use client';
-import { Settings, ShieldAlert, KeyRound, Activity, Check, X, Lock, Users, Globe, Database, UserPlus, HardDriveDownload, Server } from 'lucide-react';
+import { Settings, ShieldAlert, KeyRound, Activity, Check, X, Lock, Users, Globe, Database, UserPlus, HardDriveDownload, Server, RefreshCw, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -12,17 +12,72 @@ export default function SettingsPage() {
   
   const [actionModal, setActionModal] = useState({ isOpen: false, loading: false, success: false, message: '' });
   
+  // Custom Toast State
+  const [toasts, setToasts] = useState<{id: number, message: string, icon: string}[]>([]);
+  
+  // Personnel State
+  const [isInviteOpen, setIsInviteOpen] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteLoading, setInviteLoading] = useState(false);
+  const [admins, setAdmins] = useState([
+    { name: 'Abhijeet K.', email: 'abhi@aegis.gov', role: 'God-Mode', hw: true, lastLogin: 'Current Session' },
+    { name: 'Security Ops', email: 'secops@aegis.gov', role: 'Super-Admin', hw: true, lastLogin: '2 days ago' }
+  ]);
+
+  // Network IPs State
+  const [isIpModalOpen, setIsIpModalOpen] = useState(false);
+  const [ipInput, setIpInput] = useState('');
+  const [ipLoading, setIpLoading] = useState(false);
+  const [whitelistedIps, setWhitelistedIps] = useState([
+    '164.100.0.0/16 (India NIC)', 
+    '103.247.238.0/24 (Bangladesh Gov)', 
+    '222.165.160.0/20 (Sri Lanka Gov)', 
+    '202.79.32.0/20 (Nepal Gov)'
+  ]);
+
   const rotationLogs = [
     { hash: 'SHA-256: 0x8F4A9B2E...99BC', time: '10:45 AM, Jun 8' },
     { hash: 'SHA-256: 0x3C9F1A0B...9D4E', time: '02:12 AM, May 15' },
     { hash: 'SHA-256: 0x7B2D5F8C...1A0B', time: '11:30 PM, Apr 22' },
   ];
 
+  const showToast = (message: string, icon: string) => {
+    const id = Date.now();
+    setToasts(prev => [...prev, { id, message, icon }]);
+    setTimeout(() => {
+      setToasts(prev => prev.filter(t => t.id !== id));
+    }, 4000);
+  };
+
   const handleAction = (message: string, duration: number = 2000, loadingMsg: string = 'Propagating zero-knowledge keys...') => {
     setActionModal({ isOpen: true, loading: true, success: false, message: loadingMsg });
     setTimeout(() => {
       setActionModal({ isOpen: true, loading: false, success: true, message: message });
     }, duration);
+  };
+
+  const handleInvite = () => {
+    if (!inviteEmail) return;
+    setInviteLoading(true);
+    setTimeout(() => {
+      setAdmins(prev => [...prev, { name: 'Pending Verification', email: inviteEmail, role: 'Super-Admin', hw: false, lastLogin: 'Never' }]);
+      setInviteLoading(false);
+      setIsInviteOpen(false);
+      setInviteEmail('');
+      showToast(`Encrypted invite dispatched to ${inviteEmail}`, '✉️');
+    }, 1000);
+  };
+
+  const handleAddIp = () => {
+    if (!ipInput) return;
+    setIpLoading(true);
+    setTimeout(() => {
+      setWhitelistedIps(prev => [...prev, ipInput]);
+      setIpLoading(false);
+      setIsIpModalOpen(false);
+      setIpInput('');
+      showToast(`Network Grid Updated: Subnet block added.`, '🌍');
+    }, 1000);
   };
 
   const Toggle = ({ active, onClick }: { active: boolean, onClick: () => void }) => (
@@ -41,8 +96,129 @@ export default function SettingsPage() {
   );
 
   return (
-    <div className="p-8 min-h-screen bg-[#000000] text-white flex flex-col md:flex-row gap-8 transition-all duration-300">
+    <div className="p-8 min-h-screen bg-[#000000] text-white flex flex-col md:flex-row gap-8 transition-all duration-300 relative">
       
+      {/* Global Toast Container */}
+      <div className="fixed top-8 right-8 z-[9999999] flex flex-col gap-3 pointer-events-none">
+        <AnimatePresence>
+          {toasts.map(toast => (
+            <motion.div
+              key={toast.id}
+              initial={{ opacity: 0, x: 50, scale: 0.9 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="bg-zinc-900 border border-zinc-800 shadow-2xl px-4 py-3 rounded-xl flex items-center gap-3 text-sm font-medium tracking-tight"
+            >
+              <span className="text-xl">{toast.icon}</span>
+              {toast.message}
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
+
+      {/* Invite Modal */}
+      <AnimatePresence>
+        {isInviteOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/90 backdrop-blur-xl p-4 transition-all duration-300"
+          >
+            <motion.div 
+              initial={{ scale: 0.95, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 20 }}
+              className="bg-[#050505] border border-zinc-800 p-8 rounded-2xl w-full max-w-md shadow-[0_0_50px_rgba(16,185,129,0.1)]"
+            >
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
+                  <UserPlus className="w-6 h-6 text-emerald-500" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold tracking-tight text-white">PROVISION NEW OVERSIGHT ADMIN</h2>
+                </div>
+              </div>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-[10px] font-mono text-zinc-500 uppercase tracking-widest mb-2">Government Email Address</label>
+                  <input 
+                    type="email" 
+                    value={inviteEmail}
+                    onChange={(e) => setInviteEmail(e.target.value)}
+                    placeholder="admin@aegis.gov"
+                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-emerald-500 transition-colors"
+                  />
+                </div>
+                <div className="flex gap-4 pt-4">
+                  <button 
+                    onClick={() => { setIsInviteOpen(false); setInviteEmail(''); }}
+                    className="flex-1 px-4 py-3 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg font-medium transition-colors border border-zinc-800"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    onClick={handleInvite}
+                    disabled={inviteLoading || !inviteEmail}
+                    className="flex-1 px-4 py-3 bg-emerald-600 disabled:bg-emerald-900/50 text-white disabled:text-white/50 rounded-lg font-bold tracking-widest uppercase transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)] disabled:shadow-none hover:bg-emerald-500 flex items-center justify-center gap-2"
+                  >
+                    {inviteLoading ? <Activity className="w-4 h-4 animate-spin" /> : 'Dispatch Encrypted Invite'}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Add IP Modal */}
+      <AnimatePresence>
+        {isIpModalOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/90 backdrop-blur-xl p-4 transition-all duration-300"
+          >
+            <motion.div 
+              initial={{ scale: 0.95, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 20 }}
+              className="bg-[#050505] border border-zinc-800 p-8 rounded-2xl w-full max-w-md shadow-2xl"
+            >
+              <h2 className="text-xl font-bold tracking-tight text-white mb-6">ADD SUBNET BLOCK</h2>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-[10px] font-mono text-zinc-500 uppercase tracking-widest mb-2">CIDR Range / Description</label>
+                  <input 
+                    type="text" 
+                    value={ipInput}
+                    onChange={(e) => setIpInput(e.target.value)}
+                    placeholder="e.g. 103.45.XX.XX/24 - New Node"
+                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-3 text-white font-mono text-sm focus:outline-none focus:border-emerald-500 transition-colors"
+                  />
+                </div>
+                <div className="flex gap-4 pt-4">
+                  <button 
+                    onClick={() => { setIsIpModalOpen(false); setIpInput(''); }}
+                    className="flex-1 px-4 py-3 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg font-medium transition-colors border border-zinc-800"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    onClick={handleAddIp}
+                    disabled={ipLoading || !ipInput}
+                    className="flex-1 px-4 py-3 bg-emerald-600 hover:bg-emerald-500 disabled:bg-emerald-900/50 text-white rounded-lg font-bold transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)] disabled:shadow-none flex items-center justify-center"
+                  >
+                    {ipLoading ? <Activity className="w-4 h-4 animate-spin" /> : 'Whitelist'}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Settings Sidebar */}
       <div className="w-full md:w-64 flex flex-col gap-2 shrink-0">
         <h2 className="text-xs font-mono uppercase tracking-widest text-zinc-500 mb-4 px-3">Configuration</h2>
@@ -66,6 +242,7 @@ export default function SettingsPage() {
 
       {/* Main Content Area */}
       <div className="flex-1 max-w-4xl relative">
+        {/* Action Modal (Wait/Loading spinner) */}
         <AnimatePresence>
           {actionModal.isOpen && (
             <motion.div 
@@ -132,7 +309,7 @@ export default function SettingsPage() {
                   <p className="text-zinc-500 text-sm">Manage high-clearance administrators and Super-Admin tokens.</p>
                 </div>
                 <button 
-                  onClick={() => handleAction('Super-Admin Invite Sent Successfully', 1500, 'Generating secure invitation token...')}
+                  onClick={() => setIsInviteOpen(true)}
                   className="bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-emerald-500 px-4 py-2 rounded-lg font-medium text-sm transition-colors flex items-center gap-2"
                 >
                   <UserPlus className="w-4 h-4" /> Invite Super-Admin
@@ -145,7 +322,10 @@ export default function SettingsPage() {
                     <h4 className="text-base font-semibold text-white group-hover:text-emerald-500 transition-colors">Require YubiKey/Hardware 2FA</h4>
                     <p className="text-sm text-zinc-500 mt-1">Enforce physical hardware keys for all Super-Admin accounts.</p>
                   </div>
-                  <Toggle active={yubiKey} onClick={() => setYubiKey(!yubiKey)} />
+                  <Toggle active={yubiKey} onClick={() => {
+                    setYubiKey(!yubiKey);
+                    showToast(!yubiKey ? 'Security Policy Updated: Hardware 2FA Enforced globally.' : 'Security Policy Updated: Hardware 2FA Disabled.', '🔐');
+                  }} />
                 </div>
 
                 <div className="overflow-x-auto border-t border-zinc-800 pt-6">
@@ -159,18 +339,20 @@ export default function SettingsPage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-zinc-800/50 text-zinc-300">
-                      <tr className="hover:bg-zinc-800/50 transition-colors">
-                        <td className="px-4 py-4 font-medium text-white">Abhijeet K. <span className="text-zinc-500 font-normal ml-1">abhi@aegis.gov</span></td>
-                        <td className="px-4 py-4"><span className="bg-red-500/10 text-red-500 px-2 py-1 rounded text-[10px] font-mono uppercase tracking-widest border border-red-500/20">God-Mode</span></td>
-                        <td className="px-4 py-4 text-emerald-500"><Check className="w-4 h-4" /></td>
-                        <td className="px-4 py-4 text-right text-xs text-zinc-500 font-mono">Current Session</td>
-                      </tr>
-                      <tr className="hover:bg-zinc-800/50 transition-colors">
-                        <td className="px-4 py-4 font-medium text-white">Security Ops <span className="text-zinc-500 font-normal ml-1">secops@aegis.gov</span></td>
-                        <td className="px-4 py-4"><span className="bg-emerald-500/10 text-emerald-500 px-2 py-1 rounded text-[10px] font-mono uppercase tracking-widest border border-emerald-500/20">Super-Admin</span></td>
-                        <td className="px-4 py-4 text-emerald-500"><Check className="w-4 h-4" /></td>
-                        <td className="px-4 py-4 text-right text-xs text-zinc-500 font-mono">2 days ago</td>
-                      </tr>
+                      {admins.map((admin, i) => (
+                        <tr key={i} className="hover:bg-zinc-800/50 transition-colors">
+                          <td className="px-4 py-4 font-medium text-white">{admin.name} <span className="text-zinc-500 font-normal ml-1">{admin.email}</span></td>
+                          <td className="px-4 py-4">
+                            <span className={`${admin.role === 'God-Mode' ? 'bg-red-500/10 text-red-500 border-red-500/20' : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'} px-2 py-1 rounded text-[10px] font-mono uppercase tracking-widest border`}>
+                              {admin.role}
+                            </span>
+                          </td>
+                          <td className="px-4 py-4 text-emerald-500">
+                            {admin.hw ? <Check className="w-4 h-4" /> : <span className="text-zinc-600"><X className="w-4 h-4" /></span>}
+                          </td>
+                          <td className="px-4 py-4 text-right text-xs text-zinc-500 font-mono">{admin.lastLogin}</td>
+                        </tr>
+                      ))}
                     </tbody>
                   </table>
                 </div>
@@ -198,13 +380,24 @@ export default function SettingsPage() {
                     <h4 className="text-base font-semibold text-white group-hover:text-emerald-500 transition-colors">Strict BIMSTEC Geo-Lock</h4>
                     <p className="text-sm text-zinc-500 mt-1">Block all network requests originating outside of authorized South Asian jurisdictions.</p>
                   </div>
-                  <Toggle active={geoLock} onClick={() => setGeoLock(!geoLock)} />
+                  <Toggle active={geoLock} onClick={() => {
+                    setGeoLock(!geoLock);
+                    showToast(!geoLock ? 'Network Grid Updated: Non-BIMSTEC IPs blocked globally.' : 'Network Grid Updated: Geo-Lock disabled. Traffic open.', '🌍');
+                  }} />
                 </div>
 
                 <div>
-                  <h3 className="text-xs font-mono uppercase tracking-widest text-zinc-400 mb-4">Whitelisted Government IP Blocks</h3>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-xs font-mono uppercase tracking-widest text-zinc-400">Whitelisted Government IP Blocks</h3>
+                    <button 
+                      onClick={() => setIsIpModalOpen(true)}
+                      className="text-emerald-500 hover:text-emerald-400 flex items-center gap-1 text-[10px] font-mono uppercase tracking-widest transition-colors"
+                    >
+                      <Plus className="w-3 h-3" /> Add Subnet Block
+                    </button>
+                  </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {['164.100.0.0/16 (India NIC)', '103.247.238.0/24 (Bangladesh Gov)', '222.165.160.0/20 (Sri Lanka Gov)', '202.79.32.0/20 (Nepal Gov)'].map((ip, i) => (
+                    {whitelistedIps.map((ip, i) => (
                       <div key={i} className="bg-[#000] border border-zinc-800 p-3 rounded-lg flex items-center justify-between">
                         <span className="text-xs font-mono text-zinc-300">{ip}</span>
                         <Check className="w-4 h-4 text-emerald-500" />
@@ -348,7 +541,10 @@ export default function SettingsPage() {
                       <h4 className="text-base font-semibold text-white group-hover:text-emerald-500 transition-colors">Biometric 2FA Enforcement</h4>
                       <p className="text-sm text-zinc-500 mt-1">Require FaceID/TouchID upon every active login.</p>
                     </div>
-                    <Toggle active={bio2FA} onClick={() => setBio2FA(!bio2FA)} />
+                    <Toggle active={bio2FA} onClick={() => {
+                      setBio2FA(!bio2FA);
+                      showToast(!bio2FA ? 'Security Policy Updated: Biometric 2FA Enforced.' : 'Security Policy Updated: Biometric 2FA Disabled.', '🛡️');
+                    }} />
                   </div>
                   
                   <div className="h-px bg-zinc-800/50 w-full"></div>
@@ -358,7 +554,10 @@ export default function SettingsPage() {
                       <h4 className="text-base font-semibold text-white group-hover:text-emerald-500 transition-colors">Strict IP Whitelisting</h4>
                       <p className="text-sm text-zinc-500 mt-1">Block all traffic originating outside of authorized zones.</p>
                     </div>
-                    <Toggle active={ipWhitelist} onClick={() => setIpWhitelist(!ipWhitelist)} />
+                    <Toggle active={ipWhitelist} onClick={() => {
+                      setIpWhitelist(!ipWhitelist);
+                      showToast(!ipWhitelist ? 'Network Protocol Updated: IP Whitelisting enabled.' : 'Network Protocol Updated: IP Whitelisting disabled.', '🌐');
+                    }} />
                   </div>
                 </div>
               </div>
