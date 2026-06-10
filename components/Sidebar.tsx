@@ -66,33 +66,39 @@ export function Sidebar() {
       </nav>
       
       <div className="px-4 mt-auto">
-        <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800">
-          <div className="relative shrink-0">
-            <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-emerald-500 font-bold text-xs">AK</div>
-            <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-zinc-950 animate-pulse"></div>
+        <div className={`flex items-center px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 transition-all overflow-hidden ${isHovered ? 'gap-3' : 'justify-center'}`}>
+          <div className="relative shrink-0 w-10 h-10 rounded-full flex items-center justify-center overflow-hidden">
+            <div className="absolute inset-[-50%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg,transparent,transparent,#10b981)]"></div>
+            <div className="absolute inset-[2px] bg-zinc-900 rounded-full flex items-center justify-center text-white font-bold text-xs z-10">AK</div>
           </div>
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: isHovered ? 1 : 0 }}
-            className="flex flex-col whitespace-nowrap"
-          >
-            <span className="text-sm font-semibold text-white">Abhijeet K.</span>
-            <span className="text-[10px] text-zinc-500 tracking-widest font-mono">OVERSIGHT ADMIN</span>
-          </motion.div>
+          {isHovered && (
+            <motion.div 
+              initial={{ opacity: 0, w: 0 }}
+              animate={{ opacity: 1, w: 'auto' }}
+              className="flex flex-col whitespace-nowrap"
+            >
+              <span className="text-sm font-semibold text-white">Abhijeet K.</span>
+              <span className="text-[10px] text-emerald-500 tracking-widest font-mono uppercase flex items-center gap-1">
+                <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span> FOUNDER
+              </span>
+            </motion.div>
+          )}
         </div>
         
         <button 
           onClick={() => { auth.signOut().then(() => window.location.href = '/'); }} 
-          className="w-full mt-2 flex items-center justify-center gap-2 text-red-500 hover:bg-red-500/10 py-2 rounded-md transition-colors text-sm font-medium"
+          className="w-full mt-2 flex items-center justify-center gap-2 text-red-500 hover:bg-red-500/10 py-2 rounded-md transition-colors text-sm font-medium overflow-hidden"
         >
-          <LogOut size={16} /> 
-          <motion.span
-            initial={{ opacity: 0 }}
-            animate={{ opacity: isHovered ? 1 : 0 }}
-            className="whitespace-nowrap"
-          >
-            Terminate Session
-          </motion.span>
+          <LogOut size={16} className="shrink-0" /> 
+          {isHovered && (
+            <motion.span
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="whitespace-nowrap"
+            >
+              Terminate Session
+            </motion.span>
+          )}
         </button>
       </div>
     </motion.aside>
