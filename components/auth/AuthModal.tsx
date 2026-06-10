@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, ShieldCheck, User as UserIcon, Building2 } from 'lucide-react';
 import { auth, db } from '@/lib/firebase/config';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { doc, setDoc, getDocFromServer } from 'firebase/firestore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
@@ -42,9 +42,13 @@ export function AuthModal() {
         if (user.email === 'abhi.admin.dev@gmail.com') {
           fetchedRole = 'admin';
         } else {
-          const docSnap = await getDoc(doc(db, 'users', user.uid));
-          if (docSnap.exists()) {
-            fetchedRole = docSnap.data().role || 'citizen';
+          try {
+            const docSnap = await getDocFromServer(doc(db, 'users', user.uid));
+            if (docSnap.exists()) {
+              fetchedRole = docSnap.data().role || 'citizen';
+            }
+          } catch (e: any) {
+             console.warn("Could not fetch user role, defaulting to citizen:", e.message);
           }
         }
       } else {

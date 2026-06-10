@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { User, onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase/config';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDocFromServer } from 'firebase/firestore';
 
 interface UserData {
   uid: string;
@@ -48,7 +48,7 @@ export const useAuthStore = create<AuthState>((set) => ({
           return;
         }
         try {
-          const userDoc = await getDoc(doc(db, 'users', user.uid));
+          const userDoc = await getDocFromServer(doc(db, 'users', user.uid));
           if (userDoc.exists()) {
             set({ userData: userDoc.data() as UserData });
           } else {
