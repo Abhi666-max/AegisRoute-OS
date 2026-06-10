@@ -1,6 +1,6 @@
 'use client';
-import { Settings, ShieldAlert, KeyRound, Activity, Check, X, Lock, Users, Globe, Database, UserPlus, HardDriveDownload, Server, RefreshCw, Plus } from 'lucide-react';
-import { useState } from 'react';
+import { Settings, ShieldAlert, KeyRound, Activity, Check, X, Lock, Users, Globe, Database, UserPlus, HardDriveDownload, Server, RefreshCw, Plus, Trash2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function SettingsPage() {
@@ -10,7 +10,7 @@ export default function SettingsPage() {
   const [yubiKey, setYubiKey] = useState(false);
   const [activeMenu, setActiveMenu] = useState('personnel');
   
-  const [actionModal, setActionModal] = useState({ isOpen: false, loading: false, success: false, message: '' });
+  const [actionModal, setActionModal] = useState({ isOpen: false, loading: false, success: false, message: '', title: '' });
   
   // Custom Toast State
   const [toasts, setToasts] = useState<{id: number, message: string, icon: string}[]>([]);
@@ -20,8 +20,8 @@ export default function SettingsPage() {
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteLoading, setInviteLoading] = useState(false);
   const [admins, setAdmins] = useState([
-    { name: 'Abhijeet K.', email: 'abhi@aegis.gov', role: 'God-Mode', hw: true, lastLogin: 'Current Session' },
-    { name: 'Security Ops', email: 'secops@aegis.gov', role: 'Super-Admin', hw: true, lastLogin: '2 days ago' }
+    { name: 'Abhijeet K.', email: 'abhi@aegis.gov', role: 'God-Mode', hw: true, lastLogin: 'Current Session', status: 'ACTIVE' },
+    { name: 'Security Ops', email: 'secops@aegis.gov', role: 'Super-Admin', hw: true, lastLogin: '2 days ago', status: 'ACTIVE' }
   ]);
 
   // Network IPs State
@@ -35,11 +35,15 @@ export default function SettingsPage() {
     '202.79.32.0/20 (Nepal Gov)'
   ]);
 
-  const rotationLogs = [
+  // Cryptography State
+  const [rotationLogs, setRotationLogs] = useState([
     { hash: 'SHA-256: 0x8F4A9B2E...99BC', time: '10:45 AM, Jun 8' },
     { hash: 'SHA-256: 0x3C9F1A0B...9D4E', time: '02:12 AM, May 15' },
     { hash: 'SHA-256: 0x7B2D5F8C...1A0B', time: '11:30 PM, Apr 22' },
-  ];
+  ]);
+
+  // Database Sync State
+  const [lastSyncTime, setLastSyncTime] = useState('14m ago');
 
   const showToast = (message: string, icon: string) => {
     const id = Date.now();
@@ -49,23 +53,21 @@ export default function SettingsPage() {
     }, 4000);
   };
 
-  const handleAction = (message: string, duration: number = 2000, loadingMsg: string = 'Propagating zero-knowledge keys...') => {
-    setActionModal({ isOpen: true, loading: true, success: false, message: loadingMsg });
-    setTimeout(() => {
-      setActionModal({ isOpen: true, loading: false, success: true, message: message });
-    }, duration);
-  };
-
   const handleInvite = () => {
     if (!inviteEmail) return;
     setInviteLoading(true);
     setTimeout(() => {
-      setAdmins(prev => [...prev, { name: 'Pending Verification', email: inviteEmail, role: 'Super-Admin', hw: false, lastLogin: 'Never' }]);
+      setAdmins(prev => [...prev, { name: 'Pending Verification', email: inviteEmail, role: 'Super-Admin', hw: false, lastLogin: 'Never', status: 'PENDING VERIFICATION' }]);
       setInviteLoading(false);
       setIsInviteOpen(false);
       setInviteEmail('');
       showToast(`Encrypted invite dispatched to ${inviteEmail}`, '✉️');
     }, 1000);
+  };
+
+  const handleRevokeInvite = (emailToRevoke: string) => {
+    setAdmins(prev => prev.filter(admin => admin.email !== emailToRevoke));
+    showToast('Invite securely revoked.', '🗑️');
   };
 
   const handleAddIp = () => {
@@ -78,6 +80,31 @@ export default function SettingsPage() {
       setIpInput('');
       showToast(`Network Grid Updated: Subnet block added.`, '🌍');
     }, 1000);
+  };
+
+  const handleTriggerSnapshot = () => {
+    setActionModal({ isOpen: true, loading: true, success: false, message: 'INITIATING FIRESTORE -> POSTGRES VECTOR SNAPSHOT', title: 'DATABASE SYNC' });
+    setTimeout(() => {
+      setActionModal(prev => ({ ...prev, loading: false, success: true, message: 'SNAPSHOT SECURED in Cold Storage' }));
+      setLastSyncTime('Just now');
+      setTimeout(() => {
+         setActionModal({ isOpen: false, loading: false, success: false, message: '', title: '' });
+      }, 1500);
+    }, 2000);
+  };
+
+  const handleRotateKeys = () => {
+    setActionModal({ isOpen: true, loading: true, success: false, message: 'WARNING: ROTATING AES-256 MASTER KEYS', title: 'CRYPTOGRAPHY CONTROL' });
+    setTimeout(() => {
+       setActionModal({ isOpen: false, loading: false, success: false, message: '', title: '' });
+       
+       const newHash = `SHA-256: 0x${Math.random().toString(16).substr(2, 8).toUpperCase()}...${Math.random().toString(16).substr(2, 4).toUpperCase()}`;
+       setRotationLogs(prev => [
+         { hash: newHash, time: 'Just now' },
+         ...prev
+       ]);
+       showToast('Master encryption keys successfully rotated.', '🔐');
+    }, 2500);
   };
 
   const Toggle = ({ active, onClick }: { active: boolean, onClick: () => void }) => (
@@ -116,6 +143,55 @@ export default function SettingsPage() {
         </AnimatePresence>
       </div>
 
+      {/* Cinematic Center Modal (Phase 17/21 logic) */}
+      <AnimatePresence>
+        {actionModal.isOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/90 backdrop-blur-xl p-4 transition-all duration-300"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="bg-[#050505] border border-zinc-800 p-10 rounded-3xl w-full max-w-md text-center shadow-[0_0_80px_rgba(0,0,0,0.8)]"
+            >
+              {actionModal.loading ? (
+                <div className="flex flex-col items-center gap-8">
+                  <div className="relative w-24 h-24 flex items-center justify-center">
+                    <div className="absolute inset-0 border-4 border-zinc-800 rounded-full"></div>
+                    <div className={`absolute inset-0 border-4 rounded-full border-t-transparent animate-spin ${actionModal.title === 'CRYPTOGRAPHY CONTROL' ? 'border-red-500' : 'border-emerald-500'}`}></div>
+                    {actionModal.title === 'CRYPTOGRAPHY CONTROL' ? (
+                       <KeyRound className="w-10 h-10 text-red-500 animate-pulse" />
+                    ) : (
+                       <Database className="w-10 h-10 text-emerald-500 animate-pulse" />
+                    )}
+                  </div>
+                  <div>
+                    <h2 className={`text-xl font-bold tracking-tight mb-2 ${actionModal.title === 'CRYPTOGRAPHY CONTROL' ? 'text-red-500' : 'text-white'}`}>{actionModal.message}</h2>
+                    <p className="text-xs text-zinc-500 font-mono tracking-widest uppercase">System locked during transaction...</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center gap-8">
+                  <motion.div 
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+                    className="w-24 h-24 rounded-full flex items-center justify-center bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 shadow-[0_0_30px_rgba(16,185,129,0.2)]"
+                  >
+                    <Check className="w-12 h-12" />
+                  </motion.div>
+                  <h2 className="text-2xl font-bold tracking-tight text-white">{actionModal.message}</h2>
+                </div>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Invite Modal */}
       <AnimatePresence>
         {isInviteOpen && (
@@ -147,7 +223,7 @@ export default function SettingsPage() {
                     value={inviteEmail}
                     onChange={(e) => setInviteEmail(e.target.value)}
                     placeholder="admin@aegis.gov"
-                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-emerald-500 transition-colors"
+                    className="w-full bg-[#000] border border-zinc-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-emerald-500 transition-colors"
                   />
                 </div>
                 <div className="flex gap-4 pt-4">
@@ -195,7 +271,7 @@ export default function SettingsPage() {
                     value={ipInput}
                     onChange={(e) => setIpInput(e.target.value)}
                     placeholder="e.g. 103.45.XX.XX/24 - New Node"
-                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-3 text-white font-mono text-sm focus:outline-none focus:border-emerald-500 transition-colors"
+                    className="w-full bg-[#000] border border-zinc-800 rounded-lg px-4 py-3 text-white font-mono text-sm focus:outline-none focus:border-emerald-500 transition-colors"
                   />
                 </div>
                 <div className="flex gap-4 pt-4">
@@ -242,55 +318,6 @@ export default function SettingsPage() {
 
       {/* Main Content Area */}
       <div className="flex-1 max-w-4xl relative">
-        {/* Action Modal (Wait/Loading spinner) */}
-        <AnimatePresence>
-          {actionModal.isOpen && (
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/90 backdrop-blur-xl p-4 transition-all duration-300"
-            >
-              <motion.div 
-                initial={{ scale: 0.9, y: 20 }}
-                animate={{ scale: 1, y: 0 }}
-                exit={{ scale: 0.9, y: 20 }}
-                className="bg-zinc-900 border border-zinc-800 p-10 rounded-3xl w-full max-w-md text-center shadow-[0_0_80px_rgba(0,0,0,0.8)]"
-              >
-                {actionModal.loading ? (
-                  <div className="flex flex-col items-center gap-8">
-                    <div className="relative w-20 h-20 flex items-center justify-center">
-                      <div className="absolute inset-0 border-4 border-zinc-800 rounded-full"></div>
-                      <div className="absolute inset-0 border-4 border-emerald-500 rounded-full border-t-transparent animate-spin"></div>
-                      <Lock className="w-8 h-8 text-emerald-500 animate-pulse" />
-                    </div>
-                    <div>
-                      <h2 className="text-xl font-bold tracking-tight text-white mb-2">{actionModal.message}</h2>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-center gap-8">
-                    <motion.div 
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-                      className="w-20 h-20 rounded-full flex items-center justify-center bg-emerald-500/20 text-emerald-500 border border-emerald-500/30 shadow-[0_0_30px_rgba(16,185,129,0.3)]"
-                    >
-                      <Check className="w-10 h-10" />
-                    </motion.div>
-                    <h2 className="text-2xl font-bold tracking-tight text-white">{actionModal.message}</h2>
-                    <button 
-                      onClick={() => setActionModal({ isOpen: false, loading: false, success: false, message: '' })}
-                      className="w-full py-4 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-xl text-white font-semibold transition-all duration-300 shadow-lg"
-                    >
-                      Acknowledge
-                    </button>
-                  </div>
-                )}
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
 
         <AnimatePresence mode="wait">
           
@@ -316,7 +343,7 @@ export default function SettingsPage() {
                 </button>
               </div>
               
-              <div className="border border-zinc-800 rounded-2xl bg-zinc-900 p-6 shadow-2xl relative overflow-hidden">
+              <div className="border border-zinc-800 rounded-2xl bg-[#050505] p-6 shadow-2xl relative overflow-hidden">
                 <div className="flex items-center justify-between group mb-6">
                   <div>
                     <h4 className="text-base font-semibold text-white group-hover:text-emerald-500 transition-colors">Require YubiKey/Hardware 2FA</h4>
@@ -335,24 +362,55 @@ export default function SettingsPage() {
                         <th className="px-4 py-3 font-medium">Administrator</th>
                         <th className="px-4 py-3 font-medium">Clearance Level</th>
                         <th className="px-4 py-3 font-medium">Hardware 2FA</th>
-                        <th className="px-4 py-3 font-medium text-right">Last Login</th>
+                        <th className="px-4 py-3 font-medium text-right">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-zinc-800/50 text-zinc-300">
-                      {admins.map((admin, i) => (
-                        <tr key={i} className="hover:bg-zinc-800/50 transition-colors">
-                          <td className="px-4 py-4 font-medium text-white">{admin.name} <span className="text-zinc-500 font-normal ml-1">{admin.email}</span></td>
-                          <td className="px-4 py-4">
-                            <span className={`${admin.role === 'God-Mode' ? 'bg-red-500/10 text-red-500 border-red-500/20' : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'} px-2 py-1 rounded text-[10px] font-mono uppercase tracking-widest border`}>
-                              {admin.role}
-                            </span>
-                          </td>
-                          <td className="px-4 py-4 text-emerald-500">
-                            {admin.hw ? <Check className="w-4 h-4" /> : <span className="text-zinc-600"><X className="w-4 h-4" /></span>}
-                          </td>
-                          <td className="px-4 py-4 text-right text-xs text-zinc-500 font-mono">{admin.lastLogin}</td>
-                        </tr>
-                      ))}
+                      <AnimatePresence>
+                        {admins.map((admin, i) => (
+                          <motion.tr 
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            transition={{ duration: 0.2 }}
+                            key={admin.email} 
+                            className="hover:bg-zinc-800/50 transition-colors"
+                          >
+                            <td className="px-4 py-4">
+                               <div className="flex flex-col">
+                                  <span className="font-medium text-white">{admin.name}</span>
+                                  <span className="text-[10px] font-mono text-zinc-500 mt-0.5">{admin.email}</span>
+                               </div>
+                            </td>
+                            <td className="px-4 py-4">
+                              <span className={`${admin.role === 'God-Mode' ? 'bg-red-500/10 text-red-500 border-red-500/20' : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'} px-2 py-1 rounded text-[10px] font-mono uppercase tracking-widest border`}>
+                                {admin.role}
+                              </span>
+                            </td>
+                            <td className="px-4 py-4">
+                              {admin.status === 'PENDING VERIFICATION' ? (
+                                <span className="text-[10px] font-mono text-amber-500 uppercase tracking-widest bg-amber-500/10 border border-amber-500/20 px-2 py-1 rounded">Pending</span>
+                              ) : admin.hw ? (
+                                <span className="text-emerald-500"><Check className="w-4 h-4" /></span>
+                              ) : (
+                                <span className="text-zinc-600"><X className="w-4 h-4" /></span>
+                              )}
+                            </td>
+                            <td className="px-4 py-4 text-right">
+                              {admin.status === 'PENDING VERIFICATION' ? (
+                                 <button 
+                                   onClick={() => handleRevokeInvite(admin.email)}
+                                   className="bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 px-3 py-1.5 rounded-lg text-[10px] font-mono uppercase tracking-widest transition-colors inline-flex items-center gap-1.5"
+                                 >
+                                    <Trash2 className="w-3 h-3" /> Cancel Invite
+                                 </button>
+                              ) : (
+                                 <span className="text-xs text-zinc-500 font-mono">Last: {admin.lastLogin}</span>
+                              )}
+                            </td>
+                          </motion.tr>
+                        ))}
+                      </AnimatePresence>
                     </tbody>
                   </table>
                 </div>
@@ -374,7 +432,7 @@ export default function SettingsPage() {
                 <p className="text-zinc-500 text-sm">Control regional access and infrastructure edge-routing.</p>
               </div>
 
-              <div className="border border-zinc-800 rounded-2xl bg-zinc-900 p-8 shadow-2xl relative overflow-hidden">
+              <div className="border border-zinc-800 rounded-2xl bg-[#050505] p-8 shadow-2xl relative overflow-hidden">
                 <div className="flex items-center justify-between group mb-8 border-b border-zinc-800 pb-8">
                   <div>
                     <h4 className="text-base font-semibold text-white group-hover:text-emerald-500 transition-colors">Strict BIMSTEC Geo-Lock</h4>
@@ -423,7 +481,7 @@ export default function SettingsPage() {
                 <p className="text-zinc-500 text-sm">Monitor multi-region database replication and Vector sync.</p>
               </div>
 
-              <div className="border border-zinc-800 rounded-2xl bg-zinc-900 p-8 shadow-2xl relative overflow-hidden flex flex-col items-center justify-center py-16">
+              <div className="border border-zinc-800 rounded-2xl bg-[#050505] p-8 shadow-2xl relative overflow-hidden flex flex-col items-center justify-center py-16">
                 <div className="absolute top-0 w-full h-1 bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
                 
                 <div className="flex items-center gap-6 mb-8 w-full max-w-md justify-between">
@@ -445,6 +503,7 @@ export default function SettingsPage() {
                     <span className="bg-emerald-500/10 text-emerald-500 px-3 py-1 rounded-full text-[10px] font-mono uppercase tracking-widest border border-emerald-500/20 mt-4 flex items-center gap-2">
                       <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div> SYNCED
                     </span>
+                    <span className="text-[10px] text-zinc-500 font-mono mt-1">Last Sync: {lastSyncTime}</span>
                   </div>
 
                   <div className="flex flex-col items-center gap-2">
@@ -456,7 +515,7 @@ export default function SettingsPage() {
                 </div>
 
                 <button 
-                  onClick={() => handleAction('Snapshot Created Successfully', 2500, 'Generating global database snapshot...')}
+                  onClick={handleTriggerSnapshot}
                   className="bg-[#000] hover:bg-zinc-800 border border-zinc-700 hover:border-zinc-600 text-white px-6 py-4 rounded-xl text-sm font-bold uppercase tracking-widest transition-all duration-300 shadow-lg flex items-center justify-center gap-3 w-full max-w-md mt-6"
                 >
                   <HardDriveDownload className="w-5 h-5" /> Trigger Manual Snapshot
@@ -479,7 +538,7 @@ export default function SettingsPage() {
                 <p className="text-zinc-500 text-sm">Manage master encryption keys and security hashes.</p>
               </div>
 
-              <div className="border border-red-900/30 rounded-2xl bg-zinc-900 p-8 shadow-2xl relative overflow-hidden">
+              <div className="border border-red-900/30 rounded-2xl bg-[#050505] p-8 shadow-2xl relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-red-500/5 blur-[120px] rounded-full pointer-events-none"></div>
                 
                 <div className="relative z-10">
@@ -493,7 +552,7 @@ export default function SettingsPage() {
                     Master encryption keys secure the entire BIMSTEC data grid. Rotating keys will temporarily disconnect all nodes and force re-authentication across the mesh. This action is heavily audited.
                   </p>
                   <button 
-                    onClick={() => handleAction('AES-256 Keys Rotated Successfully', 3000, 'Propagating zero-knowledge keys across mesh...')} 
+                    onClick={handleRotateKeys} 
                     className="w-full bg-red-600 hover:bg-red-500 text-white px-8 py-5 rounded-xl text-sm font-bold uppercase tracking-widest transition-all duration-300 shadow-[0_0_20px_rgba(220,38,38,0.3)] hover:shadow-[0_0_30px_rgba(220,38,38,0.5)] flex items-center justify-center gap-3"
                   >
                     <RefreshCw className="w-5 h-5" /> Execute Key Rotation
@@ -502,15 +561,22 @@ export default function SettingsPage() {
                   <div className="mt-10 pt-8 border-t border-zinc-800">
                     <h3 className="text-xs font-mono uppercase tracking-widest text-zinc-500 mb-6">Key Ledger (Recent Rotations)</h3>
                     <div className="space-y-3">
-                      {rotationLogs.map((log, i) => (
-                        <div key={i} className="flex justify-between items-center p-4 rounded-xl bg-[#000] border border-zinc-800 hover:border-zinc-700 transition-colors">
-                          <div className="flex items-center gap-3">
-                            <ShieldAlert className="w-4 h-4 text-zinc-500" />
-                            <span className="text-sm font-mono text-emerald-500">{log.hash}</span>
-                          </div>
-                          <span className="text-xs text-zinc-500 uppercase font-mono tracking-wider">{log.time}</span>
-                        </div>
-                      ))}
+                      <AnimatePresence>
+                        {rotationLogs.map((log, i) => (
+                          <motion.div 
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            key={log.hash} 
+                            className="flex justify-between items-center p-4 rounded-xl bg-[#000] border border-zinc-800 hover:border-zinc-700 transition-colors"
+                          >
+                            <div className="flex items-center gap-3">
+                              <ShieldAlert className="w-4 h-4 text-zinc-500" />
+                              <span className="text-sm font-mono text-emerald-500">{log.hash}</span>
+                            </div>
+                            <span className="text-xs text-zinc-500 uppercase font-mono tracking-wider">{log.time}</span>
+                          </motion.div>
+                        ))}
+                      </AnimatePresence>
                     </div>
                   </div>
                 </div>
@@ -532,7 +598,7 @@ export default function SettingsPage() {
                 <p className="text-zinc-500 text-sm">Global access requirements and enforcement policies.</p>
               </div>
               
-              <div className="border border-zinc-800 rounded-2xl bg-zinc-900 p-8 shadow-2xl relative overflow-hidden">
+              <div className="border border-zinc-800 rounded-2xl bg-[#050505] p-8 shadow-2xl relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 blur-[120px] rounded-full pointer-events-none"></div>
                 
                 <div className="space-y-8 relative z-10">
