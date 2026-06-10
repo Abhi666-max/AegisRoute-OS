@@ -48,7 +48,9 @@ export default function AdminDashboard() {
   const [actionModal, setActionModal] = useState<{ isOpen: boolean, type: string, target?: any, loading: boolean, success: boolean, message: string }>({
     isOpen: false, type: '', loading: false, success: false, message: ''
   });
+  const [wipeModalOpen, setWipeModalOpen] = useState(false);
   const [wipeConfirmText, setWipeConfirmText] = useState("");
+  const [nodeToDelete, setNodeToDelete] = useState<any>(null);
 
   useEffect(() => {
     setMounted(true);
