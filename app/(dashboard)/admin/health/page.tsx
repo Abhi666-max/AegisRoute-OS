@@ -69,26 +69,40 @@ export default function HealthPage() {
           </div>
         ))}
 
-        {/* Realistic Incidents Log */}
-        <div className="mt-8 pt-6 border-t border-zinc-800">
-           <h3 className="text-lg font-semibold text-white tracking-tighter mb-6">Past Incidents</h3>
-           <div className="space-y-4">
-             <div className="flex items-start gap-4 p-5 rounded-xl border border-emerald-500/20 bg-emerald-500/5 hover:bg-emerald-500/10 transition-colors">
-                <CheckCircle2 className="w-6 h-6 text-emerald-500 mt-1" />
-                <div>
-                  <h4 className="text-base font-medium text-emerald-500">[Resolved] API Gateway Latency Spike in Dhaka</h4>
-                  <p className="text-sm text-zinc-400 mt-1 leading-relaxed">Traffic routing issue caused a temporary 200ms latency spike for Dhaka Central node. Failover completed successfully and traffic normalized.</p>
-                  <p className="text-xs font-mono text-zinc-500 mt-3 uppercase tracking-widest">Jun 8, 2026 - 14:30 IST</p>
+        {/* Historical Downtime Log Timeline */}
+        <div className="mt-10 pt-8 border-t border-zinc-800">
+           <h3 className="text-lg font-semibold text-white tracking-tighter mb-8">Historical Downtime Log</h3>
+           <div className="relative border-l border-zinc-800 ml-3 space-y-8 pb-4">
+             
+             <div className="relative pl-8">
+                <div className="absolute w-3 h-3 bg-[#050505] border-2 border-emerald-500 rounded-full -left-[6.5px] top-1.5"></div>
+                <div className="p-5 rounded-xl border border-zinc-800 bg-[#050505] hover:bg-zinc-900 transition-colors">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between mb-2 gap-2">
+                    <h4 className="text-base font-medium text-emerald-500">Edge Node Latency Spike (Dhaka Region)</h4>
+                    <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest bg-zinc-950 px-2 py-1 rounded border border-zinc-800">May 14, 2026</span>
+                  </div>
+                  <p className="text-sm text-zinc-400 leading-relaxed">Traffic routing issue caused a temporary 200ms latency spike for Dhaka Central node. Failover completed successfully and traffic normalized.</p>
+                  <div className="mt-4 flex items-center gap-2 text-xs font-mono text-zinc-500">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Resolved in 14m
+                  </div>
                 </div>
              </div>
-             <div className="flex items-start gap-4 p-5 rounded-xl border border-zinc-800 bg-[#050505] hover:bg-zinc-900 transition-colors">
-                <CheckCircle2 className="w-6 h-6 text-zinc-500 mt-1" />
-                <div>
-                  <h4 className="text-base font-medium text-zinc-300">[Resolved] Routine Vector Indexing Maintenance</h4>
-                  <p className="text-sm text-zinc-500 mt-1 leading-relaxed">Scheduled PostgreSQL maintenance. Zero downtime observed across the global mesh.</p>
-                  <p className="text-xs font-mono text-zinc-600 mt-3 uppercase tracking-widest">Jun 1, 2026 - 02:00 IST</p>
+
+             <div className="relative pl-8">
+                <div className="absolute w-3 h-3 bg-[#050505] border-2 border-zinc-500 rounded-full -left-[6.5px] top-1.5"></div>
+                <div className="p-5 rounded-xl border border-zinc-800 bg-[#050505] hover:bg-zinc-900 transition-colors">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between mb-2 gap-2">
+                    <h4 className="text-base font-medium text-zinc-300">Database Read Rejection</h4>
+                    <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest bg-zinc-950 px-2 py-1 rounded border border-zinc-800">April 02, 2026</span>
+                  </div>
+                  <p className="text-sm text-zinc-500 leading-relaxed">Brief rejection of cross-border queries due to strict IP validation rules. Rule adjusted dynamically.</p>
+                  <div className="mt-4 flex items-center gap-4 text-xs font-mono text-zinc-500">
+                    <div className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-zinc-500"></span> Resolved in 4m</div>
+                    <a href="#" className="text-blue-500 hover:text-blue-400 underline underline-offset-2 transition-colors">Post-mortem attached</a>
+                  </div>
                 </div>
              </div>
+
            </div>
         </div>
       </div>
