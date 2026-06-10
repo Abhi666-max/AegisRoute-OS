@@ -1,6 +1,6 @@
 'use client';
-import { Settings, ShieldAlert, KeyRound, Activity, Check, X, Lock, Users, Globe, Database, UserPlus, HardDriveDownload, Server, RefreshCw, Plus, Trash2 } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { Settings, ShieldAlert, KeyRound, Activity, Check, X, Lock, Users, Globe, Database, UserPlus, HardDriveDownload, Server, RefreshCw, Plus, Trash2, CheckCircle, AlertTriangle } from 'lucide-react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function SettingsPage() {
@@ -10,7 +10,14 @@ export default function SettingsPage() {
   const [yubiKey, setYubiKey] = useState(false);
   const [activeMenu, setActiveMenu] = useState('personnel');
   
-  const [actionModal, setActionModal] = useState({ isOpen: false, loading: false, success: false, message: '', title: '' });
+  // Cinematic Action State
+  const [actionState, setActionState] = useState<{
+    isOpen: boolean;
+    type: 'loading' | 'success' | 'delete' | 'info';
+    title: string;
+    message: string;
+    target?: string;
+  }>({ isOpen: false, type: 'info', title: '', message: '' });
   
   // Custom Toast State
   const [toasts, setToasts] = useState<{id: number, message: string, icon: string}[]>([]);
@@ -65,9 +72,29 @@ export default function SettingsPage() {
     }, 1000);
   };
 
-  const handleRevokeInvite = (emailToRevoke: string) => {
+  const initiateRevokeInvite = (emailToRevoke: string) => {
+    setActionState({
+      isOpen: true,
+      type: 'delete',
+      title: 'CONFIRM REVOCATION',
+      message: `This will permanently invalidate the dispatch key for ${emailToRevoke}.`,
+      target: emailToRevoke
+    });
+  };
+
+  const executeRevocation = () => {
+    const emailToRevoke = actionState.target;
     setAdmins(prev => prev.filter(admin => admin.email !== emailToRevoke));
-    showToast('Invite securely revoked.', '🗑️');
+    setActionState({
+      isOpen: true,
+      type: 'success',
+      title: 'INVITE REVOKED',
+      message: `The dispatch key has been permanently destroyed.`,
+      target: ''
+    });
+    setTimeout(() => {
+       setActionState(prev => ({ ...prev, isOpen: false }));
+    }, 1500);
   };
 
   const handleAddIp = () => {
@@ -83,27 +110,28 @@ export default function SettingsPage() {
   };
 
   const handleTriggerSnapshot = () => {
-    setActionModal({ isOpen: true, loading: true, success: false, message: 'INITIATING FIRESTORE -> POSTGRES VECTOR SNAPSHOT', title: 'DATABASE SYNC' });
+    setActionState({ isOpen: true, type: 'loading', title: 'DATABASE SYNC', message: 'INITIATING FIRESTORE -> POSTGRES VECTOR SNAPSHOT' });
     setTimeout(() => {
-      setActionModal(prev => ({ ...prev, loading: false, success: true, message: 'SNAPSHOT SECURED in Cold Storage' }));
+      setActionState({ isOpen: true, type: 'success', title: 'SYNC COMPLETE', message: 'SNAPSHOT SECURED IN COLD STORAGE' });
       setLastSyncTime('Just now');
       setTimeout(() => {
-         setActionModal({ isOpen: false, loading: false, success: false, message: '', title: '' });
+         setActionState(prev => ({ ...prev, isOpen: false }));
       }, 1500);
     }, 2000);
   };
 
   const handleRotateKeys = () => {
-    setActionModal({ isOpen: true, loading: true, success: false, message: 'WARNING: ROTATING AES-256 MASTER KEYS', title: 'CRYPTOGRAPHY CONTROL' });
+    setActionState({ isOpen: true, type: 'loading', title: 'CRYPTOGRAPHY CONTROL', message: 'WARNING: ROTATING AES-256 MASTER KEYS' });
     setTimeout(() => {
-       setActionModal({ isOpen: false, loading: false, success: false, message: '', title: '' });
-       
+       setActionState({ isOpen: true, type: 'success', title: 'ROTATION SUCCESSFUL', message: 'AES-256 KEYS PROPAGATED GLOBALLY' });
        const newHash = `SHA-256: 0x${Math.random().toString(16).substr(2, 8).toUpperCase()}...${Math.random().toString(16).substr(2, 4).toUpperCase()}`;
        setRotationLogs(prev => [
          { hash: newHash, time: 'Just now' },
          ...prev
        ]);
-       showToast('Master encryption keys successfully rotated.', '🔐');
+       setTimeout(() => {
+         setActionState(prev => ({ ...prev, isOpen: false }));
+       }, 1500);
     }, 2500);
   };
 
@@ -130,10 +158,12 @@ export default function SettingsPage() {
         <AnimatePresence>
           {toasts.map(toast => (
             <motion.div
+              layout
               key={toast.id}
               initial={{ opacity: 0, x: 50, scale: 0.9 }}
               animate={{ opacity: 1, x: 0, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
               className="bg-zinc-900 border border-zinc-800 shadow-2xl px-4 py-3 rounded-xl flex items-center gap-3 text-sm font-medium tracking-tight"
             >
               <span className="text-xl">{toast.icon}</span>
@@ -143,50 +173,108 @@ export default function SettingsPage() {
         </AnimatePresence>
       </div>
 
-      {/* Cinematic Center Modal (Phase 17/21 logic) */}
+      {/* Action-Specific Cinematic Modal */}
       <AnimatePresence>
-        {actionModal.isOpen && (
+        {actionState.isOpen && (
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/90 backdrop-blur-xl p-4 transition-all duration-300"
+            className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/95 backdrop-blur-3xl p-4 transition-all duration-300"
           >
             <motion.div 
-              initial={{ scale: 0.9, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.9, y: 20 }}
-              className="bg-[#050505] border border-zinc-800 p-10 rounded-3xl w-full max-w-md text-center shadow-[0_0_80px_rgba(0,0,0,0.8)]"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className={`bg-[#050505] border ${
+                actionState.type === 'delete' ? 'border-red-900/50 shadow-[0_0_80px_rgba(220,38,38,0.2)]' :
+                actionState.type === 'success' ? 'border-emerald-900/50 shadow-[0_0_80px_rgba(16,185,129,0.2)]' :
+                'border-zinc-800 shadow-[0_0_80px_rgba(0,0,0,0.8)]'
+              } p-10 rounded-3xl w-full max-w-md text-center relative overflow-hidden`}
             >
-              {actionModal.loading ? (
-                <div className="flex flex-col items-center gap-8">
-                  <div className="relative w-24 h-24 flex items-center justify-center">
-                    <div className="absolute inset-0 border-4 border-zinc-800 rounded-full"></div>
-                    <div className={`absolute inset-0 border-4 rounded-full border-t-transparent animate-spin ${actionModal.title === 'CRYPTOGRAPHY CONTROL' ? 'border-red-500' : 'border-emerald-500'}`}></div>
-                    {actionModal.title === 'CRYPTOGRAPHY CONTROL' ? (
-                       <KeyRound className="w-10 h-10 text-red-500 animate-pulse" />
-                    ) : (
-                       <Database className="w-10 h-10 text-emerald-500 animate-pulse" />
-                    )}
-                  </div>
-                  <div>
-                    <h2 className={`text-xl font-bold tracking-tight mb-2 ${actionModal.title === 'CRYPTOGRAPHY CONTROL' ? 'text-red-500' : 'text-white'}`}>{actionModal.message}</h2>
-                    <p className="text-xs text-zinc-500 font-mono tracking-widest uppercase">System locked during transaction...</p>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex flex-col items-center gap-8">
-                  <motion.div 
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-                    className="w-24 h-24 rounded-full flex items-center justify-center bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 shadow-[0_0_30px_rgba(16,185,129,0.2)]"
-                  >
-                    <Check className="w-12 h-12" />
-                  </motion.div>
-                  <h2 className="text-2xl font-bold tracking-tight text-white">{actionModal.message}</h2>
-                </div>
-              )}
+              
+              {/* Animated Background Glow */}
+              <div className={`absolute inset-0 opacity-10 ${
+                actionState.type === 'delete' ? 'bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-red-500 via-transparent to-transparent animate-pulse' :
+                actionState.type === 'success' ? 'bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-emerald-500 via-transparent to-transparent' :
+                'bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-zinc-500 via-transparent to-transparent'
+              }`} />
+
+              <div className="relative z-10 flex flex-col items-center gap-8">
+                
+                {actionState.type === 'loading' && (
+                  <>
+                    <div className="relative w-24 h-24 flex items-center justify-center">
+                      <div className="absolute inset-0 border-4 border-zinc-800 rounded-full"></div>
+                      <div className={`absolute inset-0 border-4 rounded-full border-t-transparent animate-spin ${actionState.title === 'CRYPTOGRAPHY CONTROL' ? 'border-red-500' : 'border-emerald-500'}`}></div>
+                      {actionState.title === 'CRYPTOGRAPHY CONTROL' ? (
+                         <KeyRound className="w-10 h-10 text-red-500 animate-pulse" />
+                      ) : (
+                         <Database className="w-10 h-10 text-emerald-500 animate-pulse" />
+                      )}
+                    </div>
+                    <div>
+                      <h2 className={`text-xl font-bold tracking-tight mb-2 ${actionState.title === 'CRYPTOGRAPHY CONTROL' ? 'text-red-500' : 'text-white'}`}>{actionState.message}</h2>
+                      <p className="text-xs text-zinc-500 font-mono tracking-widest uppercase">System locked during transaction...</p>
+                    </div>
+                  </>
+                )}
+
+                {actionState.type === 'success' && (
+                  <>
+                    <motion.div 
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+                      className="flex items-center justify-center text-emerald-500"
+                    >
+                      <CheckCircle size={80} className="drop-shadow-[0_0_20px_rgba(16,185,129,0.5)]" />
+                    </motion.div>
+                    <div>
+                      <h2 className="text-2xl font-bold tracking-tight text-emerald-500">{actionState.title}</h2>
+                      <p className="text-zinc-400 mt-2">{actionState.message}</p>
+                    </div>
+                    <button 
+                      onClick={() => setActionState(prev => ({ ...prev, isOpen: false }))}
+                      className="w-full py-4 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 rounded-xl text-white font-mono uppercase tracking-widest text-xs font-bold transition-all duration-300 shadow-lg"
+                    >
+                      [CLOSE TERMINAL]
+                    </button>
+                  </>
+                )}
+
+                {actionState.type === 'delete' && (
+                  <>
+                    <motion.div 
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+                      className="flex items-center justify-center text-red-500"
+                    >
+                      <AlertTriangle size={80} className="drop-shadow-[0_0_20px_rgba(220,38,38,0.5)]" />
+                    </motion.div>
+                    <div>
+                      <h2 className="text-2xl font-bold tracking-tight text-red-500">{actionState.title}</h2>
+                      <p className="text-zinc-400 mt-2">{actionState.message}</p>
+                    </div>
+                    <div className="flex gap-4 w-full">
+                       <button 
+                         onClick={() => setActionState(prev => ({ ...prev, isOpen: false }))}
+                         className="flex-1 py-4 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 rounded-xl text-white font-mono uppercase tracking-widest text-xs transition-all duration-300"
+                       >
+                         CANCEL
+                       </button>
+                       <button 
+                         onClick={executeRevocation}
+                         className="flex-1 py-4 bg-red-600 hover:bg-red-500 rounded-xl text-white font-mono uppercase tracking-widest text-xs font-bold transition-all duration-300 shadow-[0_0_20px_rgba(220,38,38,0.4)]"
+                       >
+                         PERMANENTLY REVOKE
+                       </button>
+                    </div>
+                  </>
+                )}
+              </div>
             </motion.div>
           </motion.div>
         )}
@@ -199,12 +287,13 @@ export default function SettingsPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/90 backdrop-blur-xl p-4 transition-all duration-300"
+            className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/90 backdrop-blur-2xl p-4 transition-all duration-300"
           >
             <motion.div 
               initial={{ scale: 0.95, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: 20 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
               className="bg-[#050505] border border-zinc-800 p-8 rounded-2xl w-full max-w-md shadow-[0_0_50px_rgba(16,185,129,0.1)]"
             >
               <div className="flex items-center gap-4 mb-6">
@@ -260,6 +349,7 @@ export default function SettingsPage() {
               initial={{ scale: 0.95, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: 20 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
               className="bg-[#050505] border border-zinc-800 p-8 rounded-2xl w-full max-w-md shadow-2xl"
             >
               <h2 className="text-xl font-bold tracking-tight text-white mb-6">ADD SUBNET BLOCK</h2>
@@ -328,6 +418,7 @@ export default function SettingsPage() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
               className="space-y-8"
             >
               <div className="flex items-center justify-between">
@@ -369,10 +460,11 @@ export default function SettingsPage() {
                       <AnimatePresence>
                         {admins.map((admin, i) => (
                           <motion.tr 
+                            layout
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.95 }}
-                            transition={{ duration: 0.2 }}
+                            transition={{ type: "spring", damping: 25, stiffness: 300 }}
                             key={admin.email} 
                             className="hover:bg-zinc-800/50 transition-colors"
                           >
@@ -399,7 +491,7 @@ export default function SettingsPage() {
                             <td className="px-4 py-4 text-right">
                               {admin.status === 'PENDING VERIFICATION' ? (
                                  <button 
-                                   onClick={() => handleRevokeInvite(admin.email)}
+                                   onClick={() => initiateRevokeInvite(admin.email)}
                                    className="bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 px-3 py-1.5 rounded-lg text-[10px] font-mono uppercase tracking-widest transition-colors inline-flex items-center gap-1.5"
                                  >
                                     <Trash2 className="w-3 h-3" /> Cancel Invite
@@ -425,6 +517,7 @@ export default function SettingsPage() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
               className="space-y-8"
             >
               <div>
@@ -455,12 +548,22 @@ export default function SettingsPage() {
                     </button>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {whitelistedIps.map((ip, i) => (
-                      <div key={i} className="bg-[#000] border border-zinc-800 p-3 rounded-lg flex items-center justify-between">
-                        <span className="text-xs font-mono text-zinc-300">{ip}</span>
-                        <Check className="w-4 h-4 text-emerald-500" />
-                      </div>
-                    ))}
+                    <AnimatePresence>
+                      {whitelistedIps.map((ip, i) => (
+                        <motion.div 
+                          layout
+                          initial={{ opacity: 0, scale: 0.95 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.95 }}
+                          transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                          key={i} 
+                          className="bg-[#000] border border-zinc-800 p-3 rounded-lg flex items-center justify-between"
+                        >
+                          <span className="text-xs font-mono text-zinc-300">{ip}</span>
+                          <Check className="w-4 h-4 text-emerald-500" />
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
                   </div>
                 </div>
               </div>
@@ -474,6 +577,7 @@ export default function SettingsPage() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
               className="space-y-8"
             >
               <div>
@@ -531,6 +635,7 @@ export default function SettingsPage() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
               className="space-y-8"
             >
               <div>
@@ -564,8 +669,11 @@ export default function SettingsPage() {
                       <AnimatePresence>
                         {rotationLogs.map((log, i) => (
                           <motion.div 
-                            initial={{ opacity: 0, y: -10 }}
-                            animate={{ opacity: 1, y: 0 }}
+                            layout
+                            initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            transition={{ type: "spring", damping: 25, stiffness: 300 }}
                             key={log.hash} 
                             className="flex justify-between items-center p-4 rounded-xl bg-[#000] border border-zinc-800 hover:border-zinc-700 transition-colors"
                           >
@@ -591,6 +699,7 @@ export default function SettingsPage() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
               className="space-y-8"
             >
               <div>

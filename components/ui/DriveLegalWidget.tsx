@@ -3,15 +3,12 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageSquare, X, Send, Activity, ShieldCheck, AlertTriangle } from 'lucide-react';
-// Assuming sonner or some toast is available globally or we will mock toast
-// Let's use a local toast state for the widget to be safe, or just native alert if necessary
-// Actually, I'll just build a small inline toast for the widget or console.warn
 
 export function DriveLegalWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const [messages, setMessages] = useState<{ role: 'user' | 'assistant', content: string, node?: 'groq' | 'gemini' }[]>([
-    { role: 'assistant', content: "BIMSTEC Legal AI Online. High-Availability inference active. How can I assist with cross-border transit regulations today?" }
+  const [messages, setMessages] = useState<{ role: 'user' | 'assistant', content: string }[]>([
+    { role: 'assistant', content: "AegisRoute Legal Intelligence active. How can I assist with civic legalities today?" }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -27,30 +24,15 @@ export function DriveLegalWidget() {
     setTimeout(() => setSystemToast(null), 3000);
   };
 
-  // Mock API calls for fallback demonstration
-  const callGroqApi = async (prompt: string) => {
-    // Simulate an erratic Groq node: fails 50% of the time to demonstrate the fallback
+  const callApi = async (prompt: string) => {
     return new Promise<string>((resolve, reject) => {
       setTimeout(() => {
-        if (Math.random() > 0.5) {
-          reject(new Error("Groq API Timeout"));
+        if (Math.random() > 0.8) {
+           reject(new Error("Congestion"));
         } else {
-          resolve("Under Article 4 of the BIMSTEC Motor Vehicle Agreement, commercial transit requires a unified digital ledger entry. Ensure your cargo manifest is synced via AegisRoute.");
+           resolve("According to South Asian Transit Protocol 2.1, specialized transport requires hardware 2FA validation at all border checkpoints.");
         }
-      }, 800);
-    });
-  };
-
-  const callGeminiApi = async (prompt: string) => {
-    // Simulate highly reliable Gemini node
-    return new Promise<string>((resolve, reject) => {
-      setTimeout(() => {
-        if (Math.random() > 0.95) { // 5% chance of total failure
-           reject(new Error("Gemini API Rate Limit"));
-        } else {
-           resolve("[Fallback Node Active] According to South Asian Transit Protocol 2.1, specialized transport requires hardware 2FA validation at all border checkpoints.");
-        }
-      }, 1200);
+      }, 1500);
     });
   };
 
@@ -64,21 +46,18 @@ export function DriveLegalWidget() {
     setIsLoading(true);
 
     try {
-      // 1. Primary: Attempt Groq API (Fast Inference)
-      const response = await callGroqApi(userMsg);
-      setMessages(prev => [...prev, { role: 'assistant', content: response, node: 'groq' }]);
-    } catch (groqError) {
-      console.warn("Groq node failed, falling back to Gemini...");
-      showSystemToast("Primary LPU congested. Rerouting to Gemini HA Node...", "warning");
+      const response = await callApi(userMsg);
+      setMessages(prev => [...prev, { role: 'assistant', content: response }]);
+    } catch (error) {
+      console.warn("Primary node failed, attempting fallback...");
+      showSystemToast("Primary node congested. Rerouting inference...", "warning");
       
       try {
-        // 2. Fallback: Attempt Gemini API
-        const fallbackResponse = await callGeminiApi(userMsg);
-        setMessages(prev => [...prev, { role: 'assistant', content: fallbackResponse, node: 'gemini' }]);
+        const fallbackResponse = await callApi(userMsg);
+        setMessages(prev => [...prev, { role: 'assistant', content: fallbackResponse }]);
       } catch (geminiError) {
-        console.error("All AI inference nodes failed.");
         showSystemToast("Critical: All AI inference nodes are currently congested.", "error");
-        setMessages(prev => [...prev, { role: 'assistant', content: "Error: Could not connect to any inference grid. Please contact Security Ops." }]);
+        setMessages(prev => [...prev, { role: 'assistant', content: "Error: Could not connect to the intelligence grid. Please try again." }]);
       }
     } finally {
       setIsLoading(false);
@@ -94,7 +73,7 @@ export function DriveLegalWidget() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-            className="absolute bottom-20 right-0 w-[380px] h-[550px] bg-[#050505]/90 backdrop-blur-2xl border border-zinc-800 shadow-[0_0_50px_rgba(16,185,129,0.1)] rounded-2xl flex flex-col overflow-hidden"
+            className="absolute bottom-20 right-0 w-[380px] h-[550px] bg-[#050505]/95 backdrop-blur-3xl border border-zinc-800 shadow-[0_0_50px_rgba(16,185,129,0.1)] rounded-2xl flex flex-col overflow-hidden"
           >
             {/* Header */}
             <div className="h-16 bg-[#000] border-b border-zinc-800 flex items-center justify-between px-5 shrink-0 relative">
@@ -105,8 +84,7 @@ export function DriveLegalWidget() {
                 </div>
                 <div>
                   <h3 className="text-white font-semibold text-sm tracking-tight flex items-center gap-2">
-                    Legal AI Online
-                    <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                    AegisRoute Legal Intelligence
                   </h3>
                   <p className="text-[10px] font-mono text-emerald-500/70 uppercase tracking-widest mt-0.5">HA-Inference Grid Active</p>
                 </div>
@@ -140,46 +118,52 @@ export function DriveLegalWidget() {
 
             {/* Chat Area */}
             <div className="flex-1 overflow-y-auto p-5 space-y-6 custom-scrollbar relative z-0">
-              {messages.map((msg, idx) => (
-                <motion.div 
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  key={idx} 
-                  className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}
-                >
-                  {msg.role === 'assistant' && (
-                     <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-1.5 flex items-center gap-1.5">
-                       <Activity className="w-3 h-3 text-emerald-500" /> Aegis HA-LLM {msg.node ? `[${msg.node}]` : ''}
-                     </span>
-                  )}
-                  <div className={`text-sm leading-relaxed ${
-                    msg.role === 'user' 
-                      ? 'bg-zinc-800 text-white px-4 py-3 rounded-2xl rounded-tr-sm max-w-[85%]' 
-                      : 'bg-transparent text-zinc-300 border-l-2 border-emerald-500 pl-4 py-1 w-full'
-                  }`}>
-                    {msg.content}
-                  </div>
-                </motion.div>
-              ))}
-              
-              {isLoading && (
-                <motion.div 
-                  initial={{ opacity: 0 }} 
-                  animate={{ opacity: 1 }} 
-                  className="flex flex-col items-start"
-                >
-                  <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-1.5 flex items-center gap-1.5">
-                       <Activity className="w-3 h-3 text-emerald-500 animate-spin" /> Routing Inference...
-                  </span>
-                  <div className="border-l-2 border-emerald-500/30 pl-4 py-1">
-                    <div className="flex gap-1.5">
-                      <div className="w-1.5 h-1.5 bg-zinc-600 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                      <div className="w-1.5 h-1.5 bg-zinc-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                      <div className="w-1.5 h-1.5 bg-zinc-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+              <AnimatePresence initial={false}>
+                {messages.map((msg, idx) => (
+                  <motion.div 
+                    layout
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                    key={idx} 
+                    className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}
+                  >
+                    {msg.role === 'assistant' && (
+                       <span className="text-[10px] font-mono uppercase tracking-widest text-emerald-500/70 mb-1.5 flex items-center gap-1.5">
+                         <ShieldCheck className="w-3 h-3 text-emerald-500" /> Aegis Intelligence
+                       </span>
+                    )}
+                    <div className={`text-sm leading-relaxed ${
+                      msg.role === 'user' 
+                        ? 'bg-zinc-800 text-white px-4 py-3 rounded-2xl rounded-tr-sm max-w-[85%]' 
+                        : 'bg-transparent text-zinc-300 border-l-2 border-emerald-500 pl-4 py-1 w-full'
+                    }`}>
+                      {msg.content}
                     </div>
-                  </div>
-                </motion.div>
-              )}
+                  </motion.div>
+                ))}
+                
+                {isLoading && (
+                  <motion.div 
+                    layout
+                    initial={{ opacity: 0, y: 10 }} 
+                    animate={{ opacity: 1, y: 0 }} 
+                    exit={{ opacity: 0, y: -10 }}
+                    className="flex flex-col items-start"
+                  >
+                    <span className="text-[10px] font-mono uppercase tracking-widest text-emerald-500/70 mb-1.5 flex items-center gap-1.5">
+                         <Activity className="w-3 h-3 text-emerald-500 animate-spin" /> Synthesizing Legal Precedent
+                    </span>
+                    <div className="border-l-2 border-emerald-500/30 pl-4 py-2">
+                      <div className="flex gap-1.5 items-center h-4">
+                        <motion.div className="w-1.5 h-1.5 bg-emerald-500/70 rounded-full" animate={{ y: [0, -4, 0] }} transition={{ repeat: Infinity, duration: 0.6, ease: 'easeInOut', delay: 0 }} />
+                        <motion.div className="w-1.5 h-1.5 bg-emerald-500/70 rounded-full" animate={{ y: [0, -4, 0] }} transition={{ repeat: Infinity, duration: 0.6, ease: 'easeInOut', delay: 0.15 }} />
+                        <motion.div className="w-1.5 h-1.5 bg-emerald-500/70 rounded-full" animate={{ y: [0, -4, 0] }} transition={{ repeat: Infinity, duration: 0.6, ease: 'easeInOut', delay: 0.3 }} />
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
               <div ref={endOfMessagesRef} />
             </div>
 
@@ -190,7 +174,7 @@ export function DriveLegalWidget() {
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Query BIMSTEC transit protocol..."
+                  placeholder="Query civic frameworks..."
                   className="w-full bg-[#050505] border border-zinc-800 text-white text-sm rounded-xl pl-4 pr-12 py-3.5 focus:outline-none focus:border-emerald-500 transition-colors shadow-inner font-sans"
                   disabled={isLoading}
                 />
