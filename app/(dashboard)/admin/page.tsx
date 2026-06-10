@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shield, Users, Activity, Zap, Check, X, Search, Database, RefreshCw, Key, Building, Terminal, ShieldCheck, AlertTriangle, Loader2 } from 'lucide-react';
+import { Shield, Users, Activity, Zap, Check, X, Search, Database, RefreshCw, Key, Building, Terminal, ShieldCheck, AlertTriangle, Play } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useRouter } from 'next/navigation';
 
@@ -40,7 +40,7 @@ export default function AdminDashboard() {
   const [nodes, setNodes] = useState(BIMSTEC_MOCK_NODES);
   const [leads, setLeads] = useState(PIPELINE_MOCK_LEADS);
   const [activeTab, setActiveTab] = useState('nodes'); 
-  const [historyMode, setHistoryMode] = useState(false); // [Active Nodes] | [Audit History]
+  const [historyMode, setHistoryMode] = useState(false); 
   
   const [auditNode, setAuditNode] = useState<any>(null);
 
@@ -65,13 +65,17 @@ export default function AdminDashboard() {
     setActionModal({ isOpen: true, type: actionType, target, loading: true, success: false, message: `Executing ${actionType}...` });
     
     setTimeout(() => {
-      // Soft deletes / mutations
+      // Mutations
       if (actionType === 'TERMINATE_NODE' && target) {
         setNodes(prev => prev.map(n => n.id === target.id ? { ...n, status: 'TERMINATED' } : n));
+      } else if (actionType === 'RESTORE_NODE' && target) {
+        setNodes(prev => prev.map(n => n.id === target.id ? { ...n, status: 'GRANTED' } : n));
       } else if (actionType === 'ISSUE_KEY' && target) {
         setLeads(prev => prev.map(l => l.id === target.id ? { ...l, status: 'PROVISIONED' } : l));
       } else if (actionType === 'REJECT_LEAD' && target) {
         setLeads(prev => prev.map(l => l.id === target.id ? { ...l, status: 'REJECTED' } : l));
+      } else if (actionType === 'RESTORE_LEAD' && target) {
+        setLeads(prev => prev.map(l => l.id === target.id ? { ...l, status: 'PENDING APPROVAL' } : l));
       } else if (actionType === 'TOGGLE_ACCESS' && target) {
         setNodes(prev => prev.map(n => n.id === target.id ? { ...n, status: target.status === 'GRANTED' ? 'REVOKED' : 'GRANTED' } : n));
       } else if (actionType === 'WIPE_DATA') {
@@ -97,7 +101,7 @@ export default function AdminDashboard() {
   const totalAuthorities = nodes.filter(u => u.role === 'AUTHORITY' && u.status !== 'TERMINATED').length * 12;
 
   return (
-    <div className="relative w-full min-h-screen bg-[#000000] text-zinc-300 font-sans flex flex-col rounded-xl overflow-hidden border border-zinc-800">
+    <div className="relative w-full min-h-screen bg-[#000000] text-zinc-300 font-sans flex flex-col rounded-xl overflow-hidden border border-zinc-800 transition-all duration-300">
       
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px] pointer-events-none z-0"></div>
       
@@ -108,7 +112,7 @@ export default function AdminDashboard() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/90 backdrop-blur-md p-4"
+            className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/90 backdrop-blur-xl p-4"
           >
             <motion.div 
               initial={{ scale: 0.9, y: 20 }}
@@ -156,12 +160,12 @@ export default function AdminDashboard() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/90 backdrop-blur-md p-4"
+            className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/90 backdrop-blur-xl p-4 transition-all duration-300"
           >
             <motion.div 
               initial={{ scale: 0.95, y: 20 }}
               animate={{ scale: 1, y: 0 }}
-              className="bg-red-950/40 border border-red-900 p-8 rounded-2xl max-w-lg w-full shadow-[0_0_100px_rgba(220,38,38,0.2)]"
+              className="bg-red-950/40 border-2 border-red-900 p-8 rounded-2xl max-w-lg w-full shadow-[0_0_100px_rgba(220,38,38,0.4)]"
             >
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-12 h-12 rounded-full bg-red-900/50 flex items-center justify-center">
@@ -196,7 +200,7 @@ export default function AdminDashboard() {
                   <button 
                     disabled={wipeConfirmText !== "CONFIRM"}
                     onClick={() => { setWipeModalOpen(false); executeCinematicAction('WIPE_DATA'); }}
-                    className="flex-1 px-4 py-3 bg-red-600 disabled:bg-red-900/50 text-white disabled:text-white/50 rounded-lg font-bold tracking-widest uppercase transition-all shadow-[0_0_20px_rgba(220,38,38,0.3)] disabled:shadow-none"
+                    className="flex-1 px-4 py-3 bg-red-600 disabled:bg-red-900/50 text-white disabled:text-white/50 rounded-lg font-bold tracking-widest uppercase transition-all shadow-[0_0_20px_rgba(220,38,38,0.3)] disabled:shadow-none hover:bg-red-500"
                   >
                     EXECUTE PURGE
                   </button>
@@ -214,7 +218,7 @@ export default function AdminDashboard() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/90 backdrop-blur-md p-4"
+            className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/90 backdrop-blur-xl p-4 transition-all duration-300"
           >
             <motion.div 
               initial={{ scale: 0.95, y: 20 }}
@@ -315,7 +319,7 @@ export default function AdminDashboard() {
           <div className="flex items-center justify-between w-full">
             <h1 className="text-sm font-mono tracking-widest uppercase text-emerald-500 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              SUPER-ADMIN OVERSIGHT
+              ENTERPRISE COMMAND CENTER
             </h1>
             
             <div className="flex items-center gap-1 bg-zinc-900/50 p-1 rounded-lg border border-zinc-800">
@@ -345,17 +349,18 @@ export default function AdminDashboard() {
           {/* Top Metric Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { label: 'Total Citizens', value: totalCitizens.toLocaleString(), icon: Users, trend: 'Live Sync Active' },
-              { label: 'Total Authorities', value: totalAuthorities.toLocaleString(), icon: Shield, trend: 'Fully Operational' },
-              { label: 'Live SOS Incidents', value: 12, icon: Activity, trend: 'Real-time telemetry' },
-              { label: 'System Latency', value: '12ms / 99.9%', icon: Zap, trend: 'Optimal' }
+              { label: 'Active Personnel', value: totalCitizens.toLocaleString(), icon: Users, trend: 'Global Sync Active' },
+              { label: 'Verified Authorities', value: totalAuthorities.toLocaleString(), icon: Shield, trend: 'Mesh Operational' },
+              { label: 'Live Telemetry Events', value: 12, icon: Activity, trend: 'Real-time ingestion' },
+              { label: 'Infrastructure Latency', value: '12ms / 99.9%', icon: Zap, trend: 'Vercel Edge Optimal' }
             ].map((metric, i) => (
               <motion.div 
                 key={i}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
-                className="relative overflow-hidden rounded-xl p-[1px] h-32"
+                whileHover={{ scale: 1.02 }}
+                className="relative overflow-hidden rounded-xl p-[1px] h-32 transition-all duration-300"
               >
                 <span className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#000000_0%,#00FF66_50%,#000000_100%)] opacity-100 pointer-events-none" />
                 <div className="relative bg-[#050505] border border-zinc-800/50 rounded-xl p-5 flex flex-col justify-between h-full z-10">
@@ -379,7 +384,7 @@ export default function AdminDashboard() {
                 onClick={() => setHistoryMode(false)}
                 className={`px-4 py-1.5 text-xs font-semibold uppercase tracking-wider rounded-md transition-colors ${!historyMode ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
               >
-                Active Nodes
+                Active Infrastructure
               </button>
               <button
                 onClick={() => setHistoryMode(true)}
@@ -398,12 +403,12 @@ export default function AdminDashboard() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.2 }}
-                className="bg-[#050505] border border-zinc-800 rounded-xl flex flex-col shadow-2xl relative z-10"
+                className="bg-[#050505] border border-zinc-800 rounded-xl flex flex-col shadow-2xl relative z-10 overflow-hidden"
               >
                 <div className="p-5 border-b border-zinc-800 bg-[#020202]/50 flex justify-between items-center rounded-t-xl">
                   <div>
-                    <h3 className="text-sm font-semibold tracking-tighter text-white">{historyMode ? 'Historical Archive' : 'Registered Users & Nodes'}</h3>
-                    <p className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 mt-1">{historyMode ? 'Read-only audit trail.' : 'Manage system access across all roles.'}</p>
+                    <h3 className="text-sm font-semibold tracking-tighter text-white">{historyMode ? 'Historical Archive' : 'Active Personnel & Nodes'}</h3>
+                    <p className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 mt-1">{historyMode ? 'Read-only audit trail and data loop.' : 'Manage system access across all roles.'}</p>
                   </div>
                   {!historyMode && (
                     <div className="px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[10px] font-mono rounded-full uppercase tracking-widest flex items-center gap-2">
@@ -427,10 +432,11 @@ export default function AdminDashboard() {
                       <AnimatePresence>
                         {(historyMode ? historyNodes : activeNodes).map((userNode) => (
                           <motion.tr 
-                            initial={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
                             key={userNode.id} 
-                            className={`transition-colors ${historyMode ? 'opacity-50 hover:opacity-100 grayscale' : 'hover:bg-white/[0.02]'}`}
+                            className={`transition-colors ${historyMode ? 'opacity-60 hover:opacity-100 bg-zinc-950/20' : 'hover:bg-white/[0.02]'}`}
                           >
                             <td className="px-6 py-4">
                               <div className="flex flex-col">
@@ -457,25 +463,32 @@ export default function AdminDashboard() {
                             </td>
                             <td className="px-6 py-4 text-right">
                               <div className="flex items-center justify-end gap-2">
-                                {!historyMode && (
+                                {!historyMode ? (
                                   <>
                                     <button 
                                       onClick={() => executeCinematicAction('TOGGLE_ACCESS', userNode)}
-                                      className="bg-zinc-800/50 text-zinc-300 border border-zinc-700 px-3 py-1.5 rounded-md text-[10px] font-mono uppercase tracking-widest hover:bg-zinc-700 transition-all"
+                                      className="bg-zinc-800/50 text-zinc-300 border border-zinc-700 px-3 py-1.5 rounded-md text-[10px] font-mono uppercase tracking-widest hover:bg-zinc-700 transition-all duration-300"
                                     >
                                       Toggle Access
                                     </button>
                                     <button 
                                       onClick={() => setNodeToDelete(userNode)}
-                                      className="bg-red-950/30 text-red-500 border border-red-900/50 px-3 py-1.5 rounded-md text-[10px] font-mono uppercase tracking-widest hover:bg-red-900/50 transition-all inline-flex items-center gap-1.5"
+                                      className="bg-red-950/30 text-red-500 border border-red-900/50 px-3 py-1.5 rounded-md text-[10px] font-mono uppercase tracking-widest hover:bg-red-900/50 transition-all duration-300 inline-flex items-center gap-1.5"
                                     >
                                       <X className="w-3 h-3" /> Delete
                                     </button>
                                   </>
+                                ) : (
+                                  <button 
+                                      onClick={() => executeCinematicAction('RESTORE_NODE', userNode)}
+                                      className="bg-emerald-950/30 text-emerald-500 border border-emerald-900/50 px-3 py-1.5 rounded-md text-[10px] font-mono uppercase tracking-widest hover:bg-emerald-900/50 transition-all duration-300 inline-flex items-center gap-1.5"
+                                    >
+                                      <RefreshCw className="w-3 h-3" /> Re-Provision
+                                  </button>
                                 )}
                                 <button 
                                   onClick={() => setAuditNode(userNode)}
-                                  className="bg-blue-950/30 text-blue-400 border border-blue-900/50 px-3 py-1.5 rounded-md text-[10px] font-mono uppercase tracking-widest hover:bg-blue-900/50 transition-all inline-flex items-center gap-1.5"
+                                  className="bg-blue-950/30 text-blue-400 border border-blue-900/50 px-3 py-1.5 rounded-md text-[10px] font-mono uppercase tracking-widest hover:bg-blue-900/50 transition-all duration-300 inline-flex items-center gap-1.5"
                                 >
                                   <Search className="w-3 h-3" /> Audit Log
                                 </button>
@@ -515,14 +528,15 @@ export default function AdminDashboard() {
                     <p className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 mt-1">Pending IaaS API Requests</p>
                   </div>
                 </div>
-                <div className="p-5 space-y-4">
+                <div className="p-5 space-y-4 overflow-hidden">
                   <AnimatePresence>
                     {(historyMode ? historyLeads : activeLeads).map((lead) => (
                       <motion.div 
-                        initial={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.95 }}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
                         key={lead.id} 
-                        className={`flex flex-col md:flex-row md:items-center justify-between p-4 rounded-lg border border-zinc-800/50 transition-colors gap-4 ${historyMode ? 'bg-zinc-950/30 opacity-60 grayscale' : 'bg-[#020202] hover:border-zinc-700'}`}
+                        className={`flex flex-col md:flex-row md:items-center justify-between p-4 rounded-lg border border-zinc-800/50 transition-all duration-300 gap-4 ${historyMode ? 'bg-zinc-950/30 opacity-60 hover:opacity-100' : 'bg-[#020202] hover:border-zinc-700'}`}
                       >
                         <div>
                           <h4 className="text-sm font-medium text-zinc-200 tracking-tight">{lead.org}</h4>
@@ -540,15 +554,19 @@ export default function AdminDashboard() {
                           </div>
                         </div>
                         <div className="flex flex-col sm:flex-row items-center gap-2">
-                          {!historyMode && (
+                          {!historyMode ? (
                             <>
-                              <button onClick={() => executeCinematicAction('ISSUE_KEY', lead)} className="w-full sm:w-auto bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 px-4 py-2 rounded-lg text-[10px] font-bold font-mono uppercase tracking-widest hover:bg-emerald-500/20 transition-all inline-flex items-center justify-center gap-1.5">
+                              <button onClick={() => executeCinematicAction('ISSUE_KEY', lead)} className="w-full sm:w-auto bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 px-4 py-2 rounded-lg text-[10px] font-bold font-mono uppercase tracking-widest hover:bg-emerald-500/20 transition-all duration-300 inline-flex items-center justify-center gap-1.5">
                                 <Key className="w-3 h-3" /> Issue API Key
                               </button>
-                              <button onClick={() => executeCinematicAction('REJECT_LEAD', lead)} className="w-full sm:w-auto bg-zinc-800 text-zinc-300 border border-zinc-700 px-4 py-2 rounded-lg text-[10px] font-bold font-mono uppercase tracking-widest hover:bg-zinc-700 transition-all inline-flex items-center justify-center gap-1.5">
+                              <button onClick={() => executeCinematicAction('REJECT_LEAD', lead)} className="w-full sm:w-auto bg-zinc-800 text-zinc-300 border border-zinc-700 px-4 py-2 rounded-lg text-[10px] font-bold font-mono uppercase tracking-widest hover:bg-zinc-700 transition-all duration-300 inline-flex items-center justify-center gap-1.5">
                                 <X className="w-3 h-3" /> Reject
                               </button>
                             </>
+                          ) : (
+                            <button onClick={() => executeCinematicAction('RESTORE_LEAD', lead)} className="w-full sm:w-auto bg-emerald-950/30 text-emerald-500 border border-emerald-900/50 px-4 py-2 rounded-lg text-[10px] font-bold font-mono uppercase tracking-widest hover:bg-emerald-900/50 transition-all duration-300 inline-flex items-center justify-center gap-1.5">
+                                <RefreshCw className="w-3 h-3" /> Un-Archive
+                            </button>
                           )}
                         </div>
                       </motion.div>
@@ -571,12 +589,11 @@ export default function AdminDashboard() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.2 }}
-                className="bg-red-950/10 border border-red-900/50 rounded-xl flex flex-col shadow-2xl relative z-10 overflow-hidden"
+                className="bg-[repeating-linear-gradient(45deg,#000,#000_10px,#1a0000_10px,#1a0000_20px)] border-2 border-red-900/50 rounded-xl flex flex-col shadow-2xl relative z-10 overflow-hidden"
               >
-                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay"></div>
-                <div className="p-5 border-b border-red-900/30 bg-red-950/20 flex items-center gap-3 rounded-t-xl relative z-10">
+                <div className="p-5 border-b border-red-900/30 bg-red-950/40 flex items-center gap-3 rounded-t-xl relative z-10">
                   <div className="w-8 h-8 rounded-lg bg-red-950 border border-red-900/50 flex items-center justify-center">
-                    <Database className="w-4 h-4 text-red-500" />
+                    <Database className="w-4 h-4 text-red-500 animate-pulse" />
                   </div>
                   <div>
                     <h3 className="text-sm font-semibold tracking-tighter text-red-500">THE DANGER ZONE</h3>
@@ -586,13 +603,13 @@ export default function AdminDashboard() {
                 <div className="p-8 space-y-4 relative z-10 flex flex-col justify-center h-full max-w-2xl mx-auto w-full">
                   <button 
                     onClick={() => setWipeModalOpen(true)}
-                    className="w-full bg-red-600 hover:bg-red-500 text-white font-bold tracking-widest uppercase text-sm py-5 rounded-xl transition-all shadow-[0_0_20px_rgba(220,38,38,0.3)]"
+                    className="w-full bg-red-600 hover:bg-red-500 text-white font-bold tracking-widest uppercase text-sm py-5 rounded-xl transition-all duration-300 shadow-[0_0_20px_rgba(220,38,38,0.5)] hover:shadow-[0_0_30px_rgba(220,38,38,0.8)] animate-pulse"
                   >
                     WIPE ALL MESH DATA
                   </button>
                   <button 
                     onClick={() => executeCinematicAction('RESTORE_DATA')}
-                    className="w-full bg-[#050505] text-zinc-400 border border-zinc-800 hover:border-zinc-700 hover:text-white px-4 py-5 rounded-xl text-sm font-mono uppercase tracking-widest transition-all inline-flex items-center justify-center gap-2"
+                    className="w-full bg-[#050505] text-zinc-400 border border-zinc-800 hover:border-zinc-700 hover:text-white px-4 py-5 rounded-xl text-sm font-mono uppercase tracking-widest transition-all duration-300 inline-flex items-center justify-center gap-2"
                   >
                     <RefreshCw className="w-4 h-4" /> RESTORE FROM ENCRYPTED BACKUP
                   </button>
