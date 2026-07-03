@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Sidebar } from "@/components/Sidebar";
 import { motion } from "framer-motion";
@@ -15,23 +15,27 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     setMounted(true);
   }, []);
 
+  const pathname = usePathname();
+
   useEffect(() => {
     if (mounted && !loading) {
       if (!user) {
         router.push("/");
       } else {
-        const isAuthorized = user.email === "abhi.admin.dev@gmail.com" || user.email?.endsWith("@gov.in");
-        if (!isAuthorized) {
-          router.push("/");
+        const isAuthorityRoute = pathname?.startsWith("/authority") || pathname?.startsWith("/admin");
+        const isAuthorityUser = user.email === "abhi.admin.dev@gmail.com" || user.email?.endsWith("@gov.in") || userData?.role?.toLowerCase() === "authority";
+        if (isAuthorityRoute && !isAuthorityUser) {
+          router.push("/citizen");
         }
       }
     }
-  }, [user, loading, router, mounted]);
+  }, [user, loading, router, mounted, pathname, userData]);
 
-  const isAuthorized = user?.email === "abhi.admin.dev@gmail.com" || user?.email?.endsWith("@gov.in");
+  const isAuthorityRoute = pathname?.startsWith("/authority") || pathname?.startsWith("/admin");
+  const isAuthorityUser = user?.email === "abhi.admin.dev@gmail.com" || user?.email?.endsWith("@gov.in") || userData?.role?.toLowerCase() === "authority";
 
   // Show neon loader while determining auth state or if not mounted
-  if (!mounted || loading || (!isAuthorized && user)) {
+  if (!mounted || loading || (!user) || (isAuthorityRoute && !isAuthorityUser)) {
     return (
       <div className="fixed inset-0 z-[200] bg-[#050505] flex flex-col items-center justify-center">
         <motion.div

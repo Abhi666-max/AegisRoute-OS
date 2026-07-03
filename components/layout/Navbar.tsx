@@ -15,9 +15,14 @@ export function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
 
-  const getDashboardRoute = () => {
-    if (user?.email === 'abhi.admin.dev@gmail.com') return '/admin';
-    return '/authority';
+  const getDashboardInfo = () => {
+    if (user?.email === 'abhi.admin.dev@gmail.com' || userData?.role?.toUpperCase() === 'SUPER_ADMIN') {
+      return { label: 'God Mode Vault', route: '/admin' };
+    }
+    if (userData?.role?.toLowerCase() === 'authority' || user?.email?.endsWith('@gov.in')) {
+      return { label: 'Command Center', route: '/authority' };
+    }
+    return { label: 'Citizen Portal', route: '/citizen' };
   };
 
   useEffect(() => {
@@ -25,7 +30,7 @@ export function Navbar() {
     return () => unsubscribe();
   }, [initializeAuth]);
 
-  if (pathname?.startsWith('/admin') || pathname?.startsWith('/authority') || pathname?.startsWith('/godmode')) return null;
+  if (pathname?.startsWith('/admin') || pathname?.startsWith('/authority') || pathname?.startsWith('/citizen') || pathname?.startsWith('/godmode')) return null;
 
   return (
     <motion.nav 
@@ -62,52 +67,29 @@ export function Navbar() {
         {/* CTA */}
         <div className="hidden md:flex items-center gap-4">
           {user ? (
-            <>
-              {(userData?.role === 'citizen' && user.email !== 'abhi.admin.dev@gmail.com') ? (
-                <motion.div whileHover="hover" className="relative cursor-pointer z-50">
-                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-zinc-900 border border-zinc-800">
-                    <UserIcon size={14} className="text-zinc-400" />
-                    <span className="text-white text-xs font-medium capitalize">Citizen</span>
-                  </div>
-                  <motion.div 
-                    initial={{ opacity: 0, y: 10, pointerEvents: 'none' }}
-                    variants={{ hover: { opacity: 1, y: 0, pointerEvents: 'auto' } }}
-                    className="absolute right-0 top-full mt-2 w-64 bg-zinc-950/80 backdrop-blur-xl border border-white/10 rounded-xl p-4 shadow-2xl"
-                  >
-                    <p className="text-white text-sm font-semibold truncate">{user.displayName || user.email}</p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                      <span className="text-xs text-emerald-500 font-mono">Live GPS Sync Active</span>
-                    </div>
-                    <p className="text-xs text-zinc-500 font-mono mt-3">Current Node:<br/>BIMSTEC Grid</p>
-                    <button 
-                      onClick={() => { auth.signOut(); router.push('/'); }}
-                      className="mt-4 w-full bg-red-500/10 hover:bg-red-500/20 text-red-500 font-semibold text-xs py-2 rounded-lg transition-colors border border-red-500/20"
-                    >
-                      Sign Out
-                    </button>
-                  </motion.div>
-                </motion.div>
-              ) : (
-                <Link 
-                  href={getDashboardRoute()}
-                  className="relative inline-flex h-9 overflow-hidden rounded-full p-[1px] focus:outline-none focus:ring-2 focus:ring-zinc-400 focus:ring-offset-2 focus:ring-offset-zinc-50"
-                >
-                  <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#E2CBFF_0%,#393BB2_50%,#E2CBFF_100%)]" />
-                  <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-zinc-950 px-4 py-1 text-sm font-medium text-white backdrop-blur-3xl">
-                    {userData?.role === 'authority' ? 'Authority Dashboard' : 'Enter Dashboard'}
-                  </span>
-                </Link>
-              )}
-            </>
+            <div className="flex items-center gap-3">
+              <Link 
+                href={getDashboardInfo().route}
+                className="relative inline-flex h-9 overflow-hidden rounded-full p-[1px] focus:outline-none focus:ring-2 focus:ring-zinc-400 focus:ring-offset-2 focus:ring-offset-zinc-50"
+              >
+                <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#3b82f6_0%,#1d4ed8_50%,#3b82f6_100%)]" />
+                <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-zinc-950 px-5 py-1 text-sm font-semibold text-white backdrop-blur-3xl hover:bg-zinc-900 transition-colors">
+                  {getDashboardInfo().label}
+                </span>
+              </Link>
+              <button 
+                onClick={() => { auth.signOut(); router.push('/'); }}
+                className="px-3 py-1.5 text-xs font-semibold rounded-full bg-zinc-900/80 border border-zinc-800 text-zinc-400 hover:text-red-400 hover:border-red-500/30 transition-all"
+              >
+                Sign Out
+              </button>
+            </div>
           ) : (
-
-
             <button 
-              onClick={() => setDemoModalOpen(true)}
-              className="px-4 py-1.5 text-sm font-medium border border-zinc-700 rounded-md bg-zinc-900 text-zinc-300 hover:bg-white hover:text-black transition-all"
+              onClick={() => setAuthModalOpen(true)}
+              className="px-5 py-1.5 text-sm font-semibold border border-zinc-700 rounded-full bg-white text-black hover:bg-zinc-200 transition-all shadow-[0_0_20px_rgba(255,255,255,0.15)]"
             >
-              Request Enterprise Demo
+              Login / Start for Free
             </button>
           )}
         </div>

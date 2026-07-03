@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { LayoutDashboard, AlertTriangle, BarChart3, Activity, Settings, ChevronRight, LogOut, Shield } from "lucide-react";
+import { LayoutDashboard, AlertTriangle, BarChart3, Activity, Settings, ChevronRight, LogOut, Shield, FileText, History, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { auth } from '@/lib/firebase/config';
@@ -19,13 +19,18 @@ export function Sidebar() {
     return () => unsubscribe();
   }, []);
   
-  const basePath = pathname?.startsWith('/admin') ? '/admin' : '/authority';
+  const basePath = pathname?.startsWith('/admin') ? '/admin' : pathname?.startsWith('/citizen') ? '/citizen' : '/authority';
   const isAuthority = basePath === '/authority';
+  const isCitizen = basePath === '/citizen';
   const navItems = isAuthority ? [
     { icon: AlertTriangle, label: "Live Incident Triage", href: `${basePath}` },
     { icon: LayoutDashboard, label: "Fleet & Unit Dispatch", href: `${basePath}/fleet` },
     { icon: BarChart3, label: "Jurisdiction Analytics", href: `${basePath}/analytics` },
     { icon: Activity, label: "Officer Personnel", href: `${basePath}/personnel` },
+  ] : isCitizen ? [
+    { icon: FileText, label: "New Report", href: `${basePath}` },
+    { icon: History, label: "My SOS Logs", href: `${basePath}/logs` },
+    { icon: User, label: "Civic Profile", href: `${basePath}/profile` },
   ] : [
     { icon: LayoutDashboard, label: "Overview", href: `${basePath}` },
     { icon: AlertTriangle, label: "Live Feed/Incidents", href: `${basePath}/feed` },
@@ -63,7 +68,7 @@ export function Sidebar() {
           const isActive = pathname === item.href;
           return (
             <Link key={item.href} href={item.href}>
-              <div className={`flex items-center px-3 py-2 rounded-md transition-colors ${isActive ? (isAuthority ? "bg-blue-500/10 border border-blue-500/20 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.1)]" : "bg-zinc-900 border border-zinc-800 text-white shadow-[0_0_15px_rgba(16,185,129,0.1)]") : (isAuthority ? "text-zinc-500 hover:text-blue-400 hover:bg-blue-500/10" : "text-zinc-500 hover:text-white")}`}>
+              <div className={`flex items-center px-3 py-2 rounded-md transition-colors ${isActive ? (isAuthority ? "bg-blue-500/10 border border-blue-500/20 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.1)]" : isCitizen ? "bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.1)]" : "bg-zinc-900 border border-zinc-800 text-white shadow-[0_0_15px_rgba(16,185,129,0.1)]") : (isAuthority ? "text-zinc-500 hover:text-blue-400 hover:bg-blue-500/10" : isCitizen ? "text-zinc-500 hover:text-emerald-400 hover:bg-emerald-500/10" : "text-zinc-500 hover:text-white")}`}>
                 <item.icon className="w-5 h-5 shrink-0" />
                 <motion.span
                   initial={{ opacity: 0, x: -10 }}
@@ -80,11 +85,11 @@ export function Sidebar() {
       </nav>
       
       <div className="px-4 mt-auto">
-        <div className={`flex items-center px-3 py-2 rounded-lg bg-zinc-950 border transition-all overflow-hidden ${isHovered ? 'gap-3' : 'justify-center'} ${isAuthority ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' : 'border-zinc-800'}`}>
+        <div className={`flex items-center px-3 py-2 rounded-lg bg-zinc-950 border transition-all overflow-hidden ${isHovered ? 'gap-3' : 'justify-center'} ${isAuthority ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' : isCitizen ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'border-zinc-800'}`}>
           <div className="relative shrink-0 w-10 h-10 rounded-full flex items-center justify-center overflow-hidden">
             <div className={`absolute inset-[-50%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg,transparent,transparent,${isAuthority ? '#3b82f6' : '#10b981'})]`}></div>
             <div className="absolute inset-[2px] bg-zinc-900 rounded-full flex items-center justify-center text-white font-bold text-xs z-10">
-               {user?.displayName ? user.displayName.substring(0, 2).toUpperCase() : (isAuthority ? 'RA' : 'AK')}
+               {user?.displayName ? user.displayName.substring(0, 2).toUpperCase() : (isAuthority ? 'RA' : isCitizen ? 'CZ' : 'AK')}
             </div>
           </div>
           {isHovered && (
@@ -93,10 +98,10 @@ export function Sidebar() {
               animate={{ opacity: 1, w: 'auto' }}
               className="flex flex-col whitespace-nowrap"
             >
-              <span className="text-sm font-semibold text-white">{user?.displayName || (isAuthority ? 'Regional Authority' : 'Abhijeet K.')}</span>
+              <span className="text-sm font-semibold text-white">{user?.displayName || (isAuthority ? 'Regional Authority' : isCitizen ? 'Verified Citizen' : 'Abhijeet K.')}</span>
               <span className={`text-[10px] tracking-widest font-mono flex items-center gap-1 ${isAuthority ? 'text-blue-400' : 'text-emerald-500 uppercase'}`}>
                 {!isAuthority && <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>}
-                {isAuthority ? user?.email : 'FOUNDER'}
+                {isAuthority ? user?.email : isCitizen ? 'CITIZEN NODE' : 'FOUNDER'}
               </span>
             </motion.div>
           )}
