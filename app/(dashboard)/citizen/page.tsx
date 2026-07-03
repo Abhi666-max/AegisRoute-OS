@@ -21,7 +21,7 @@ export default function CitizenDashboardPage() {
   };
 
   return (
-    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="space-y-12 min-h-[85vh] text-white">
+    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="space-y-12 min-h-[85vh] text-white pb-12">
       {/* Welcome Hero Banner */}
       <div className="relative p-8 rounded-3xl bg-gradient-to-r from-zinc-950 via-[#050b14] to-zinc-950 border border-white/10 overflow-hidden shadow-2xl">
         <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-[120px] pointer-events-none"></div>
@@ -38,7 +38,7 @@ export default function CitizenDashboardPage() {
         </div>
       </div>
 
-      {/* Top Section: Quick Action Cards */}
+      {/* Top Row: Quick Action Cards */}
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-sm font-mono uppercase tracking-widest text-zinc-400 flex items-center gap-2">
@@ -73,63 +73,72 @@ export default function CitizenDashboardPage() {
         </div>
       </div>
 
-      {/* Middle Section: Consolidated RoadWatch & RoadSOS */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Middle Left: Civic Reporter Upload Box + Zero Compute Instructions */}
-        <div className="lg:col-span-5 space-y-6">
+      {/* Middle Row (Full Width): RoadWatch Telemetry Upload Module */}
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-zinc-800 bg-zinc-900/50 text-zinc-400 text-xs font-medium tracking-widest uppercase mb-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-zinc-800 bg-zinc-900/50 text-zinc-400 text-xs font-medium tracking-widest uppercase mb-2">
               <Network className="w-3.5 h-3.5 text-emerald-400" />
               Zero Compute Engine
             </div>
-            <h2 className="text-2xl font-bold tracking-tight text-white">RoadWatch Telemetry</h2>
+            <h2 className="text-2xl font-bold tracking-tight text-white">RoadWatch Telemetry & Edge Vision</h2>
             <p className="text-xs text-zinc-400 mt-1 leading-relaxed">
               Analyzes infrastructure hazards instantly on your device. Zero server dependency.
             </p>
           </div>
-
-          <RoadWatchReporter 
-            prefilledHazard={prefilledHazard}
-            onClearPrefilled={() => setPrefilledHazard(null)}
-          />
-
-          <div className="space-y-3 p-5 rounded-2xl bg-[#050b14] border border-white/10">
-            <h3 className="text-xs font-mono uppercase tracking-widest text-zinc-400 mb-2">Automated Execution Protocol</h3>
-            <div className="flex items-center gap-3.5 text-xs font-medium text-zinc-300">
-              <div className="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center font-mono shrink-0">01</div>
-              Capture or select hazard imagery from your device.
-            </div>
-            <div className="flex items-center gap-3.5 text-xs font-medium text-zinc-300">
-              <div className="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center font-mono shrink-0">02</div>
-              Edge AI scans severity score & structural damage locally.
-            </div>
-            <div className="flex items-center gap-3.5 text-xs font-medium text-zinc-300">
-              <div className="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center font-mono shrink-0">03</div>
-              Auto-syncs encrypted telemetry to authorities upon verification.
-            </div>
+          <div className="hidden sm:flex items-center gap-3 text-xs font-mono text-zinc-400 bg-[#050b14] px-4 py-2 rounded-xl border border-white/10">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            Hardware Acceleration Active
           </div>
         </div>
 
-        {/* Middle Right: Leaflet Emergency Georouting Map */}
-        <div className="lg:col-span-7 space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
-                <MapPin className="w-5 h-5 text-emerald-400" /> RoadSOS Emergency Georouting
-              </h2>
-              <p className="text-xs text-zinc-400 mt-1">Real-time OpenStreetMap dispatch node & live mesh locator.</p>
-            </div>
-            <span className="text-[11px] font-mono text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
-              Live Mesh Sync
-            </span>
-          </div>
+        <RoadWatchReporter 
+          prefilledHazard={prefilledHazard}
+          onClearPrefilled={() => setPrefilledHazard(null)}
+        />
 
-          <div className="relative rounded-3xl overflow-hidden border border-white/15 bg-[#050b14] shadow-2xl p-2">
-            {/* Embedded inner border gradient wrapper */}
-            <div className="absolute inset-0 border-2 border-emerald-500/20 rounded-3xl pointer-events-none z-20"></div>
-            <div className="rounded-2xl overflow-hidden">
-              <RoadSOSMap />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="p-4 rounded-2xl bg-[#050b14] border border-white/10 flex items-center gap-3.5 text-xs font-medium text-zinc-300">
+            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center font-mono shrink-0 font-bold">01</div>
+            <div>
+              <p className="font-bold text-white">Capture or Select</p>
+              <p className="text-[11px] text-zinc-400 mt-0.5">Capture infrastructure hazard imagery from your device.</p>
             </div>
+          </div>
+          <div className="p-4 rounded-2xl bg-[#050b14] border border-white/10 flex items-center gap-3.5 text-xs font-medium text-zinc-300">
+            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center font-mono shrink-0 font-bold">02</div>
+            <div>
+              <p className="font-bold text-white">Edge AI Verification</p>
+              <p className="text-[11px] text-zinc-400 mt-0.5">Scans severity score & structural damage locally.</p>
+            </div>
+          </div>
+          <div className="p-4 rounded-2xl bg-[#050b14] border border-white/10 flex items-center gap-3.5 text-xs font-medium text-zinc-300">
+            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center font-mono shrink-0 font-bold">03</div>
+            <div>
+              <p className="font-bold text-white">Mesh Broadcast</p>
+              <p className="text-[11px] text-zinc-400 mt-0.5">Auto-syncs encrypted telemetry upon verification.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom Row (Full Width): Leaflet Emergency Georouting Map */}
+      <div className="space-y-4 pt-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+              <MapPin className="w-5 h-5 text-emerald-400" /> RoadSOS Emergency Georouting
+            </h2>
+            <p className="text-xs text-zinc-400 mt-1">Real-time OpenStreetMap dispatch node & live mesh locator.</p>
+          </div>
+          <span className="w-fit text-[11px] font-mono text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
+            Live OpenStreetMap Array
+          </span>
+        </div>
+
+        <div className="relative rounded-3xl overflow-hidden border border-white/15 bg-[#050b14] shadow-2xl p-2">
+          <div className="rounded-2xl overflow-hidden">
+            <RoadSOSMap heightClass="h-[430px]" />
           </div>
         </div>
       </div>

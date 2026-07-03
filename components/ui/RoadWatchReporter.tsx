@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Camera, Upload, AlertTriangle, CheckCircle2, ShieldAlert, Cpu, Sparkles, X, Network, Loader2 } from "lucide-react";
+import { Camera, Upload, CheckCircle2, Cpu, X, Network, Loader2, Sparkles, ShieldAlert } from "lucide-react";
 import { useOfflineSync } from "@/hooks/useOfflineSync";
 
 interface RoadWatchReporterProps {
@@ -18,10 +18,9 @@ export function RoadWatchReporter({ prefilledHazard, onClearPrefilled }: RoadWat
   const { isOnline, submitReport } = useOfflineSync();
   const [location, setLocation] = useState<{lat: number, lng: number} | null>(null);
 
-  // Step 5 Requirements
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [isUploaded, setIsUploaded] = useState(false);
+  const [isAnalyzed, setIsAnalyzed] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [currentHazardType, setCurrentHazardType] = useState('Structural Road Hazard');
 
@@ -37,42 +36,41 @@ export function RoadWatchReporter({ prefilledHazard, onClearPrefilled }: RoadWat
     if (prefilledHazard) {
       setCurrentHazardType(prefilledHazard);
       setIsModalOpen(true);
-      setIsUploaded(false);
+      setIsAnalyzed(false);
       setShowSuccess(false);
     }
   }, [prefilledHazard]);
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
-    setIsUploaded(false);
+    setIsAnalyzed(false);
     setShowSuccess(false);
   };
 
-  const simulateUploadProcess = (selectedFile?: File) => {
+  const simulateUploadAndScan = (selectedFile?: File) => {
     if (selectedFile) {
       setFile(selectedFile);
       setPreview(URL.createObjectURL(selectedFile));
     } else {
-      // Create a dummy high-fidelity canvas preview if clicked without selecting file
       setPreview('https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=600&q=80');
     }
     setLoading(true);
-    setIsUploaded(false);
+    setIsAnalyzed(false);
     setTimeout(() => {
       setLoading(false);
-      setIsUploaded(true);
+      setIsAnalyzed(true);
     }, 1500);
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
-      simulateUploadProcess(selectedFile);
+      simulateUploadAndScan(selectedFile);
     }
   };
 
-  const handleConfirmSubmit = async () => {
-    if (!isUploaded) return;
+  const handleDispatch = async () => {
+    if (!isAnalyzed) return;
     await submitReport({
       type: 'Hazard_Report',
       hazardType: currentHazardType,
@@ -85,10 +83,10 @@ export function RoadWatchReporter({ prefilledHazard, onClearPrefilled }: RoadWat
     setTimeout(() => {
       setShowSuccess(false);
       setIsModalOpen(false);
-      setIsUploaded(false);
+      setIsAnalyzed(false);
       setPreview(null);
       if (onClearPrefilled) onClearPrefilled();
-    }, 2000);
+    }, 2500);
   };
 
   const handleCloseModal = () => {
@@ -120,10 +118,10 @@ export function RoadWatchReporter({ prefilledHazard, onClearPrefilled }: RoadWat
         </p>
       </div>
 
-      {/* Interactive Upload Box */}
+      {/* Interactive Upload Box Trigger */}
       <div 
         onClick={handleOpenModal}
-        className="relative w-full h-56 border-2 border-dashed border-white/10 hover:border-emerald-500/50 rounded-2xl flex flex-col items-center justify-center transition-all cursor-pointer bg-black/40 group overflow-hidden"
+        className="relative w-full h-44 border-2 border-dashed border-white/10 hover:border-emerald-500/50 rounded-2xl flex flex-col items-center justify-center transition-all cursor-pointer bg-black/40 group overflow-hidden"
       >
         <div className="flex flex-col items-center text-center p-6">
           <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 mb-3 group-hover:scale-110 transition-transform shadow-[0_0_20px_rgba(16,185,129,0.15)]">
@@ -154,7 +152,7 @@ export function RoadWatchReporter({ prefilledHazard, onClearPrefilled }: RoadWat
             >
               <button 
                 onClick={handleCloseModal} 
-                className="absolute top-5 right-5 w-8 h-8 rounded-full bg-zinc-900 border border-white/10 flex items-center justify-center text-zinc-400 hover:text-white transition-colors"
+                className="absolute top-5 right-5 w-8 h-8 rounded-full bg-zinc-900 border border-white/10 flex items-center justify-center text-zinc-400 hover:text-white transition-colors z-50"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -176,23 +174,23 @@ export function RoadWatchReporter({ prefilledHazard, onClearPrefilled }: RoadWat
                   <div className="w-24 h-24 mx-auto rounded-full bg-emerald-500/20 border-2 border-emerald-400 flex items-center justify-center shadow-[0_0_50px_rgba(16,185,129,0.5)]">
                     <CheckCircle2 className="w-14 h-14 text-emerald-400" />
                   </div>
-                  <h4 className="text-2xl font-black text-white tracking-tight">Report Secured & Dispatched</h4>
+                  <h4 className="text-2xl font-black text-white tracking-tight uppercase">SOS DISPATCHED TO AUTHORITY QUEUE</h4>
                   <p className="text-xs font-mono text-emerald-400">Cryptographic hash committed to regional ledger.</p>
                 </motion.div>
               ) : (
                 <div className="space-y-6">
-                  {/* Dropzone inside modal */}
+                  {/* Dropzone inside modal - object-contain used to prevent image stretching */}
                   <div 
                     onClick={() => fileInputRef.current?.click()}
-                    className="relative w-full h-48 border-2 border-dashed border-white/15 hover:border-emerald-500/50 rounded-2xl flex flex-col items-center justify-center cursor-pointer bg-black/50 overflow-hidden group transition-all"
+                    className="relative w-full h-56 border-2 border-dashed border-white/15 hover:border-emerald-500/50 rounded-2xl flex flex-col items-center justify-center cursor-pointer bg-black/50 overflow-hidden group transition-all"
                   >
                     {preview ? (
                       <>
-                        <img src={preview} alt="Upload preview" className="absolute inset-0 w-full h-full object-cover opacity-70" />
+                        <img src={preview} alt="Upload preview" className="absolute inset-0 w-full h-full object-contain p-2 bg-black opacity-85" />
                         {loading && (
-                          <div className="absolute inset-0 bg-black/75 backdrop-blur-sm flex flex-col items-center justify-center text-emerald-400 font-mono text-xs gap-2">
+                          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm flex flex-col items-center justify-center text-emerald-400 font-mono text-xs gap-2">
                             <Loader2 className="w-8 h-8 animate-spin" />
-                            <span>RUNNING EDGE COMPUTER VISION...</span>
+                            <span>SCANNING & ANALYZING MEDIA...</span>
                           </div>
                         )}
                       </>
@@ -214,14 +212,14 @@ export function RoadWatchReporter({ prefilledHazard, onClearPrefilled }: RoadWat
 
                   {!preview && !loading && (
                     <button 
-                      onClick={() => simulateUploadProcess()}
+                      onClick={() => simulateUploadAndScan()}
                       className="text-xs font-mono text-emerald-400 underline hover:text-emerald-300"
                     >
                       Or click here to simulate instant edge-AI vision test
                     </button>
                   )}
 
-                  {isUploaded && !loading && (
+                  {isAnalyzed && !loading && (
                     <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-left flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
                         <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
@@ -242,8 +240,8 @@ export function RoadWatchReporter({ prefilledHazard, onClearPrefilled }: RoadWat
                       Cancel
                     </button>
                     <button 
-                      disabled={!isUploaded || loading}
-                      onClick={handleConfirmSubmit} 
+                      disabled={!isAnalyzed || loading}
+                      onClick={handleDispatch} 
                       className="flex-1 py-3.5 bg-emerald-600 hover:bg-emerald-500 disabled:bg-zinc-800 disabled:text-zinc-600 disabled:border-transparent text-white rounded-xl font-mono text-xs tracking-widest uppercase shadow-[0_0_25px_rgba(16,185,129,0.4)] disabled:shadow-none transition-all font-bold"
                     >
                       Confirm & Dispatch SOS
