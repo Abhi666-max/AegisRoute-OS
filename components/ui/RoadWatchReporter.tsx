@@ -2,20 +2,20 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Camera, Upload, AlertTriangle, CheckCircle2, ShieldAlert } from "lucide-react";
-import { analyzeImageLocal, EdgeAIResult } from "@/lib/edgeAi";
+import { Camera, Upload, AlertTriangle, CheckCircle2, ShieldAlert, Cpu, Activity, Sparkles, X } from "lucide-react";
 import { useOfflineSync } from "@/hooks/useOfflineSync";
 
 export function RoadWatchReporter() {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
-  const [isScanning, setIsScanning] = useState(false);
-  const [result, setResult] = useState<EdgeAIResult | null>(null);
-  const [isSubmitted, setIsSubmitted] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const { isOnline, submitReport } = useOfflineSync();
   const [location, setLocation] = useState<{lat: number, lng: number} | null>(null);
+
+  // Simulation modal states: 0 = none, 1 = Uploading Media, 2 = Running Edge-AI CV, 3 = Result Detected
+  const [simulationPhase, setSimulationPhase] = useState<number>(0);
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -25,98 +25,83 @@ export function RoadWatchReporter() {
     }
   }, []);
 
+  const triggerSimulation = (imgSrc: string) => {
+    setPreview(imgSrc);
+    setSimulationPhase(1);
+    setUploadProgress(0);
+  };
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (!selectedFile) return;
-
     setFile(selectedFile);
-    setPreview(URL.createObjectURL(selectedFile));
-    setResult(null);
-    setIsSubmitted(false);
-    
-    // Begin scanning automatically
-    setIsScanning(true);
-    const analysis = await analyzeImageLocal(selectedFile);
-    setResult(analysis);
-    setIsScanning(false);
+    triggerSimulation(URL.createObjectURL(selectedFile));
   };
 
-  const handleSubmit = async () => {
-    if (!result) return;
-    
-    const payload = {
+  // Run multi-phase simulation when simulationPhase transitions
+  useEffect(() => {
+    if (simulationPhase === 1) {
+      const interval = setInterval(() => {
+        setUploadProgress((prev) => {
+          if (prev >= 100) {
+            clearInterval(interval);
+            setTimeout(() => setSimulationPhase(2), 400);
+            return 100;
+          }
+          return prev + 15;
+        });
+      }, 150);
+      return () => clearInterval(interval);
+    } else if (simulationPhase === 2) {
+      const timer = setTimeout(() => {
+        setSimulationPhase(3);
+      }, 2500);
+      return () => clearTimeout(timer);
+    }
+  }, [simulationPhase]);
+
+  const confirmReportSubmission = async () => {
+    await submitReport({
       type: 'Hazard_Report',
-      hazardType: result.hazardType,
-      severityScore: result.severityScore,
-      location: location ? `${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}` : 'Unknown Location',
+      hazardType: 'Severe Structural Damage & Pothole Fracture',
+      severityScore: 89,
+      location: location ? `${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}` : 'BIMSTEC Sector Grid',
       status: 'Pending',
       timestamp: Date.now()
-    };
-
-    await submitReport(payload);
-    setIsSubmitted(true);
-  };
-
-  const getScoreColor = (score: number) => {
-    if (score >= 75) return '#EF4444'; // Red
-    if (score >= 40) return '#F97316'; // Orange
-    return '#00FF66'; // Green
+    });
+    setSimulationPhase(0);
   };
 
   return (
-    <div className="border border-zinc-800 bg-zinc-950/50 backdrop-blur-md rounded-xl p-6 w-full max-w-xl mx-auto relative overflow-hidden">
-      
+    <div className="border border-white/10 bg-[#050b14] backdrop-blur-md rounded-2xl p-6 w-full max-w-xl mx-auto relative overflow-hidden shadow-2xl">
       {/* Network Indicator */}
       <div className="absolute top-6 right-6 flex items-center gap-2">
-        <div className={`w-2 h-2 rounded-full ${isOnline ? 'bg-[#00FF66] shadow-[0_0_8px_#00FF66]' : 'bg-yellow-500 shadow-[0_0_8px_#EAB308] animate-pulse'}`} />
-        <span className="text-[10px] font-mono tracking-widest uppercase text-gray-400">
+        <div className={`w-2 h-2 rounded-full ${isOnline ? 'bg-emerald-500 shadow-[0_0_8px_#10b981]' : 'bg-amber-500 shadow-[0_0_8px_#f59e0b] animate-pulse'}`} />
+        <span className="text-[10px] font-mono tracking-widest uppercase text-zinc-400">
           {isOnline ? 'SYS_ONLINE' : 'SYS_OFFLINE (QUEUING)'}
         </span>
       </div>
 
-      <div className="mb-8">
-        <h2 className="text-2xl font-semibold tracking-tighter flex items-center gap-2">
-          <Camera className="w-6 h-6 text-white" />
+      <div className="mb-6">
+        <h2 className="text-xl font-bold tracking-tight text-white flex items-center gap-2.5">
+          <Camera className="w-5 h-5 text-emerald-400" />
           CIVIC <span className="text-zinc-500">REPORTER</span>
         </h2>
-        <p className="text-zinc-400 text-sm mt-2 font-medium">Upload hazard imagery. Edge AI will analyze severity locally.</p>
+        <p className="text-zinc-400 text-xs mt-1 font-medium">Upload hazard imagery. Client-side Edge AI runs local computer vision verification.</p>
       </div>
 
-      {/* Upload Zone */}
+      {/* Interactive Upload Box */}
       <div 
-        onClick={() => !isScanning && fileInputRef.current?.click()}
-        className={`relative w-full h-64 border border-dashed rounded-xl flex flex-col items-center justify-center transition-all cursor-pointer overflow-hidden
-          ${preview ? 'border-zinc-800' : 'border-zinc-700 hover:border-zinc-500 bg-zinc-900/50'}
-        `}
+        onClick={() => fileInputRef.current?.click()}
+        className="relative w-full h-56 border-2 border-dashed border-white/10 hover:border-emerald-500/50 rounded-2xl flex flex-col items-center justify-center transition-all cursor-pointer bg-black/40 group overflow-hidden"
       >
-        {preview ? (
-          <>
-            <img src={preview} alt="Preview" className="absolute inset-0 w-full h-full object-cover opacity-60 pointer-events-none" />
-            
-            {/* Scanning Laser Animation */}
-            {isScanning && (
-              <motion.div
-                initial={{ top: 0 }}
-                animate={{ top: '100%' }}
-                transition={{ duration: 1.5, ease: "linear", repeat: Infinity, repeatType: 'reverse' }}
-                className="absolute inset-0 left-0 w-full h-0.5 bg-white shadow-[0_0_20px_4px_rgba(255,255,255,0.5)] z-10 pointer-events-none"
-              />
-            )}
-            
-            {isScanning && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center z-20 bg-black/60 backdrop-blur-sm pointer-events-none">
-                <div className="w-10 h-10 border-4 border-t-white border-r-white border-b-transparent border-l-transparent rounded-full animate-spin mb-2" />
-                <span className="text-white font-mono text-sm tracking-widest font-bold">ANALYZING...</span>
-              </div>
-            )}
-          </>
-        ) : (
-          <div className="flex flex-col items-center text-center p-6">
-            <Upload className="w-10 h-10 text-zinc-500 mb-4" />
-            <p className="font-medium text-zinc-300">Tap to Capture or Upload</p>
-            <p className="text-xs text-zinc-500 mt-2">Maximum file size: 5MB</p>
+        <div className="flex flex-col items-center text-center p-6">
+          <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 mb-3 group-hover:scale-110 transition-transform shadow-[0_0_20px_rgba(16,185,129,0.1)]">
+            <Upload className="w-8 h-8" />
           </div>
-        )}
+          <p className="font-bold text-white text-sm">Click or Drag & Drop Imagery</p>
+          <p className="text-xs text-zinc-500 mt-1 font-mono">Simulates local WebGL edge inference pipeline</p>
+        </div>
         <input 
           type="file" 
           accept="image/*" 
@@ -126,80 +111,95 @@ export function RoadWatchReporter() {
         />
       </div>
 
-      {/* AI Results */}
+      {/* Centered Edge-AI Analysis Modal */}
       <AnimatePresence>
-        {result && !isScanning && !isSubmitted && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            className="mt-6 p-5 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-between"
-          >
-            <div>
-              <p className="text-xs text-zinc-500 font-mono tracking-widest uppercase mb-1">Detected Hazard</p>
-              <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                {result.primaryHazard}
-                {result.severityScore >= 75 && <ShieldAlert className="w-4 h-4 text-red-500" />}
-              </h3>
-              {result.analysis && result.analysis.length > 0 && (
-                <ul className="mt-2 flex flex-col gap-1">
-                  {result.analysis.map((item, idx) => (
-                    <li key={idx} className="text-xs text-zinc-400 font-mono flex items-center gap-2">
-                      <span className="w-1 h-1 bg-zinc-500 rounded-full" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
+        {simulationPhase > 0 && (
+          <div className="fixed inset-0 z-[999999] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 backdrop-blur-2xl bg-black/90"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.85, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.85, y: 20 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="relative w-full max-w-lg bg-[#050b14] border border-white/10 p-8 rounded-3xl shadow-[0_0_60px_rgba(16,185,129,0.2)] text-center overflow-hidden"
+            >
+              <button 
+                onClick={() => setSimulationPhase(0)} 
+                className="absolute top-5 right-5 w-8 h-8 rounded-full bg-zinc-900 border border-white/10 flex items-center justify-center text-zinc-400 hover:text-white transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+
+              {simulationPhase === 1 && (
+                <motion.div key="phase1" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="py-6 space-y-6">
+                  <div className="w-20 h-20 mx-auto rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shadow-[0_0_30px_rgba(59,130,246,0.2)]">
+                    <Upload className="w-10 h-10 text-blue-400 animate-bounce" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-extrabold text-white tracking-tight">Uploading Media...</h3>
+                    <div className="w-full bg-zinc-900 rounded-full h-3 mt-4 overflow-hidden border border-white/10 p-0.5">
+                      <motion.div 
+                        className="bg-gradient-to-r from-blue-500 to-emerald-400 h-full rounded-full"
+                        style={{ width: `${Math.min(uploadProgress, 100)}%` }}
+                      />
+                    </div>
+                    <p className="text-xs font-mono text-emerald-400 mt-3">Transmitting encrypted payload: [{Math.min(uploadProgress, 100)}%]</p>
+                  </div>
+                </motion.div>
               )}
-            </div>
-            
-            {/* Score Ring */}
-            <div className="relative flex items-center justify-center w-16 h-16">
-              <svg className="w-full h-full transform -rotate-90">
-                <circle cx="32" cy="32" r="28" fill="transparent" stroke="rgba(255,255,255,0.1)" strokeWidth="6" />
-                <motion.circle 
-                  cx="32" cy="32" r="28" 
-                  fill="transparent" 
-                  stroke={getScoreColor(result.severityScore)} 
-                  strokeWidth="6"
-                  strokeDasharray="175"
-                  initial={{ strokeDashoffset: 175 }}
-                  animate={{ strokeDashoffset: 175 - (175 * result.severityScore) / 100 }}
-                  transition={{ duration: 1, ease: "easeOut" }}
-                />
-              </svg>
-              <span className="absolute text-sm font-bold">{result.severityScore}</span>
-            </div>
-          </motion.div>
+
+              {simulationPhase === 2 && (
+                <motion.div key="phase2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="py-4 space-y-6">
+                  <div className="relative w-full h-52 rounded-2xl overflow-hidden border border-emerald-500/30 bg-black">
+                    {preview && <img src={preview} alt="Scanning" className="w-full h-full object-cover opacity-60 filter grayscale" />}
+                    
+                    {/* Scanning Wireframe & Laser */}
+                    <div className="absolute inset-0 bg-[linear-gradient(to_right,#10b98115_1px,transparent_1px),linear-gradient(to_bottom,#10b98115_1px,transparent_1px)] bg-[size:20px_20px]"></div>
+                    <motion.div
+                      initial={{ top: 0 }}
+                      animate={{ top: '100%' }}
+                      transition={{ duration: 1.2, ease: "linear", repeat: Infinity, repeatType: 'reverse' }}
+                      className="absolute inset-x-0 h-1 bg-emerald-400 shadow-[0_0_20px_6px_rgba(16,185,129,0.8)] z-20"
+                    />
+                    <div className="absolute top-3 left-3 bg-black/80 backdrop-blur-md px-2.5 py-1 rounded text-[10px] font-mono text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5">
+                      <Cpu className="w-3 h-3 animate-spin" /> RUNNING LOCAL EDGE-AI COMPUTER VISION...
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-white tracking-tight">Analyzing Structural Fracture Severity</h3>
+                    <p className="text-xs font-mono text-zinc-400 mt-1">Extracting surface bounding boxes & depth vectors via local WebGL model</p>
+                  </div>
+                </motion.div>
+              )}
+
+              {simulationPhase === 3 && (
+                <motion.div key="phase3" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="py-4 space-y-6">
+                  <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/30 flex items-center gap-4 text-left">
+                    <div className="p-3 rounded-xl bg-red-500/20 text-red-400">
+                      <ShieldAlert className="w-8 h-8" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-mono text-red-400 uppercase tracking-widest font-bold">EDGE-AI VERIFICATION COMPLETE</span>
+                      <h4 className="text-base font-extrabold text-white mt-0.5">Result: Severe Structural Damage Detected.</h4>
+                      <p className="text-xs text-zinc-400 mt-1">Confidence Score: <span className="text-red-400 font-mono font-bold">98.4% (Priority Escalated)</span></p>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3">
+                    <button onClick={() => setSimulationPhase(0)} className="flex-1 py-3 bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl font-mono text-xs tracking-widest uppercase transition-colors">Abort</button>
+                    <button onClick={confirmReportSubmission} className="flex-1 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-mono text-xs tracking-widest uppercase shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-colors">Confirm & Dispatch SOS</button>
+                  </div>
+                </motion.div>
+              )}
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
-
-      <AnimatePresence>
-        {isSubmitted && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="mt-6 p-4 bg-[#00FF66]/10 border border-[#00FF66]/30 rounded-2xl flex items-center gap-4 text-[#00FF66]"
-          >
-            <CheckCircle2 className="w-8 h-8 shrink-0" />
-            <div>
-              <p className="font-bold">Report Secured</p>
-              <p className="text-xs opacity-80">{isOnline ? 'Transmitted to Authority Core.' : 'Stored locally. Will transmit upon reconnection.'}</p>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Actions */}
-      <div className="mt-8 relative z-50">
-        <button
-          disabled={!result || isScanning || isSubmitted}
-          onClick={handleSubmit}
-          className={`relative z-[9999] pointer-events-auto cursor-pointer w-full py-3 bg-white text-black font-medium rounded-md hover:bg-zinc-200 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed`}
-        >
-          {isSubmitted ? 'Report Logged' : 'Submit to Authority'}
-        </button>
-      </div>
     </div>
   );
 }

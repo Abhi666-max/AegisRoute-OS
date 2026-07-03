@@ -98,11 +98,20 @@ export function Sidebar() {
               animate={{ opacity: 1, w: 'auto' }}
               className="flex flex-col whitespace-nowrap"
             >
-              <span className="text-sm font-semibold text-white">{user?.displayName || (isAuthority ? 'Regional Authority' : isCitizen ? 'Verified Citizen' : 'Abhijeet K.')}</span>
-              <span className={`text-[10px] tracking-widest font-mono flex items-center gap-1 ${isAuthority ? 'text-blue-400' : 'text-emerald-500 uppercase'}`}>
-                {!isAuthority && <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>}
-                {isAuthority ? user?.email : isCitizen ? 'CITIZEN NODE' : 'FOUNDER'}
-              </span>
+              {isCitizen ? (
+                <>
+                  <div className="text-white font-bold text-sm truncate max-w-[140px]">{user?.displayName || 'Active Citizen'}</div>
+                  <div className="text-xs text-emerald-400 font-mono truncate max-w-[140px]">{user?.email || 'citizen@node.aegisroute'}</div>
+                </>
+              ) : (
+                <>
+                  <span className="text-sm font-semibold text-white">{user?.displayName || (isAuthority ? 'Regional Authority' : 'Abhijeet K.')}</span>
+                  <span className={`text-[10px] tracking-widest font-mono flex items-center gap-1 ${isAuthority ? 'text-blue-400' : 'text-emerald-500 uppercase'}`}>
+                    {!isAuthority && <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>}
+                    {isAuthority ? user?.email : 'FOUNDER'}
+                  </span>
+                </>
+              )}
             </motion.div>
           )}
         </div>
