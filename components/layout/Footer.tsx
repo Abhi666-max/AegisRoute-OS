@@ -45,8 +45,8 @@ export function Footer() {
           <h4 className="text-white font-medium mb-6">Product</h4>
           <ul className="flex flex-col gap-4 text-sm text-zinc-500">
             <li><Link href="/developers" className="hover:text-white transition-colors">DriveLegal Engine</Link></li>
-            <li><Link href="/report" className="hover:text-white transition-colors">RoadWatch AI</Link></li>
-            <li><Link href="/sos" className="hover:text-white transition-colors">RoadSOS Router</Link></li>
+            <li><Link href="/citizen" className="hover:text-white transition-colors">RoadWatch AI</Link></li>
+            <li><Link href="/citizen" className="hover:text-white transition-colors">RoadSOS Router</Link></li>
             <li><Link href="/developers" className="hover:text-white transition-colors">Enterprise Security</Link></li>
           </ul>
         </div>

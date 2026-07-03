@@ -100,7 +100,7 @@ export function Sidebar() {
             >
               {isCitizen ? (
                 <>
-                  <div className="text-white font-bold text-sm truncate max-w-[140px]">{user?.displayName || 'Active Citizen'}</div>
+                  <div className="text-white font-bold text-sm truncate max-w-[140px]">{user?.displayName || user?.email?.split('@')[0] || 'Citizen Node'}</div>
                   <div className="text-xs text-emerald-400 font-mono truncate max-w-[140px]">{user?.email || 'citizen@node.aegisroute'}</div>
                 </>
               ) : (

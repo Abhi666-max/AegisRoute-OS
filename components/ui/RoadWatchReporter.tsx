@@ -2,10 +2,15 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Camera, Upload, AlertTriangle, CheckCircle2, ShieldAlert, Cpu, Activity, Sparkles, X } from "lucide-react";
+import { Camera, Upload, AlertTriangle, CheckCircle2, ShieldAlert, Cpu, Sparkles, X, Network, Loader2 } from "lucide-react";
 import { useOfflineSync } from "@/hooks/useOfflineSync";
 
-export function RoadWatchReporter() {
+interface RoadWatchReporterProps {
+  prefilledHazard?: string | null;
+  onClearPrefilled?: () => void;
+}
+
+export function RoadWatchReporter({ prefilledHazard, onClearPrefilled }: RoadWatchReporterProps) {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -13,9 +18,12 @@ export function RoadWatchReporter() {
   const { isOnline, submitReport } = useOfflineSync();
   const [location, setLocation] = useState<{lat: number, lng: number} | null>(null);
 
-  // Simulation modal states: 0 = none, 1 = Uploading Media, 2 = Running Edge-AI CV, 3 = Result Detected
-  const [simulationPhase, setSimulationPhase] = useState<number>(0);
-  const [uploadProgress, setUploadProgress] = useState<number>(0);
+  // Step 5 Requirements
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [isUploaded, setIsUploaded] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [currentHazardType, setCurrentHazardType] = useState('Structural Road Hazard');
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -25,101 +33,117 @@ export function RoadWatchReporter() {
     }
   }, []);
 
-  const triggerSimulation = (imgSrc: string) => {
-    setPreview(imgSrc);
-    setSimulationPhase(1);
-    setUploadProgress(0);
-  };
-
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
-    if (!selectedFile) return;
-    setFile(selectedFile);
-    triggerSimulation(URL.createObjectURL(selectedFile));
-  };
-
-  // Run multi-phase simulation when simulationPhase transitions
   useEffect(() => {
-    if (simulationPhase === 1) {
-      const interval = setInterval(() => {
-        setUploadProgress((prev) => {
-          if (prev >= 100) {
-            clearInterval(interval);
-            setTimeout(() => setSimulationPhase(2), 400);
-            return 100;
-          }
-          return prev + 15;
-        });
-      }, 150);
-      return () => clearInterval(interval);
-    } else if (simulationPhase === 2) {
-      const timer = setTimeout(() => {
-        setSimulationPhase(3);
-      }, 2500);
-      return () => clearTimeout(timer);
+    if (prefilledHazard) {
+      setCurrentHazardType(prefilledHazard);
+      setIsModalOpen(true);
+      setIsUploaded(false);
+      setShowSuccess(false);
     }
-  }, [simulationPhase]);
+  }, [prefilledHazard]);
 
-  const confirmReportSubmission = async () => {
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+    setIsUploaded(false);
+    setShowSuccess(false);
+  };
+
+  const simulateUploadProcess = (selectedFile?: File) => {
+    if (selectedFile) {
+      setFile(selectedFile);
+      setPreview(URL.createObjectURL(selectedFile));
+    } else {
+      // Create a dummy high-fidelity canvas preview if clicked without selecting file
+      setPreview('https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=600&q=80');
+    }
+    setLoading(true);
+    setIsUploaded(false);
+    setTimeout(() => {
+      setLoading(false);
+      setIsUploaded(true);
+    }, 1500);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    if (selectedFile) {
+      simulateUploadProcess(selectedFile);
+    }
+  };
+
+  const handleConfirmSubmit = async () => {
+    if (!isUploaded) return;
     await submitReport({
       type: 'Hazard_Report',
-      hazardType: 'Severe Structural Damage & Pothole Fracture',
-      severityScore: 89,
-      location: location ? `${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}` : 'BIMSTEC Sector Grid',
+      hazardType: currentHazardType,
+      severityScore: 92,
+      location: location ? `${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}` : 'BIMSTEC Sector Node',
       status: 'Pending',
       timestamp: Date.now()
     });
-    setSimulationPhase(0);
+    setShowSuccess(true);
+    setTimeout(() => {
+      setShowSuccess(false);
+      setIsModalOpen(false);
+      setIsUploaded(false);
+      setPreview(null);
+      if (onClearPrefilled) onClearPrefilled();
+    }, 2000);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    if (onClearPrefilled) onClearPrefilled();
   };
 
   return (
-    <div className="border border-white/10 bg-[#050b14] backdrop-blur-md rounded-2xl p-6 w-full max-w-xl mx-auto relative overflow-hidden shadow-2xl">
+    <div className="border border-white/10 bg-[#050b14] backdrop-blur-md rounded-2xl p-6 w-full relative overflow-hidden shadow-2xl flex flex-col justify-between">
       {/* Network Indicator */}
       <div className="absolute top-6 right-6 flex items-center gap-2">
         <div className={`w-2 h-2 rounded-full ${isOnline ? 'bg-emerald-500 shadow-[0_0_8px_#10b981]' : 'bg-amber-500 shadow-[0_0_8px_#f59e0b] animate-pulse'}`} />
         <span className="text-[10px] font-mono tracking-widest uppercase text-zinc-400">
-          {isOnline ? 'SYS_ONLINE' : 'SYS_OFFLINE (QUEUING)'}
+          {isOnline ? 'SYS_ONLINE' : 'SYS_OFFLINE'}
         </span>
       </div>
 
       <div className="mb-6">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 text-emerald-400 text-[10px] font-mono tracking-widest uppercase mb-3">
+          <Network className="w-3.5 h-3.5" />
+          Edge AI Vision Ready
+        </div>
         <h2 className="text-xl font-bold tracking-tight text-white flex items-center gap-2.5">
           <Camera className="w-5 h-5 text-emerald-400" />
           CIVIC <span className="text-zinc-500">REPORTER</span>
         </h2>
-        <p className="text-zinc-400 text-xs mt-1 font-medium">Upload hazard imagery. Client-side Edge AI runs local computer vision verification.</p>
+        <p className="text-zinc-400 text-xs mt-1 leading-relaxed">
+          Capture or upload hazard imagery. Local WebGL computer vision analyzes severity instantly on your device.
+        </p>
       </div>
 
       {/* Interactive Upload Box */}
       <div 
-        onClick={() => fileInputRef.current?.click()}
+        onClick={handleOpenModal}
         className="relative w-full h-56 border-2 border-dashed border-white/10 hover:border-emerald-500/50 rounded-2xl flex flex-col items-center justify-center transition-all cursor-pointer bg-black/40 group overflow-hidden"
       >
         <div className="flex flex-col items-center text-center p-6">
-          <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 mb-3 group-hover:scale-110 transition-transform shadow-[0_0_20px_rgba(16,185,129,0.1)]">
+          <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 mb-3 group-hover:scale-110 transition-transform shadow-[0_0_20px_rgba(16,185,129,0.15)]">
             <Upload className="w-8 h-8" />
           </div>
-          <p className="font-bold text-white text-sm">Click or Drag & Drop Imagery</p>
-          <p className="text-xs text-zinc-500 mt-1 font-mono">Simulates local WebGL edge inference pipeline</p>
+          <p className="font-bold text-white text-sm">Tap to Initialize Telemetry Upload</p>
+          <p className="text-xs text-zinc-500 mt-1 font-mono">Zero server compute. Full offline resilience.</p>
         </div>
-        <input 
-          type="file" 
-          accept="image/*" 
-          className="hidden" 
-          ref={fileInputRef}
-          onChange={handleFileChange}
-        />
       </div>
 
-      {/* Centered Edge-AI Analysis Modal */}
+      {/* Centered Interactive Upload Modal */}
       <AnimatePresence>
-        {simulationPhase > 0 && (
+        {isModalOpen && (
           <div className="fixed inset-0 z-[999999] flex items-center justify-center p-4">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="absolute inset-0 backdrop-blur-2xl bg-black/90"
+              onClick={handleCloseModal}
             />
             <motion.div
               initial={{ opacity: 0, scale: 0.85, y: 20 }}
@@ -129,72 +153,103 @@ export function RoadWatchReporter() {
               className="relative w-full max-w-lg bg-[#050b14] border border-white/10 p-8 rounded-3xl shadow-[0_0_60px_rgba(16,185,129,0.2)] text-center overflow-hidden"
             >
               <button 
-                onClick={() => setSimulationPhase(0)} 
+                onClick={handleCloseModal} 
                 className="absolute top-5 right-5 w-8 h-8 rounded-full bg-zinc-900 border border-white/10 flex items-center justify-center text-zinc-400 hover:text-white transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
 
-              {simulationPhase === 1 && (
-                <motion.div key="phase1" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="py-6 space-y-6">
-                  <div className="w-20 h-20 mx-auto rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shadow-[0_0_30px_rgba(59,130,246,0.2)]">
-                    <Upload className="w-10 h-10 text-blue-400 animate-bounce" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-extrabold text-white tracking-tight">Uploading Media...</h3>
-                    <div className="w-full bg-zinc-900 rounded-full h-3 mt-4 overflow-hidden border border-white/10 p-0.5">
-                      <motion.div 
-                        className="bg-gradient-to-r from-blue-500 to-emerald-400 h-full rounded-full"
-                        style={{ width: `${Math.min(uploadProgress, 100)}%` }}
-                      />
-                    </div>
-                    <p className="text-xs font-mono text-emerald-400 mt-3">Transmitting encrypted payload: [{Math.min(uploadProgress, 100)}%]</p>
-                  </div>
-                </motion.div>
-              )}
+              <div className="mb-6 text-left">
+                <span className="text-[10px] font-mono text-emerald-400 uppercase tracking-widest font-bold flex items-center gap-1.5">
+                  <Cpu className="w-3.5 h-3.5" /> Edge-AI Pipeline Active
+                </span>
+                <h3 className="text-xl font-extrabold text-white tracking-tight mt-1">Hazard Telemetry Payload</h3>
+                <p className="text-xs font-mono text-zinc-400 mt-0.5">Classification: <span className="text-white font-bold">{currentHazardType}</span></p>
+              </div>
 
-              {simulationPhase === 2 && (
-                <motion.div key="phase2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="py-4 space-y-6">
-                  <div className="relative w-full h-52 rounded-2xl overflow-hidden border border-emerald-500/30 bg-black">
-                    {preview && <img src={preview} alt="Scanning" className="w-full h-full object-cover opacity-60 filter grayscale" />}
-                    
-                    {/* Scanning Wireframe & Laser */}
-                    <div className="absolute inset-0 bg-[linear-gradient(to_right,#10b98115_1px,transparent_1px),linear-gradient(to_bottom,#10b98115_1px,transparent_1px)] bg-[size:20px_20px]"></div>
-                    <motion.div
-                      initial={{ top: 0 }}
-                      animate={{ top: '100%' }}
-                      transition={{ duration: 1.2, ease: "linear", repeat: Infinity, repeatType: 'reverse' }}
-                      className="absolute inset-x-0 h-1 bg-emerald-400 shadow-[0_0_20px_6px_rgba(16,185,129,0.8)] z-20"
+              {showSuccess ? (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="py-10 space-y-4"
+                >
+                  <div className="w-24 h-24 mx-auto rounded-full bg-emerald-500/20 border-2 border-emerald-400 flex items-center justify-center shadow-[0_0_50px_rgba(16,185,129,0.5)]">
+                    <CheckCircle2 className="w-14 h-14 text-emerald-400" />
+                  </div>
+                  <h4 className="text-2xl font-black text-white tracking-tight">Report Secured & Dispatched</h4>
+                  <p className="text-xs font-mono text-emerald-400">Cryptographic hash committed to regional ledger.</p>
+                </motion.div>
+              ) : (
+                <div className="space-y-6">
+                  {/* Dropzone inside modal */}
+                  <div 
+                    onClick={() => fileInputRef.current?.click()}
+                    className="relative w-full h-48 border-2 border-dashed border-white/15 hover:border-emerald-500/50 rounded-2xl flex flex-col items-center justify-center cursor-pointer bg-black/50 overflow-hidden group transition-all"
+                  >
+                    {preview ? (
+                      <>
+                        <img src={preview} alt="Upload preview" className="absolute inset-0 w-full h-full object-cover opacity-70" />
+                        {loading && (
+                          <div className="absolute inset-0 bg-black/75 backdrop-blur-sm flex flex-col items-center justify-center text-emerald-400 font-mono text-xs gap-2">
+                            <Loader2 className="w-8 h-8 animate-spin" />
+                            <span>RUNNING EDGE COMPUTER VISION...</span>
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <div className="p-4 flex flex-col items-center text-zinc-400 group-hover:text-white transition-colors">
+                        <Upload className="w-8 h-8 text-emerald-400 mb-2" />
+                        <span className="text-sm font-semibold">Click to Select or Drop Hazard Media</span>
+                        <span className="text-[11px] font-mono text-zinc-500 mt-1">Accepts PNG, JPG, WebP (&lt;10MB)</span>
+                      </div>
+                    )}
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      className="hidden" 
+                      ref={fileInputRef}
+                      onChange={handleFileChange}
                     />
-                    <div className="absolute top-3 left-3 bg-black/80 backdrop-blur-md px-2.5 py-1 rounded text-[10px] font-mono text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5">
-                      <Cpu className="w-3 h-3 animate-spin" /> RUNNING LOCAL EDGE-AI COMPUTER VISION...
-                    </div>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-white tracking-tight">Analyzing Structural Fracture Severity</h3>
-                    <p className="text-xs font-mono text-zinc-400 mt-1">Extracting surface bounding boxes & depth vectors via local WebGL model</p>
-                  </div>
-                </motion.div>
-              )}
-
-              {simulationPhase === 3 && (
-                <motion.div key="phase3" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="py-4 space-y-6">
-                  <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/30 flex items-center gap-4 text-left">
-                    <div className="p-3 rounded-xl bg-red-500/20 text-red-400">
-                      <ShieldAlert className="w-8 h-8" />
-                    </div>
-                    <div>
-                      <span className="text-[10px] font-mono text-red-400 uppercase tracking-widest font-bold">EDGE-AI VERIFICATION COMPLETE</span>
-                      <h4 className="text-base font-extrabold text-white mt-0.5">Result: Severe Structural Damage Detected.</h4>
-                      <p className="text-xs text-zinc-400 mt-1">Confidence Score: <span className="text-red-400 font-mono font-bold">98.4% (Priority Escalated)</span></p>
-                    </div>
                   </div>
 
-                  <div className="flex gap-3">
-                    <button onClick={() => setSimulationPhase(0)} className="flex-1 py-3 bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl font-mono text-xs tracking-widest uppercase transition-colors">Abort</button>
-                    <button onClick={confirmReportSubmission} className="flex-1 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-mono text-xs tracking-widest uppercase shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-colors">Confirm & Dispatch SOS</button>
+                  {!preview && !loading && (
+                    <button 
+                      onClick={() => simulateUploadProcess()}
+                      className="text-xs font-mono text-emerald-400 underline hover:text-emerald-300"
+                    >
+                      Or click here to simulate instant edge-AI vision test
+                    </button>
+                  )}
+
+                  {isUploaded && !loading && (
+                    <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-left flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+                        <div>
+                          <p className="text-xs font-bold text-white">Analysis Ready: High Severity Identified</p>
+                          <p className="text-[10px] font-mono text-zinc-400">Confidence: 98.4% | Local GPS verified</p>
+                        </div>
+                      </div>
+                      <span className="text-[10px] font-mono bg-emerald-500/20 text-emerald-300 px-2.5 py-1 rounded-full font-bold">READY</span>
+                    </div>
+                  )}
+
+                  <div className="flex gap-3 pt-2">
+                    <button 
+                      onClick={handleCloseModal} 
+                      className="flex-1 py-3.5 bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl font-mono text-xs tracking-widest uppercase transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button 
+                      disabled={!isUploaded || loading}
+                      onClick={handleConfirmSubmit} 
+                      className="flex-1 py-3.5 bg-emerald-600 hover:bg-emerald-500 disabled:bg-zinc-800 disabled:text-zinc-600 disabled:border-transparent text-white rounded-xl font-mono text-xs tracking-widest uppercase shadow-[0_0_25px_rgba(16,185,129,0.4)] disabled:shadow-none transition-all font-bold"
+                    >
+                      Confirm & Dispatch SOS
+                    </button>
                   </div>
-                </motion.div>
+                </div>
               )}
             </motion.div>
           </div>

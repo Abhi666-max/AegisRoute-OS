@@ -52,7 +52,7 @@ export default function CitizenProfilePage() {
           </div>
 
           <p className="text-xs text-zinc-400 max-w-xs">
-            Your verified telemetry reports consistently meet municipal accuracy benchmarks (>97.5%).
+            Your verified telemetry reports consistently meet municipal accuracy benchmarks (&gt;97.5%).
           </p>
         </div>
 
