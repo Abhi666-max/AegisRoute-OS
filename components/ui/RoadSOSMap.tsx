@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from 'react';
-import dynamic from 'next/dynamic';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AlertTriangle, CheckCircle2, Radar, ShieldAlert, X } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Radar, ShieldAlert, X, Ban } from 'lucide-react';
 import { toast } from 'sonner';
+import dynamic from 'next/dynamic';
+import { useIncidentStore } from '@/store/useIncidentStore';
 
 const MapContent = dynamic(() => import('./MapContent'), {
   ssr: false,
@@ -20,6 +21,22 @@ export function RoadSOSMap({ heightClass = "h-[480px]" }: RoadSOSMapProps) {
   const [isDispatching, setIsDispatching] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [showSafetyModal, setShowSafetyModal] = useState(false);
+  const [lastIncidentId, setLastIncidentId] = useState<string | null>(null);
+  const [countdown, setCountdown] = useState(30);
+
+  const { addIncident, revokeIncident } = useIncidentStore();
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (showSuccess && countdown > 0) {
+      timer = setInterval(() => {
+        setCountdown(prev => prev - 1);
+      }, 1000);
+    } else if (countdown === 0) {
+      setShowSuccess(false);
+    }
+    return () => clearInterval(timer);
+  }, [showSuccess, countdown]);
 
   const handleOpenSafetyModal = () => {
     setShowSafetyModal(true);
@@ -31,10 +48,35 @@ export function RoadSOSMap({ heightClass = "h-[480px]" }: RoadSOSMapProps) {
 
     setTimeout(() => {
       setIsDispatching(false);
+      const newId = 'SOS-' + Math.floor(1000 + Math.random() * 9000);
+      setLastIncidentId(newId);
+      setCountdown(30);
+      
+      // Step 1: Append to shared operational log array
+      const coordsStr = location ? `${location.lat.toFixed(4)}° N, ${location.lng.toFixed(4)}° E` : '23.8103° N, 90.4125° E';
+      addIncident({
+        id: newId,
+        type: 'Emergency SOS Beacon',
+        classification: 'Emergency SOS Beacon',
+        location: `${coordsStr} (Regional Node)`,
+        coordinates: coordsStr,
+        status: 'CRITICAL',
+        time: 'Just now',
+        severity: 'CRITICAL',
+        confidence: '99.9%'
+      });
+
       setShowSuccess(true);
       toast.success("Emergency Signal Relayed via OpenStreetMap nodes.");
-      setTimeout(() => setShowSuccess(false), 5000);
     }, 1800);
+  };
+
+  const handleUndoBroadcast = () => {
+    if (lastIncidentId) {
+      revokeIncident(lastIncidentId);
+      toast.info("Emergency signal revoked. Marked as CANCELLED_BY_USER in Authority queue.");
+      setShowSuccess(false);
+    }
   };
 
   return (
@@ -102,27 +144,39 @@ export function RoadSOSMap({ heightClass = "h-[480px]" }: RoadSOSMapProps) {
           </motion.button>
         </div>
 
+        {/* Step 3: 30-second window to Cancel/Undo Broadcast */}
         <AnimatePresence>
           {showSuccess && (
             <motion.div
               initial={{ opacity: 0, y: 30, scale: 0.95, x: '-50%' }}
               animate={{ opacity: 1, y: 0, scale: 1, x: '-50%' }}
               exit={{ opacity: 0, y: 20, scale: 0.95, x: '-50%' }}
-              className="absolute bottom-24 left-1/2 z-[1001] bg-zinc-950/95 backdrop-blur-xl border border-emerald-500/40 rounded-2xl p-4 flex items-center gap-3.5 shadow-xl w-[90%] max-w-sm"
+              className="absolute bottom-20 left-1/2 z-[1001] bg-zinc-950/95 backdrop-blur-xl border border-red-500/50 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-2xl w-[92%] max-w-md"
             >
-              <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 shrink-0 border border-emerald-500/20">
-                <CheckCircle2 className="w-5 h-5" />
+              <div className="flex items-center gap-3.5">
+                <div className="p-2.5 rounded-xl bg-red-500/10 text-red-400 shrink-0 border border-red-500/20 animate-pulse">
+                  <CheckCircle2 className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="font-semibold text-white text-sm tracking-tight">Emergency Beacon Active</p>
+                  <p className="text-xs text-zinc-400 font-normal">Auto-revocation window: <strong className="text-red-400">{countdown}s remaining</strong></p>
+                </div>
               </div>
-              <div>
-                <p className="font-semibold text-white text-sm tracking-tight">Emergency Beacon Relayed</p>
-                <p className="text-xs text-emerald-400 font-normal">OpenStreetMap Nodes & Regional Authority Alerted</p>
-              </div>
+
+              <motion.button
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                onClick={handleUndoBroadcast}
+                className="px-4 py-2 rounded-xl bg-zinc-900 hover:bg-red-950/80 border border-zinc-700 hover:border-red-500/50 text-red-400 font-medium text-xs tracking-tight flex items-center gap-1.5 transition-colors shrink-0"
+              >
+                <Ban className="w-3.5 h-3.5" /> Undo / False Alarm
+              </motion.button>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
-      {/* Step 5: Premium SOS Safety Modal */}
+      {/* Premium SOS Safety Modal */}
       <AnimatePresence>
         {showSafetyModal && (
           <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-black/90 backdrop-blur-2xl">
