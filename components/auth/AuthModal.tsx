@@ -42,17 +42,20 @@ export function AuthModal() {
         
         if (email.includes('@gov.in')) {
           setLoading(false);
-          window.location.href = '/authority';
+          onClose();
+          router.push('/authority');
           return;
         } else if (email === 'abhi.admin.dev@gmail.com') {
           setLoading(false);
-          window.location.href = '/admin';
+          onClose();
+          router.push('/admin');
           return;
         }
         
         fetchedRole = 'citizen';
         setLoading(false);
-        window.location.href = '/citizen';
+        onClose();
+        router.push('/citizen');
         return;
       } else {
         const registerPromise = createUserWithEmailAndPassword(auth, email, password);
@@ -71,7 +74,8 @@ export function AuthModal() {
 
         if (role === 'authority' || email.includes('@gov.in')) {
           setLoading(false);
-          window.location.href = '/authority';
+          onClose();
+          router.push('/authority');
           return;
         }
       }
@@ -81,12 +85,12 @@ export function AuthModal() {
       // Strict Routing Logic (Fallback)
       if (fetchedRole.toLowerCase() === 'authority' || email.includes('@gov.in')) {
         toast.success('Authority Node Authenticated. Connecting to Mesh...', { icon: '🏛️' });
-        window.location.href = '/authority'; // Use window.location to bypass Next.js cache lag
+        router.push('/authority');
       } else if (email === 'abhi.admin.dev@gmail.com' || fetchedRole === 'admin') {
-        window.location.href = '/admin';
+        router.push('/admin');
       } else {
         toast.success('Citizen Identity Verified.', { icon: '✅' });
-        window.location.href = '/citizen';
+        router.push('/citizen');
       }
     } catch (err: any) {
       toast.error('Connection timeout. Retrying...');

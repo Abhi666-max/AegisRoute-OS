@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertTriangle, Activity, Crosshair, Navigation, CheckCircle2, X, ShieldAlert, Radio } from 'lucide-react';
 import { useIncidentStore } from '@/store/useIncidentStore';
+import { toast } from 'sonner';
 
 export default function IngressQueuePage() {
   const [activeTab, setActiveTab] = useState<'queue' | 'dispatched'>('queue');
@@ -16,6 +17,7 @@ export default function IngressQueuePage() {
     if (!dispatchModal) return;
     updateStatus(dispatchModal, 'UNIT EN-ROUTE');
     logMetric('FLEET_DISPATCH', `Unit deployed for incident ${dispatchModal}`);
+    toast.success("Rapid Triage Unit Deployed.");
     setDispatchModal(null);
   };
 
@@ -23,7 +25,7 @@ export default function IngressQueuePage() {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="min-h-screen text-white relative font-sans">
       <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-4xl font-black tracking-tighter text-white">INGRESS QUEUE</h1>
+          <h1 className="text-4xl font-sans font-extrabold tracking-tighter text-white uppercase">INGRESS QUEUE</h1>
           <p className="text-zinc-500 font-mono tracking-widest uppercase text-sm mt-1">Real-Time Integrated Mesh Triage</p>
         </div>
 
@@ -117,9 +119,9 @@ export default function IngressQueuePage() {
                             <X className="w-3 h-3 text-red-500" /> STAND DOWN (REVOKED)
                           </span>
                         ) : isDispatched ? (
-                          <span className="text-blue-400 font-mono text-[10px] uppercase tracking-widest bg-blue-500/10 px-3 py-1.5 rounded border border-blue-500/20 inline-flex items-center gap-1.5">
-                            <Activity className="w-3 h-3 text-blue-400 animate-spin" /> FLEET EN ROUTE (Unit dispatched)
-                          </span>
+                          <button disabled className="bg-zinc-800 text-emerald-500 border border-emerald-900/50 cursor-not-allowed px-4 py-2 rounded-lg text-[10px] font-bold font-mono uppercase tracking-widest">
+                            FLEET EN-ROUTE
+                          </button>
                         ) : (
                           <motion.button 
                             whileHover={{ scale: 1.05 }}

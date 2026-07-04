@@ -4,15 +4,17 @@ import { useEffect, useState } from 'react';
 import { auth } from '@/lib/firebase/config';
 import { User } from 'firebase/auth';
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 
 export default function CitizenLayout({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
     const unsub = auth.onAuthStateChanged((u) => {
       if (!u) {
-        window.location.href = '/';
+        router.push('/');
       } else {
         setUser(u);
         setChecking(false);
@@ -23,7 +25,7 @@ export default function CitizenLayout({ children }: { children: React.ReactNode 
         setUser(auth.currentUser);
         setChecking(false);
       } else if (checking) {
-        window.location.href = '/';
+        router.push('/');
       }
     }, 400);
     return () => { unsub(); clearTimeout(timer); };

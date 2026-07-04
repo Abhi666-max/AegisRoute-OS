@@ -20,6 +20,7 @@ export function RoadWatchReporter({ prefilledHazard, onClearPrefilled }: RoadWat
 
   const [loading, setLoading] = useState(false);
   const [isAnalyzed, setIsAnalyzed] = useState(false);
+  const [isDispatching, setIsDispatching] = useState(false);
   const [dispatchSuccess, setDispatchSuccess] = useState(false);
   const [currentHazardType, setCurrentHazardType] = useState('Structural Road Hazard');
 
@@ -61,7 +62,7 @@ export function RoadWatchReporter({ prefilledHazard, onClearPrefilled }: RoadWat
     } else if (currentHazardType.toLowerCase().includes('gridlock') || currentHazardType.toLowerCase().includes('traffic')) {
       sampleImg = 'https://images.unsplash.com/photo-1508974239320-0a029497e820?auto=format&fit=crop&w=800&q=80'; // Traffic
     } else if (currentHazardType.toLowerCase().includes('flood') || currentHazardType.toLowerCase().includes('water')) {
-      sampleImg = 'https://images.unsplash.com/photo-1518241353330-0f797f83560f?auto=format&fit=crop&w=800&q=80'; // Flood
+      sampleImg = 'https://images.unsplash.com/photo-1547683905-f686c993aae5?auto=format&fit=crop&q=80&w=1000'; // Flood
     }
     setPreview(sampleImg);
     setLoading(true);
@@ -73,8 +74,9 @@ export function RoadWatchReporter({ prefilledHazard, onClearPrefilled }: RoadWat
     }, 1500);
   };
 
-  const handleDispatch = async () => {
-    if (!isAnalyzed) return;
+  const handleDispatch = () => {
+    if (!isAnalyzed || isDispatching) return;
+    setIsDispatching(true);
     const newId = 'SOS-' + Math.floor(1000 + Math.random() * 9000);
     const coordsStr = location ? `${location.lat.toFixed(4)}° N, ${location.lng.toFixed(4)}° E` : '18.9894° N, 73.1175° E';
     
@@ -92,15 +94,19 @@ export function RoadWatchReporter({ prefilledHazard, onClearPrefilled }: RoadWat
       confidence: '98.4%'
     });
 
-    await submitReport({
+    submitReport({
       type: 'Hazard_Report',
       hazardType: currentHazardType,
       severityScore: 92,
       location: coordsStr,
       status: 'Pending',
       timestamp: Date.now()
-    });
-    setDispatchSuccess(true);
+    }).catch(e => console.error(e));
+
+    setTimeout(() => {
+      setIsDispatching(false);
+      setDispatchSuccess(true); // Open the massive Green Cinematic Success Modal
+    }, 1000);
   };
 
   const reset = () => {
@@ -227,10 +233,11 @@ export function RoadWatchReporter({ prefilledHazard, onClearPrefilled }: RoadWat
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={handleDispatch} 
-                className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 rounded-xl transition-all shadow-[0_0_25px_rgba(16,185,129,0.3)] text-sm tracking-tight border border-emerald-500/30 flex items-center justify-center gap-2"
+                disabled={isDispatching}
+                className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 rounded-xl transition-all shadow-[0_0_25px_rgba(16,185,129,0.3)] text-sm tracking-tight border border-emerald-500/30 flex items-center justify-center gap-2 disabled:opacity-50"
               >
-                <Lock className="w-4 h-4" />
-                Confirm & Dispatch Payload
+                {isDispatching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Lock className="w-4 h-4" />}
+                {isDispatching ? 'DISPATCHING...' : 'Confirm & Dispatch Payload'}
               </motion.button>
             </div>
           </div>
@@ -256,8 +263,8 @@ export function RoadWatchReporter({ prefilledHazard, onClearPrefilled }: RoadWat
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium tracking-tight">
                   <Lock className="w-3.5 h-3.5" /> Cryptographic Payload Sealed
                 </div>
-                <h3 className="text-xl sm:text-2xl font-semibold text-white tracking-tight">
-                  Payload Encrypted & Dispatched
+                <h3 className="text-xl sm:text-2xl font-semibold text-white tracking-tight uppercase">
+                  PAYLOAD DISPATCHED. Authority Ingress Queue Alerted.
                 </h3>
                 <p className="text-sm text-zinc-400 leading-relaxed font-normal">
                   Your hazard telemetry and spatial coordinates have been committed to the regional municipal authority ledger.

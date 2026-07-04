@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { LayoutDashboard, AlertTriangle, BarChart3, Activity, Settings, ChevronRight, LogOut, Shield, FileText, History, User } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { auth } from '@/lib/firebase/config';
 
 // Removed static navItems, will calculate dynamically inside component
@@ -13,6 +13,7 @@ export function Sidebar() {
   const [isHovered, setIsHovered] = useState(false);
   const [user, setUser] = useState<any>(null);
   const pathname = usePathname();
+  const router = useRouter();
   
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(setUser);
@@ -117,7 +118,7 @@ export function Sidebar() {
         </div>
         
         <button 
-          onClick={() => { auth.signOut().then(() => window.location.href = '/'); }} 
+          onClick={() => { auth.signOut().then(() => router.push('/')); }} 
           className="w-full mt-2 flex items-center justify-center gap-2 text-red-500 hover:bg-red-500/10 py-2 rounded-md transition-colors text-sm font-medium overflow-hidden"
         >
           <LogOut size={16} className="shrink-0" /> 
