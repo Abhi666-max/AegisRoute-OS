@@ -84,10 +84,18 @@ export function Footer() {
             <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 tracking-tight">ABHIJEET KANGANE</span>
             <div className="w-[1px] h-4 bg-zinc-800 mx-2"></div>
             <div className="flex items-center gap-3">
-              <Github className="w-4 h-4 text-zinc-400 hover:text-white hover:scale-125 transition-all cursor-pointer" />
-              <Linkedin className="w-4 h-4 text-zinc-400 hover:text-white hover:scale-125 transition-all cursor-pointer" />
-              <Twitter className="w-4 h-4 text-zinc-400 hover:text-white hover:scale-125 transition-all cursor-pointer" />
-              <Instagram className="w-4 h-4 text-zinc-400 hover:text-white hover:scale-125 transition-all cursor-pointer" />
+              <a href="https://github.com/abhi666-max" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+                <Github className="w-4 h-4 text-zinc-400 hover:text-white hover:scale-125 transition-all cursor-pointer" />
+              </a>
+              <a href="https://www.linkedin.com/in/abhijeet-kangane/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+                <Linkedin className="w-4 h-4 text-zinc-400 hover:text-white hover:scale-125 transition-all cursor-pointer" />
+              </a>
+              <a href="https://x.com/abhijeet_037" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)">
+                <Twitter className="w-4 h-4 text-zinc-400 hover:text-white hover:scale-125 transition-all cursor-pointer" />
+              </a>
+              <a href="https://www.instagram.com/abhijeet.037/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                <Instagram className="w-4 h-4 text-zinc-400 hover:text-white hover:scale-125 transition-all cursor-pointer" />
+              </a>
             </div>
           </div>
         </div>
