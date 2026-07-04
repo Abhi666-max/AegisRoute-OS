@@ -8,6 +8,7 @@
 [![React](https://img.shields.io/badge/React-19.0-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Firebase](https://img.shields.io/badge/Firebase-Realtime%20Mesh-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)](https://firebase.google.com/)
+[![Groq SDK](https://img.shields.io/badge/Groq%20AI-Llama%203%2070B-f55036?style=for-the-badge&logo=openai&logoColor=white)](https://groq.com/)
 [![Framer Motion](https://img.shields.io/badge/Framer%20Motion-12.0-0055FF?style=for-the-badge&logo=framer&logoColor=white)](https://www.framer.com/motion/)
 [![Build Status](https://img.shields.io/badge/Build-Passing-10B981?style=for-the-badge&logo=checkmarx&logoColor=white)]()
 [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
@@ -20,7 +21,16 @@
 
 > **AegisRoute OS** is a sovereign, zero-latency civic infrastructure and emergency georouting ecosystem designed for real-time B2G (Business-to-Government) and C2G (Citizen-to-Government) communication, cryptographic telemetry ingestion, and edge-verified hazard mitigation.
 
-Built for municipal authorities, transportation agencies, and smart-city dispatch matrices, **AegisRoute OS** eliminates traditional bureaucracies and centralized communication bottlenecks. By combining **Edge-AI computer vision scanning**, **immutable cryptographic ledgers**, and a **high-availability multi-model LLM inference engine**, the platform ensures instantaneous incident triage and automated fleet routing across complex urban transit networks.
+Built for municipal authorities, transportation agencies, and smart-city dispatch matrices, **AegisRoute OS** eliminates traditional bureaucracies and centralized communication bottlenecks. By combining **Edge-AI computer vision scanning**, **immutable cryptographic ledgers**, and an **ultra-low-latency Groq AI inference engine**, the platform ensures instantaneous incident triage and automated fleet routing across complex urban transit networks.
+
+---
+
+## 👑 Founder & Principal Architect
+
+**AegisRoute OS** was envisioned, architected, and engineered by **Abhijeet Kangane** as an enterprise-grade sovereign infrastructure platform. 
+
+* **Leadership & Strategy:** Designed to bridge the operational divide between municipal governance and citizen reporting through high-availability real-time mesh networks.
+* **Architectural Vision:** Pioneered the integration of edge-verified neural vision screening with instantaneous geospatial dispatch loops and zero-trust cryptographic role enforcement.
 
 ---
 
@@ -60,24 +70,73 @@ The following Mermaid diagram illustrates the lifecycle of a hazard payload from
 
 ```mermaid
 graph TD
+    A["📱 Citizen Enclave Device<br/>(HTML5 Camera & Media Upload)"] -->|Confidence >= 98.4%| B["🧠 Edge-AI Neural Vision Layer<br/>(Confidence Scoring & Validation)"]
+    B -->|AES-256 Envelope| C["🔐 Cryptographic Payload Packaging"]
+    C -->|Offline Queue / Online Sync| D["🔥 Firebase Realtime Mesh<br/>& Zustand Cryptographic Store"]
+    
+    D <-->|Live Triage Subscription| E["🏛️ Authority Command Center<br/>(Ingress Queue & Analytics)"]
+    D <-->|SIEM Telemetry Feed| F["⚡ Founder God-Mode Vault<br/>(Global Audit Log)"]
+    
+    E -->|Authorize Deploy| G["🚨 Rapid Response Fleet Unit<br/>(State: UNIT EN-ROUTE)"]
+    G -->|Status Broadcast| D
+    
+    A -.->|30s Revocation Window| H["🛑 Revoke Signal / False Alarm<br/>(State: CANCELLED_BY_USER)"]
+    H -.->|Stand-Down Alert| E
+
     classDef citizen fill:#050505,stroke:#10b981,stroke-width:2px,color:#fff;
     classDef edge fill:#0a0a0a,stroke:#3b82f6,stroke-width:2px,color:#fff;
     classDef mesh fill:#020205,stroke:#f59e0b,stroke-width:2px,color:#fff;
     classDef auth fill:#05050a,stroke:#6366f1,stroke-width:2px,color:#fff;
     classDef fleet fill:#050505,stroke:#ec4899,stroke-width:2px,color:#fff;
 
-    A[Citizen Enclave Device<br/>HTML5 Camera / Media Upload] ::: citizen --> B(Edge-AI Neural Vision Layer<br/>Confidence Scoring & Validation) ::: edge
-    B -->|Confidence >= 98.4%| C{Payload Encryption<br/>AES-256 Envelope} ::: edge
-    C -->|Offline Queue / Online Sync| D[(Firebase Realtime Mesh<br/>& Zustand Cryptographic Store)] ::: mesh
-    
-    D <-->|Live Triage Subscription| E[Authority Command Center<br/>Ingress Queue & Analytics] ::: auth
-    D <-->|SIEM Telemetry Feed| F[Founder God-Mode Vault<br/>Global Audit Log] ::: auth
-    
-    E -->|Authorize Deploy| G[Rapid Response Fleet Unit<br/>State: UNIT EN-ROUTE] ::: fleet
-    G -->|Status Broadcast| D
-    
-    A -.->|30s Revocation Window| H[Revoke Signal / False Alarm<br/>State: CANCELLED_BY_USER] ::: citizen
-    H -.->|Stand-Down Alert| E
+    class A,H citizen;
+    class B,C edge;
+    class D mesh;
+    class E,F auth;
+    class G fleet;
+```
+
+---
+
+## 📂 Repository & File Structure
+
+AegisRoute OS follows a clean, highly modular Next.js 16 App Router architecture:
+
+```
+AegisRoute-OS/
+├── app/
+│   ├── (auth)/                  # Authentication portals & God-Mode login vault
+│   ├── (dashboard)/             # Role-isolated operational dashboards
+│   │   ├── admin/               # Founder God-Mode SIEM & telemetry matrix
+│   │   ├── authority/           # Regional Command Center & fleet triage queue
+│   │   ├── citizen/             # Citizen enclave, SOS map & hazard reporter
+│   │   └── layout.tsx           # Zero-trust RBAC layout guard
+│   ├── (public)/                # Public landing pages, developer APIs & solutions
+│   ├── api/                     # Serverless edge endpoints
+│   │   ├── chat/                # Sovereign Intelligence Groq AI endpoint
+│   │   └── drivelegal/          # BIMSTEC civic law RAG compliance endpoint
+│   ├── layout.tsx               # Root application wrapper & theme provider
+│   └── page.tsx                 # Enterprise landing portal
+├── components/
+│   ├── auth/                    # Modal authentication & hardware identity guards
+│   ├── ui/                      # Aceternity UI components, RoadWatch & Maps
+│   ├── DriveLegalWidget.tsx     # Autonomous legal aid floating interface
+│   ├── Navbar.tsx               # Dynamic role-based navigation bar
+│   └── Sidebar.tsx              # Dashboard command sidebar
+├── hooks/
+│   └── useOfflineSync.ts        # Offline-first data persistence & mesh sync engine
+├── lib/
+│   ├── firebase/                # Firebase Realtime Mesh & Firestore configuration
+│   └── supabase/                # Secondary cryptographic BaaS client setup
+├── store/
+│   ├── useAuthStore.ts          # Centralized identity & clearance state store
+│   └── useIncidentStore.ts      # Real-time cross-portal telemetry store
+├── public/                      # Static assets, branding & geospatial overlays
+├── .env.local                   # Local secret environment configuration (Git ignored)
+├── .gitignore                   # Strict security exclusion rules
+├── next.config.mjs              # Next.js build & optimization configuration
+├── package.json                 # Project dependency manifests
+└── tailwind.config.ts           # Enterprise dark-mode design system tokens
 ```
 
 ---
@@ -93,17 +152,17 @@ AegisRoute OS is engineered with state-of-the-art web technologies, prioritizing
 | **Animations** | Framer Motion 12, AnimatePresence | Fluid layout transitions, physics-based spring interactions, and cinematic modals. |
 | **State & Storage** | Zustand (with Persist Middleware), LocalStorage Array | Real-time cross-tab state synchronization without server roundtrips or cache lag. |
 | **Backend & Mesh** | Firebase Authentication, Cloud Firestore, Supabase | Sovereign identity verification, real-time document streaming, and offline resilience. |
-| **AI & Inference** | Groq API (Llama 3 / Mixtral), Google Gemini Pro | **High-Availability LLM Pipeline:** Automatic failover between Groq edge inference and Gemini RAG. |
+| **AI & Inference** | Groq SDK (`llama3-70b-8192` / `llama-3.3-70b`) | **High-Availability AI Pipeline:** Ultra-low-latency Llama-3 inference with automated self-healing fallbacks. |
 | **Geospatial & Tooling** | OpenStreetMap, Leaflet / React-Leaflet, Sonner Toasts | Real-time coordinate mapping, georouting overlays, and instant executive feedback. |
 
 ---
 
 ## 🤖 High-Availability AI & LLM Pipeline
 
-AegisRoute OS incorporates a fault-tolerant artificial intelligence pipeline for civic queries and automated incident report summarization:
+AegisRoute OS incorporates a fault-tolerant artificial intelligence pipeline powered by the **Groq SDK** for civic queries and automated incident report summarization:
 
-1. **Primary Edge Inference (Groq Engine):** Queries are routed to ultra-low-latency Groq hardware running Llama-3 or Mixtral models, delivering real-time tokens at >300 T/s.
-2. **Secondary Sovereign Fallback (Google Gemini):** If primary edge routing experiences network latency or rate-limiting, the pipeline seamlessly fails over to Google Gemini Pro without dropping client sockets.
+1. **Primary Edge Inference (`llama3-70b-8192`):** Queries are routed directly to ultra-low-latency Groq hardware running Llama-3 70B models, delivering real-time tokens at >300 T/s.
+2. **Automated Self-Healing Fallback:** If the primary endpoint encounters temporary rate-limiting or maintenance, the engine automatically retries across Groq's active high-speed endpoints (`llama-3.3-70b-versatile`, `llama-3.1-8b-instant`, and `mixtral-8x7b-32768`) without dropping client sockets.
 3. **Local Vision Validation:** Hazard classification occurs locally within the browser sandbox using simulated neural network weightings prior to network dispatch.
 
 ---
@@ -117,8 +176,8 @@ AegisRoute OS incorporates a fault-tolerant artificial intelligence pipeline for
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/aegisroute-os/aegisroute-core.git
-cd aegisroute-core
+git clone https://github.com/Abhi666-max/AegisRoute-OS.git
+cd AegisRoute-OS
 ```
 
 ### 2. Install Dependencies
@@ -127,7 +186,7 @@ npm install
 ```
 
 ### 3. Configure Environment Variables
-Create a `.env.local` file at the root of the project and populate it with your infrastructure credentials:
+Create a `.env.local` file at the root of the project and populate it with your infrastructure credentials (do not commit this file to version control):
 
 ```ini
 # =====================================================================
@@ -136,9 +195,9 @@ Create a `.env.local` file at the root of the project and populate it with your 
 
 # --- Firebase Realtime Mesh & Authentication ---
 NEXT_PUBLIC_FIREBASE_API_KEY="AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN="aegisroute-os-core.firebaseapp.com"
-NEXT_PUBLIC_FIREBASE_PROJECT_ID="aegisroute-os-core"
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET="aegisroute-os-core.appspot.com"
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN="aegisroute-os.firebaseapp.com"
+NEXT_PUBLIC_FIREBASE_PROJECT_ID="aegisroute-os"
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET="aegisroute-os.firebasestorage.app"
 NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID="100000000000"
 NEXT_PUBLIC_FIREBASE_APP_ID="1:100000000000:web:xxxxxxxxxxxxxxxxxxxx"
 
@@ -146,10 +205,9 @@ NEXT_PUBLIC_FIREBASE_APP_ID="1:100000000000:web:xxxxxxxxxxxxxxxxxxxx"
 NEXT_PUBLIC_SUPABASE_URL="https://xxxxxxxxxxxxxxxx.supabase.co"
 NEXT_PUBLIC_SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 
-# --- High-Availability AI & LLM Pipeline ---
+# --- High-Availability AI & LLM Pipeline (Groq SDK Exclusive) ---
 GROQ_API_KEY="gsk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 GEMINI_API_KEY="AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-GOOGLE_API_KEY="AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 
 # --- System Governance & Edge Routing ---
 NEXT_PUBLIC_APP_URL="http://localhost:3000"
@@ -178,8 +236,8 @@ AegisRoute OS is designed to meet strict governmental and enterprise security st
 
 <div align="center">
 
-**AegisRoute OS** • Designed and Architected for Enterprise Public Sector Infrastructure.
+**AegisRoute OS** • Designed and Architected by **Abhijeet Kangane** for Enterprise Public Sector Infrastructure.
 
-[Documentation](https://github.com) • [Security Policy](https://github.com) • [System Status](https://github.com)
+[Documentation](https://github.com/Abhi666-max/AegisRoute-OS) • [Security Policy](https://github.com/Abhi666-max/AegisRoute-OS) • [System Status](https://github.com/Abhi666-max/AegisRoute-OS)
 
 </div>
