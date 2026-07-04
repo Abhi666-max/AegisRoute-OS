@@ -1,68 +1,42 @@
-import { NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
-import { createClient } from '@supabase/supabase-js';
+import { Groq } from "groq-sdk";
+import { NextResponse } from "next/server";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://mock.supabase.co';
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'mock-key';
-const supabase = createClient(supabaseUrl, supabaseKey);
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-export async function POST(request: Request) {
+export async function POST(req: Request) {
   try {
-    const body = await request.json();
-    const query = body.query || body.prompt || (body.messages && body.messages[body.messages.length - 1]?.content);
-    const countryCode = body.countryCode || 'GLOBAL';
-
-    if (!query) {
-      return NextResponse.json({ error: 'Missing query in request body' }, { status: 400 });
+    const body = await req.json();
+    const { messages: bodyMessages, query, prompt } = body;
+    
+    let messages: any[] = [];
+    if (Array.isArray(bodyMessages)) {
+      messages = bodyMessages;
+    } else if (query || prompt) {
+      messages = [{ role: "user", content: query || prompt }];
     }
 
-    // 1. Vector Search via Supabase (Optional Context Retrieval)
-    let contextDocs: any[] = [];
-    try {
-      const mockEmbedding = Array(1536).fill(0).map(() => Math.random() * 2 - 1);
-      const { data } = await supabase.rpc('match_legal_vectors', {
-        query_embedding: mockEmbedding,
-        match_country_code: countryCode,
-        match_threshold: 0.5,
-        match_count: 3,
-      });
-      if (data) contextDocs = data;
-    } catch (e) {
-      // Vector DB might not be live or seeded, proceed with direct LLM generation
-    }
+    // Strict system prompt for B2G compliance
+    const systemPrompt = {
+      role: "system",
+      content: "You are AegisRoute Sovereign Intelligence. Provide professional, concise legal and civic protocol advice based on BIMSTEC frameworks. Maintain a formal, high-authority tone."
+    };
 
-    // 2. Real LLM Inference via Google Generative AI
-    const apiKey = process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY;
-    const systemPrompt = `You are AegisRoute Legal Intelligence, an expert in BIMSTEC civic and traffic laws. Provide concise, highly professional B2G legal advice.\n\nUser Query Context (${countryCode}):\n`;
-
-    if (apiKey && apiKey !== 'your_gemini_api_key') {
-      try {
-        const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
-        const fullPrompt = `${systemPrompt}${query}`;
-        const result = await model.generateContent(fullPrompt);
-        const text = result.response.text();
-
-        return NextResponse.json({
-          role: 'assistant',
-          content: text,
-          sources: contextDocs
-        });
-      } catch (geminiErr: any) {
-        console.warn("Gemini API call failed, attempting high-availability fallback logic:", geminiErr?.message);
-      }
-    }
-
-    // High-Availability Fallback Synthesis (When API key is unconfigured or rate-limited)
-    const fallbackResponse = `[AegisRoute Sovereign Inference Core] In accordance with BIMSTEC Civic & Transit Protocols (Article IV, Section 12 for ${countryCode}): Regarding "${query}", regional frameworks dictate immediate municipal notification within 24 hours of hazard detection. Local transport operators must enforce automated safety telemetry validation before crossing sector boundaries.`;
-
-    return NextResponse.json({
-      role: 'assistant',
-      content: fallbackResponse,
-      sources: contextDocs
+    const completion = await groq.chat.completions.create({
+      messages: [systemPrompt, ...messages],
+      model: "llama3-70b-8192",
+      temperature: 0.5,
+      max_tokens: 1024,
     });
 
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
+    const responseText = completion.choices[0]?.message?.content || "";
+
+    return NextResponse.json({ 
+      response: responseText,
+      content: responseText,
+      role: "assistant"
+    });
+  } catch (error) {
+    console.error("Groq API Error:", error);
+    return NextResponse.json({ error: "Sovereign Intelligence node currently unreachable." }, { status: 500 });
   }
 }
