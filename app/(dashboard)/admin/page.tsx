@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, Users, Activity, Zap, Check, X, Search, Database, RefreshCw, Key, Building, Terminal, ShieldCheck, AlertTriangle, Play } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useRouter } from 'next/navigation';
+import { useIncidentStore } from '@/store/useIncidentStore';
 
 const BIMSTEC_MOCK_NODES = [
   { id: 'auth_m12', name: 'Mumbai Traffic Police', email: 'mumbai.traffic@gov.in', role: 'AUTHORITY', region: 'Maharashtra West', status: 'GRANTED', lastActive: '2 mins ago' },
@@ -34,6 +35,7 @@ const MOCK_AUDIT_LOGS = [
 export default function AdminDashboard() {
   const { user } = useAuthStore();
   const router = useRouter();
+  const { incidents, metricsLog } = useIncidentStore();
   const [mounted, setMounted] = useState(false);
   
   // State
@@ -289,22 +291,21 @@ export default function AdminDashboard() {
               </div>
               
               <div className="space-y-4">
-                <p className="text-emerald-500/70">{"// Live Telemetry Feed"}</p>
-                {MOCK_AUDIT_LOGS.map((log, i) => (
+                <p className="text-emerald-500/70">{"// Live Telemetry & Dispatch Feed"}</p>
+                {metricsLog.map((log, i) => (
                   <motion.div 
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.1 }}
+                    transition={{ delay: i * 0.05 }}
                     key={i} 
                     className="flex flex-col gap-1 p-3 rounded bg-[#050505] border border-zinc-900"
                   >
                     <div className="flex items-center justify-between">
                       <span className="text-zinc-500">[{log.time}]</span>
-                      <span className={log.status === 200 || log.status === 201 ? 'text-emerald-500' : 'text-amber-500'}>
-                        {log.status}
-                      </span>
+                      <span className="text-emerald-500">200 OK</span>
                     </div>
                     <span className="text-emerald-400 font-medium">execute_rpc: {log.action}</span>
+                    <span className="text-zinc-400 text-[10px]">{log.details}</span>
                   </motion.div>
                 ))}
               </div>
@@ -351,7 +352,7 @@ export default function AdminDashboard() {
             {[
               { label: 'Active Personnel', value: totalCitizens.toLocaleString(), icon: Users, trend: 'Global Sync Active' },
               { label: 'Verified Authorities', value: totalAuthorities.toLocaleString(), icon: Shield, trend: 'Mesh Operational' },
-              { label: 'Live Telemetry Events', value: 12, icon: Activity, trend: 'Real-time ingestion' },
+              { label: 'Live Telemetry Events', value: (12 + incidents.length).toString(), icon: Activity, trend: 'Real-time ingestion' },
               { label: 'Infrastructure Latency', value: '12ms / 99.9%', icon: Zap, trend: 'Vercel Edge Optimal' }
             ].map((metric, i) => (
               <motion.div 
@@ -375,6 +376,27 @@ export default function AdminDashboard() {
                 </div>
               </motion.div>
             ))}
+          </div>
+
+          {/* Real-Time Operational Metrics & Dispatch Log */}
+          <div className="bg-[#050505] border border-zinc-800 rounded-xl p-5 shadow-xl">
+            <div className="flex items-center justify-between mb-3 border-b border-zinc-800/80 pb-3">
+              <div className="flex items-center gap-2">
+                <Activity className="w-4 h-4 text-emerald-500 animate-pulse" />
+                <h3 className="text-xs font-mono uppercase tracking-widest text-white font-semibold">Real-Time Operational Metrics & Dispatch Log</h3>
+              </div>
+              <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded border border-emerald-500/20">
+                Live Hook Active ({metricsLog.length} Events)
+              </span>
+            </div>
+            <div className="max-h-36 overflow-y-auto space-y-2 font-mono text-xs custom-scrollbar">
+              {metricsLog.slice(0, 8).map((log, idx) => (
+                <div key={idx} className="flex items-center justify-between bg-black/40 p-2.5 rounded border border-zinc-900/80 hover:border-zinc-800 transition-colors">
+                  <span className="text-zinc-500 text-[10px]">[{log.time}] <strong className="text-emerald-400">{log.action}</strong></span>
+                  <span className="text-zinc-300 text-[11px] truncate max-w-lg">{log.details}</span>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Toggle for History */}
