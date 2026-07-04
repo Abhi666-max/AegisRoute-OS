@@ -228,7 +228,7 @@ export default function CitizenLogsPage() {
           </div>
         )}
       </AnimatePresence>
-    </div>
+    </motion.div>
   );
 }
 
