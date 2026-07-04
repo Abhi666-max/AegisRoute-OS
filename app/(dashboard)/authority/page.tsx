@@ -1,43 +1,39 @@
 'use client';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AlertTriangle, Activity, Crosshair, Navigation, CheckCircle2, X } from 'lucide-react';
-
-const initialQueue = [
-  { id: 'SOS-1001', type: 'Severe Collision', location: 'Dhaka Transit Corridor', status: 'UNASSIGNED CITIZEN REPORT', time: 'Just now', severity: 'CRITICAL' },
-  { id: 'SOS-1002', type: 'Bridge Structural Failure', location: 'Colombo Hub, Section 4', status: 'UNASSIGNED CITIZEN REPORT', time: '2 mins ago', severity: 'CRITICAL' },
-  { id: 'SOS-1003', type: 'Landslide Debris', location: 'BIMSTEC Route 7', status: 'UNASSIGNED CITIZEN REPORT', time: '5 mins ago', severity: 'HIGH' },
-  { id: 'SOS-1004', type: 'Gridlock Interruption', location: 'Panvel Node', status: 'UNASSIGNED CITIZEN REPORT', time: '8 mins ago', severity: 'MODERATE' },
-  { id: 'SOS-1005', type: 'Signal Malfunction', location: 'NH-48 Sector', status: 'UNASSIGNED CITIZEN REPORT', time: '11 mins ago', severity: 'MODERATE' },
-  { id: 'SOS-1006', type: 'Multi-Vehicle Accident', location: 'Mumbai-Pune Expressway', status: 'UNASSIGNED CITIZEN REPORT', time: '15 mins ago', severity: 'CRITICAL' },
-  { id: 'SOS-1007', type: 'Chemical Spill', location: 'Surat Industrial Transit', status: 'UNASSIGNED CITIZEN REPORT', time: '18 mins ago', severity: 'CRITICAL' },
-  { id: 'SOS-1008', type: 'Flooding', location: 'Kochi Port Entry', status: 'UNASSIGNED CITIZEN REPORT', time: '21 mins ago', severity: 'HIGH' },
-  { id: 'SOS-1009', type: 'Pothole Cluster', location: 'BIMSTEC Route 2', status: 'UNASSIGNED CITIZEN REPORT', time: '25 mins ago', severity: 'LOW' },
-  { id: 'SOS-1010', type: 'Animal on Highway', location: 'NH-10 Sector', status: 'UNASSIGNED CITIZEN REPORT', time: '30 mins ago', severity: 'LOW' },
-];
+import { AlertTriangle, Activity, Crosshair, Navigation, CheckCircle2, X, ShieldAlert, Radio } from 'lucide-react';
+import { useIncidentStore } from '@/store/useIncidentStore';
 
 export default function IngressQueuePage() {
   const [activeTab, setActiveTab] = useState<'queue' | 'dispatched'>('queue');
-  const [queue, setQueue] = useState(initialQueue);
-  const [dispatched, setDispatched] = useState<{ id: string, type: string, location: string, status: string, time: string, severity: string }[]>([]);
-  
+  const { incidents, updateStatus, logMetric } = useIncidentStore();
   const [dispatchModal, setDispatchModal] = useState<string | null>(null);
+
+  const activeQueue = incidents.filter(inc => !inc.status.includes('RESOLVED'));
+  const dispatchedQueue = incidents.filter(inc => inc.status.includes('EN-ROUTE') || inc.status.includes('RESOLVED'));
 
   const confirmDispatch = () => {
     if (!dispatchModal) return;
-    const incident = queue.find(inc => inc.id === dispatchModal);
-    if (incident) {
-      setQueue(prev => prev.filter(inc => inc.id !== dispatchModal));
-      setDispatched(prev => [{ ...incident, status: 'UNIT EN-ROUTE' }, ...prev]);
-    }
+    updateStatus(dispatchModal, 'UNIT EN-ROUTE');
+    logMetric('FLEET_DISPATCH', `Unit deployed for incident ${dispatchModal}`);
     setDispatchModal(null);
   };
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="min-h-screen text-white relative">
-      <div className="mb-8">
-        <h1 className="text-4xl font-black tracking-tighter text-white">INGRESS QUEUE</h1>
-        <p className="text-zinc-500 font-mono tracking-widest uppercase text-sm mt-1">Real-Time Integrated Stream</p>
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="min-h-screen text-white relative font-sans">
+      <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-4xl font-black tracking-tighter text-white">INGRESS QUEUE</h1>
+          <p className="text-zinc-500 font-mono tracking-widest uppercase text-sm mt-1">Real-Time Integrated Mesh Triage</p>
+        </div>
+
+        <div className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-[#05050a] border border-blue-500/30 shadow-[0_0_20px_rgba(37,99,235,0.15)]">
+          <Radio className="w-5 h-5 text-blue-400 animate-pulse" />
+          <div>
+            <div className="text-[10px] font-mono uppercase tracking-widest text-zinc-400">Live Triage Telemetry</div>
+            <div className="text-sm font-bold text-white">Active Queue Badge: <span className="text-blue-400">{activeQueue.length} Incidents</span></div>
+          </div>
+        </div>
       </div>
 
       {/* Tabs */}
@@ -46,13 +42,13 @@ export default function IngressQueuePage() {
           onClick={() => setActiveTab('queue')}
           className={`px-6 py-2 rounded-full font-mono text-xs uppercase tracking-widest transition-all ${activeTab === 'queue' ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30 shadow-[0_0_20px_rgba(37,99,235,0.2)]' : 'bg-[#050505] text-zinc-500 border border-[#18181b] hover:text-white'}`}
         >
-          Active Queue ({queue.length})
+          Active Queue ({activeQueue.length})
         </button>
         <button 
           onClick={() => setActiveTab('dispatched')}
           className={`px-6 py-2 rounded-full font-mono text-xs uppercase tracking-widest transition-all ${activeTab === 'dispatched' ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30 shadow-[0_0_20px_rgba(37,99,235,0.2)]' : 'bg-[#050505] text-zinc-500 border border-[#18181b] hover:text-white'}`}
         >
-          Dispatched Tracking ({dispatched.length})
+          Dispatched Tracking ({dispatchedQueue.length})
         </button>
       </div>
 
@@ -72,53 +68,72 @@ export default function IngressQueuePage() {
             </thead>
             <tbody className="divide-y divide-[#18181b]">
               <AnimatePresence mode="popLayout">
-                {(activeTab === 'queue' ? queue : dispatched).map((inc) => (
-                  <motion.tr 
-                    layout
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95, x: 50 }}
-                    transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                    key={inc.id} 
-                    className="hover:bg-blue-900/10 transition-colors group"
-                  >
-                    <td className="px-6 py-5">
-                       <div className="flex items-center gap-3">
-                         {inc.severity === 'CRITICAL' && <AlertTriangle className="w-4 h-4 text-red-500 animate-pulse" />}
-                         {inc.severity !== 'CRITICAL' && <Crosshair className="w-4 h-4 text-zinc-500" />}
-                         <span className="font-mono text-zinc-300 font-bold group-hover:text-blue-400 transition-colors">{inc.id}</span>
-                       </div>
-                    </td>
-                    <td className="px-6 py-5 text-zinc-300 font-medium">{inc.type}</td>
-                    <td className="px-6 py-5 text-zinc-500 font-mono text-xs flex items-center gap-2">
-                      <Navigation className="w-3 h-3 text-zinc-600" /> {inc.location}
-                    </td>
-                    <td className="px-6 py-5">
-                      <span className={`px-3 py-1 rounded text-[10px] font-mono uppercase tracking-widest border ${
-                        inc.status.includes('UNASSIGNED') ? 'bg-red-500/10 text-red-500 border-red-500/20' : 
-                        inc.status.includes('EN-ROUTE') ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' :
-                        'bg-[#18181b] text-zinc-400 border-[#18181b]'
-                      }`}>
-                        {inc.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-5 text-right">
-                      {activeTab === 'queue' ? (
-                        <motion.button 
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => setDispatchModal(inc.id)}
-                          className="bg-blue-600/20 hover:bg-blue-600/40 border border-blue-500/30 text-blue-400 px-4 py-2 rounded-lg text-[10px] font-bold font-mono uppercase tracking-widest transition-all shadow-[0_0_15px_rgba(37,99,235,0.1)]"
-                        >
-                          DISPATCH EMERGENCY UNIT
-                        </motion.button>
-                      ) : (
-                        <span className="text-zinc-500 font-mono text-[10px] uppercase tracking-widest flex items-center justify-end gap-2">
-                          <Activity className="w-3 h-3 text-blue-500 animate-spin" /> TRACKING ACTIVE
+                {(activeTab === 'queue' ? activeQueue : dispatchedQueue).map((inc) => {
+                  const isCancelled = inc.status === 'CANCELLED_BY_USER';
+                  const isDispatched = inc.status.includes('EN-ROUTE') || inc.status === 'RESOLVED';
+                  return (
+                    <motion.tr 
+                      layout
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.95, x: 50 }}
+                      transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                      key={inc.id} 
+                      className="hover:bg-blue-900/10 transition-colors group"
+                    >
+                      <td className="px-6 py-5">
+                         <div className="flex items-center gap-3">
+                           {inc.severity === 'CRITICAL' && <AlertTriangle className="w-4 h-4 text-red-500 animate-pulse" />}
+                           {inc.severity !== 'CRITICAL' && <Crosshair className="w-4 h-4 text-zinc-500" />}
+                           <span className="font-mono text-zinc-300 font-bold group-hover:text-blue-400 transition-colors">{inc.id}</span>
+                         </div>
+                      </td>
+                      <td className="px-6 py-5 text-zinc-300 font-medium flex items-center gap-2">
+                        {inc.type}
+                        {inc.sourceImage && (
+                          <span className="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded font-mono">
+                            [MEDIA ATTACHED]
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-6 py-5 text-zinc-500 font-mono text-xs">
+                        <span className="flex items-center gap-1.5 truncate max-w-xs">
+                          <Navigation className="w-3 h-3 text-zinc-600 shrink-0" /> {inc.location}
                         </span>
-                      )}
-                    </td>
-                  </motion.tr>
-                ))}
+                      </td>
+                      <td className="px-6 py-5">
+                        <span className={`px-3 py-1 rounded text-[10px] font-mono uppercase tracking-widest border ${
+                          isCancelled ? 'bg-red-500/20 text-red-400 border-red-500/40 animate-pulse font-bold' :
+                          inc.status.includes('UNASSIGNED') || inc.status === 'CRITICAL' || inc.status === 'PENDING' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' : 
+                          inc.status.includes('EN-ROUTE') ? 'bg-blue-500/10 text-blue-400 border-blue-500/20 font-bold' :
+                          'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                        }`}>
+                          {isCancelled ? 'REVOKED BY CITIZEN' : inc.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-5 text-right">
+                        {isCancelled ? (
+                          <span className="text-red-400 font-mono text-[10px] uppercase tracking-widest bg-red-500/10 px-3 py-1.5 rounded border border-red-500/20 inline-flex items-center gap-1.5">
+                            <X className="w-3 h-3 text-red-500" /> STAND DOWN (REVOKED)
+                          </span>
+                        ) : isDispatched ? (
+                          <span className="text-blue-400 font-mono text-[10px] uppercase tracking-widest bg-blue-500/10 px-3 py-1.5 rounded border border-blue-500/20 inline-flex items-center gap-1.5">
+                            <Activity className="w-3 h-3 text-blue-400 animate-spin" /> FLEET EN ROUTE (Unit dispatched)
+                          </span>
+                        ) : (
+                          <motion.button 
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => setDispatchModal(inc.id)}
+                            className="bg-blue-600/20 hover:bg-blue-600/40 border border-blue-500/30 text-blue-400 px-4 py-2 rounded-lg text-[10px] font-bold font-mono uppercase tracking-widest transition-all shadow-[0_0_15px_rgba(37,99,235,0.1)]"
+                          >
+                            DISPATCH FLEET
+                          </motion.button>
+                        )}
+                      </td>
+                    </motion.tr>
+                  );
+                })}
               </AnimatePresence>
             </tbody>
           </table>
