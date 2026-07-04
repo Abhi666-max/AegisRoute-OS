@@ -37,31 +37,29 @@ export const useAuthStore = create<AuthState>((set) => ({
   initializeAuth: () => {
     set({ loading: true });
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      set({ user });
+      set({ user, loading: false });
       if (user) {
         if (user.email === 'abhi.admin.dev@gmail.com') {
           set({ 
             userData: { uid: user.uid, email: user.email, role: 'admin', country: 'Global', createdAt: Date.now() },
-            isAuthModalOpen: false,
-            loading: false
+            isAuthModalOpen: false
           });
           return;
         }
         try {
-          const userDoc = await getDocFromServer(doc(db, 'users', user.uid));
-          if (userDoc.exists()) {
-            set({ userData: userDoc.data() as UserData });
-          } else {
-            set({ userData: null });
-          }
+          getDocFromServer(doc(db, 'users', user.uid)).then((userDoc) => {
+            if (userDoc.exists()) {
+              set({ userData: userDoc.data() as UserData });
+            }
+          }).catch((error) => {
+            console.error("Error fetching user data:", error);
+          });
         } catch (error) {
-          console.error("Error fetching user data:", error);
-          set({ userData: null });
+          console.error("Error starting user fetch:", error);
         }
       } else {
         set({ userData: null });
       }
-      set({ loading: false });
     });
     return unsubscribe;
   }

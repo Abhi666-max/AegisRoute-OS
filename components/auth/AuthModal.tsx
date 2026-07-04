@@ -51,14 +51,9 @@ export function AuthModal() {
         }
         
         fetchedRole = 'citizen';
-        try {
-          const docSnap = await getDocFromServer(doc(db, 'users', user.uid));
-          if (docSnap.exists()) {
-            fetchedRole = docSnap.data().role || 'citizen';
-          }
-        } catch (e: any) {
-           console.warn("Could not fetch user role, defaulting to citizen:", e.message);
-        }
+        setLoading(false);
+        window.location.href = '/citizen';
+        return;
       } else {
         const registerPromise = createUserWithEmailAndPassword(auth, email, password);
         const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Connection timeout. Retrying...')), 5000));
@@ -91,7 +86,7 @@ export function AuthModal() {
         window.location.href = '/admin';
       } else {
         toast.success('Citizen Identity Verified.', { icon: '✅' });
-        window.location.href = '/';
+        window.location.href = '/citizen';
       }
     } catch (err: any) {
       toast.error('Connection timeout. Retrying...');

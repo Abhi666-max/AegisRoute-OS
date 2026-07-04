@@ -13,6 +13,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   useEffect(() => {
     setMounted(true);
+    const timer = setTimeout(() => {
+      if (useAuthStore.getState().loading) {
+        useAuthStore.setState({ loading: false });
+      }
+    }, 400);
+    return () => clearTimeout(timer);
   }, []);
 
   const pathname = usePathname();

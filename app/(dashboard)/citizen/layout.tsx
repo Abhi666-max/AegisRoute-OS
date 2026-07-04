@@ -18,7 +18,15 @@ export default function CitizenLayout({ children }: { children: React.ReactNode 
         setChecking(false);
       }
     });
-    return unsub;
+    const timer = setTimeout(() => {
+      if (auth.currentUser) {
+        setUser(auth.currentUser);
+        setChecking(false);
+      } else if (checking) {
+        window.location.href = '/';
+      }
+    }, 400);
+    return () => { unsub(); clearTimeout(timer); };
   }, []);
 
   if (checking || !user) {
