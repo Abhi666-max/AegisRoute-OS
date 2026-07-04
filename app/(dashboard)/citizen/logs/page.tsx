@@ -2,31 +2,37 @@
 
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AlertTriangle, CheckCircle2, Clock, MapPin, Search, Lock, Radio } from 'lucide-react';
-
-const mockLogs = [
-  { id: 'SOS-8942', date: '2026-07-04 13:15', type: 'Severe Collision & Blockade', coords: '23.8103° N, 90.4125° E (Dhaka Corridor Node)', status: 'PENDING', priority: 'HIGH', confidence: '99.2%' },
-  { id: 'SOS-8891', date: '2026-07-03 19:40', type: 'Structural Pothole Fracture', coords: '18.9894° N, 73.1175° E (Panvel Sector 4)', status: 'RESOLVED', priority: 'MODERATE', confidence: '96.8%' },
-  { id: 'SOS-8821', date: '2026-07-03 15:10', type: 'Highway Gridlock Stagnation', coords: '6.9271° N, 79.8612° E (Colombo Port Mesh)', status: 'RESOLVED', priority: 'LOW', confidence: '94.5%' },
-  { id: 'SOS-8754', date: '2026-07-02 11:32', type: 'Flash Flood Waterlogging', coords: '9.9312° N, 76.2673° E (Kochi Marine Drive)', status: 'RESOLVED', priority: 'HIGH', confidence: '98.1%' },
-  { id: 'SOS-8690', date: '2026-07-01 08:20', type: 'Traffic Signal Power Grid Failure', coords: '22.5726° N, 88.3639° E (Kolkata Central Hub)', status: 'PENDING', priority: 'HIGH', confidence: '97.9%' },
-  { id: 'SOS-8630', date: '2026-06-29 14:05', type: 'Road Surface Degradation', coords: '13.0827° N, 80.2707° E (Chennai IT Expressway)', status: 'RESOLVED', priority: 'MODERATE', confidence: '95.4%' },
-  { id: 'SOS-8512', date: '2026-06-25 21:50', type: 'Bridge Expansion Joint Gap', coords: '21.1458° N, 79.0882° E (Nagpur Zero Mile Array)', status: 'RESOLVED', priority: 'HIGH', confidence: '99.5%' },
-];
+import { AlertTriangle, CheckCircle2, Clock, MapPin, Search, Lock, Radio, Ban, ShieldAlert } from 'lucide-react';
+import { useIncidentStore } from '@/store/useIncidentStore';
+import { toast } from 'sonner';
 
 export default function CitizenLogsPage() {
+  const { incidents, revokeIncident } = useIncidentStore();
   const [filter, setFilter] = useState<'ALL' | 'PENDING' | 'RESOLVED'>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
+  const [revokeModalId, setRevokeModalId] = useState<string | null>(null);
 
   const filteredLogs = useMemo(() => {
-    return mockLogs.filter((log) => {
-      const matchesFilter = filter === 'ALL' || log.status === filter;
+    return incidents.filter((log) => {
+      const isPending = log.status === 'PENDING' || log.status === 'UNASSIGNED CITIZEN REPORT' || log.status === 'CRITICAL' || log.status === 'UNIT EN-ROUTE';
+      const isResolved = log.status === 'RESOLVED';
+      const matchesFilter = filter === 'ALL' || 
+                           (filter === 'PENDING' && isPending) || 
+                           (filter === 'RESOLVED' && isResolved);
       const matchesSearch = log.type.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                            log.coords.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            log.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
                             log.id.toLowerCase().includes(searchQuery.toLowerCase());
       return matchesFilter && matchesSearch;
     });
-  }, [filter, searchQuery]);
+  }, [incidents, filter, searchQuery]);
+
+  const handleConfirmRevocation = () => {
+    if (revokeModalId) {
+      revokeIncident(revokeModalId);
+      toast.info(`Signal ${revokeModalId} revoked. Marked as CANCELLED_BY_USER across authority nodes.`);
+      setRevokeModalId(null);
+    }
+  };
 
   return (
     <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="space-y-8 min-h-[85vh] text-zinc-100 pb-16 font-sans antialiased">
@@ -49,10 +55,10 @@ export default function CitizenLogsPage() {
         <div className="flex items-center gap-6 font-medium text-xs text-zinc-400 bg-zinc-950 px-6 py-3.5 rounded-2xl border border-zinc-800 shadow-inner relative z-10">
           <span className="flex items-center gap-2">
             <Radio className="w-4 h-4 text-emerald-400 animate-pulse" />
-            Active Broadcasts: <strong className="text-emerald-400 font-semibold text-sm">{mockLogs.length}</strong>
+            Active Broadcasts: <strong className="text-emerald-400 font-semibold text-sm">{incidents.length}</strong>
           </span>
           <span className="w-[1px] h-6 bg-zinc-800"></span>
-          <span>Pending: <strong className="text-amber-400 font-semibold text-sm">{mockLogs.filter(l => l.status === 'PENDING').length}</strong></span>
+          <span>Pending: <strong className="text-amber-400 font-semibold text-sm">{incidents.filter(l => l.status === 'PENDING' || logIsActive(l.status)).length}</strong></span>
         </div>
       </motion.div>
 
@@ -100,62 +106,132 @@ export default function CitizenLogsPage() {
                 <th className="px-6 py-4">Geospatial Node</th>
                 <th className="px-6 py-4">CV Confidence</th>
                 <th className="px-6 py-4">Municipal Status</th>
+                <th className="px-6 py-4 text-right">Action / Revocation</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-900">
               <AnimatePresence>
                 {filteredLogs.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-16 text-center text-zinc-500 text-sm font-normal">
+                    <td colSpan={7} className="px-6 py-16 text-center text-zinc-500 text-sm font-normal">
                       No matching records located in regional ledger.
                     </td>
                   </tr>
                 ) : (
-                  filteredLogs.map((log, index) => (
-                    <motion.tr
-                      layout
-                      whileHover={{ scale: 1.003, backgroundColor: 'rgba(255, 255, 255, 0.02)' }}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 10 }}
-                      transition={{ delay: index * 0.05, duration: 0.2 }}
-                      key={log.id}
-                      className="bg-zinc-950/40 hover:bg-zinc-900/50 transition-colors group cursor-default"
-                    >
-                      <td className="px-6 py-4 font-mono text-emerald-400 font-medium text-xs">{log.id}</td>
-                      <td className="px-6 py-4 text-zinc-400 text-xs">{log.date}</td>
-                      <td className="px-6 py-4 font-semibold text-white group-hover:text-emerald-400 transition-colors flex items-center gap-2.5">
-                        <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
-                        {log.type}
-                      </td>
-                      <td className="px-6 py-4 text-xs text-zinc-400">
-                        <span className="flex items-center gap-1.5 truncate max-w-xs">
-                          <MapPin className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
-                          {log.coords}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 font-mono text-xs text-zinc-300 font-semibold">
-                        {log.confidence}
-                      </td>
-                      <td className="px-6 py-4">
-                        {log.status === 'RESOLVED' ? (
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
-                            <CheckCircle2 className="w-3.5 h-3.5" /> Resolved
+                  filteredLogs.map((log, index) => {
+                    const isActive = logIsActive(log.status);
+                    const isCancelled = log.status === 'CANCELLED_BY_USER';
+                    return (
+                      <motion.tr
+                        layout
+                        whileHover={{ scale: 1.003, backgroundColor: 'rgba(255, 255, 255, 0.02)' }}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 10 }}
+                        transition={{ delay: index * 0.05, duration: 0.2 }}
+                        key={log.id}
+                        className="bg-zinc-950/40 hover:bg-zinc-900/50 transition-colors group cursor-default"
+                      >
+                        <td className="px-6 py-4 font-mono text-emerald-400 font-medium text-xs">{log.id}</td>
+                        <td className="px-6 py-4 text-zinc-400 text-xs">{log.time}</td>
+                        <td className="px-6 py-4 font-semibold text-white group-hover:text-emerald-400 transition-colors flex items-center gap-2.5">
+                          <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+                          {log.type}
+                        </td>
+                        <td className="px-6 py-4 text-xs text-zinc-400">
+                          <span className="flex items-center gap-1.5 truncate max-w-xs">
+                            <MapPin className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
+                            {log.location}
                           </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/30">
-                            <Clock className="w-3.5 h-3.5 animate-pulse" /> Pending
-                          </span>
-                        )}
-                      </td>
-                    </motion.tr>
-                  ))
+                        </td>
+                        <td className="px-6 py-4 font-mono text-xs text-zinc-300 font-semibold">
+                          {log.confidence || '98.4%'}
+                        </td>
+                        <td className="px-6 py-4">
+                          {log.status === 'RESOLVED' ? (
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                              <CheckCircle2 className="w-3.5 h-3.5" /> Resolved
+                            </span>
+                          ) : isCancelled ? (
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-red-500/10 text-red-400 border border-red-500/30">
+                              <Ban className="w-3.5 h-3.5" /> Cancelled by User
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/30">
+                              <Clock className="w-3.5 h-3.5 animate-pulse" /> {log.status}
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          {isActive && !isCancelled ? (
+                            <motion.button
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              onClick={() => setRevokeModalId(log.id)}
+                              className="px-3.5 py-1.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 text-xs font-medium tracking-tight transition-all flex items-center gap-1.5 ml-auto shadow-sm"
+                            >
+                              <Ban className="w-3.5 h-3.5" /> Revoke Signal / False Alarm
+                            </motion.button>
+                          ) : (
+                            <span className="text-xs text-zinc-600 font-normal">No action required</span>
+                          )}
+                        </td>
+                      </motion.tr>
+                    );
+                  })
                 )}
               </AnimatePresence>
             </tbody>
           </table>
         </div>
       </div>
-    </motion.div>
+
+      {/* Revocation Warning Modal */}
+      <AnimatePresence>
+        {revokeModalId && (
+          <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-2xl flex items-center justify-center p-6">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="w-full max-w-md bg-[#0a0a0a] border border-red-900/50 p-8 rounded-3xl shadow-2xl text-center space-y-6"
+            >
+              <div className="w-16 h-16 mx-auto rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center shadow-[0_0_40px_rgba(220,38,38,0.2)]">
+                <ShieldAlert className="w-8 h-8 text-red-500 animate-pulse" />
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="text-xl sm:text-2xl font-semibold text-white tracking-tight">
+                  Revoke Emergency Broadcast?
+                </h3>
+                <p className="text-sm text-zinc-400 leading-relaxed font-normal">
+                  Are you sure you want to revoke signal <strong className="text-zinc-200">{revokeModalId}</strong>? This will mark the incident as <span className="text-red-400 font-medium">CANCELLED_BY_USER</span> across all Authority dispatch queues and notify fleet units to stand down immediately.
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                <button
+                  onClick={() => setRevokeModalId(null)}
+                  className="flex-1 py-3 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-white rounded-xl text-sm font-medium tracking-tight transition-all"
+                >
+                  Keep Active
+                </button>
+                <button
+                  onClick={handleConfirmRevocation}
+                  className="flex-1 py-3 bg-red-600 hover:bg-red-500 text-white rounded-xl text-sm font-semibold tracking-tight shadow-[0_0_30px_rgba(220,38,38,0.4)] transition-all border border-red-400/40"
+                >
+                  Confirm Revocation
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </div>
   );
+}
+
+function logIsActive(status: string) {
+  return status === 'PENDING' || status === 'UNASSIGNED CITIZEN REPORT' || status === 'CRITICAL' || status === 'UNIT EN-ROUTE';
 }
