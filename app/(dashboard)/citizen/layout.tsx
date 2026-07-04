@@ -12,7 +12,7 @@ export default function CitizenLayout({ children }: { children: React.ReactNode 
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    const unsub = auth.onAuthStateChanged((u) => {
+    const unsub = auth.onAuthStateChanged((u: any) => {
       if (!u) {
         router.push('/');
       } else {

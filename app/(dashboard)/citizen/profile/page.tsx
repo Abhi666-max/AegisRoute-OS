@@ -11,7 +11,7 @@ export default function CitizenProfilePage() {
   const [user, setUser] = useState<User | null>(auth.currentUser);
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((u) => setUser(u));
+    const unsubscribe = auth.onAuthStateChanged((u: any) => setUser(u));
     return () => unsubscribe();
   }, []);
 

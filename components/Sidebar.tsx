@@ -95,8 +95,8 @@ export function Sidebar() {
           </div>
           {isHovered && (
             <motion.div 
-              initial={{ opacity: 0, w: 0 }}
-              animate={{ opacity: 1, w: 'auto' }}
+              initial={{ opacity: 0, width: 0 }}
+              animate={{ opacity: 1, width: 'auto' }}
               className="flex flex-col whitespace-nowrap"
             >
               {isCitizen ? (

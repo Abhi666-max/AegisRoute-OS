@@ -86,7 +86,7 @@ export function AuthModal() {
       if (fetchedRole.toLowerCase() === 'authority' || email.includes('@gov.in')) {
         toast.success('Authority Node Authenticated. Connecting to Mesh...', { icon: '🏛️' });
         router.push('/authority');
-      } else if (email === 'abhi.admin.dev@gmail.com' || fetchedRole === 'admin') {
+      } else if (email === 'abhi.admin.dev@gmail.com' || (fetchedRole as string) === 'admin') {
         router.push('/admin');
       } else {
         toast.success('Citizen Identity Verified.', { icon: '✅' });

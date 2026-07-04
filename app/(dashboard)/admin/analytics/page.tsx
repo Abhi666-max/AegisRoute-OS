@@ -3,7 +3,7 @@ import { BarChart3, Activity, ShieldAlert, Globe, Server } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function AnalyticsPage() {
-  const container = {
+  const container: any = {
     hidden: { opacity: 0 },
     show: {
       opacity: 1,
@@ -11,7 +11,7 @@ export default function AnalyticsPage() {
     }
   };
 
-  const item = {
+  const item: any = {
     hidden: { opacity: 0, scale: 0.95, y: 15 },
     show: { opacity: 1, scale: 1, y: 0, transition: { type: 'spring', stiffness: 100 } }
   };
