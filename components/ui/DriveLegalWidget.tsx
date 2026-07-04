@@ -8,7 +8,7 @@ export function DriveLegalWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [messages, setMessages] = useState<{ role: 'user' | 'system' | 'assistant', content: string }[]>([
-    { role: 'system', content: 'Sovereign Core Linked. Ready for legal compliance protocol execution.' }
+    { role: 'assistant', content: 'AegisRoute Sovereign Intelligence online. I am your specialized civic legal aid. How may I assist with BIMSTEC compliance protocols today?' }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);

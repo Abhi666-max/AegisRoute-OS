@@ -12,7 +12,7 @@ export function DriveLegalWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [countryCode, setCountryCode] = useState('IN');
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: 'Hello! I am DriveLegal AI. Select your BIMSTEC jurisdiction and ask me any road safety compliance or legal question.' }
+    { role: 'assistant', content: 'AegisRoute Sovereign Intelligence online. I am your specialized civic legal aid. How may I assist with BIMSTEC compliance protocols today?' }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
